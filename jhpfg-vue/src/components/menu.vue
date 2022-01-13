@@ -8,30 +8,30 @@
       @open="handleOpen"
       @close="handleClose"
       :collapse="isCollapse"
-      default-active="/user"
+      default-active="/employment"
       router
     >
       <el-button icon="el-icon-arrow-right" circle @click="changeCollapse" v-if="isCollapse"></el-button>
       <el-button icon="el-icon-arrow-left" circle @click="changeCollapse" v-if="!isCollapse"></el-button>
-      <el-menu-item index="/user">
-        <i class="el-icon-user-solid"></i>
-        <span>个人信息</span>
-      </el-menu-item>
-      <el-menu-item index="/chat">
-        <i class="el-icon-message-solid"></i>
-        <span>消息列表</span>
-      </el-menu-item>
-      <el-menu-item index="/notice">
+      <el-menu-item index="/employment">
         <i class="el-icon-s-flag"></i>
         <span>招聘信息</span>
       </el-menu-item>
-      <el-menu-item index="/information">
+      <el-menu-item index="/forum">
         <i class="el-icon-s-comment"></i>
         <span>论坛</span>
       </el-menu-item>
-      <el-menu-item index="/information">
+      <el-menu-item index="/calendar">
         <i class="el-icon-s-management"></i>
         <span>日程表</span>
+      </el-menu-item>
+      <el-menu-item index="/messages">
+        <i class="el-icon-message-solid"></i>
+        <span>消息列表</span>
+      </el-menu-item>
+      <el-menu-item index="/user">
+        <i class="el-icon-user-solid"></i>
+        <span>个人信息</span>
       </el-menu-item>
     </el-menu>
   </div>

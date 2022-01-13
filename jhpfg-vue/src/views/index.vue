@@ -1,7 +1,9 @@
 <template>
   <div id="index">
     <div class="routerView">
-      <router-view></router-view>
+      <router-view> </router-view>
+      <slot name="icon"></slot>
+      <slot name="boxTitle"></slot>
     </div>
     <User></User>
     <Menu></Menu>
@@ -21,7 +23,7 @@ export default {
 body {
   width: 100%;
   height: 100%;
-  background: #EEF7FB;
+  background: #eef7fb;
   position: relative;
 }
 .routerView {
@@ -35,5 +37,13 @@ body {
   padding: 3%;
   border-radius: 25px;
   box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.1);
+}
+.index-icon {
+  float: left;
+  margin: -0.5rem 1rem 0 -0.5rem;
+}
+.index-boxTitle {
+  float: left;
+  margin-top: -0.5rem;
 }
 </style>
