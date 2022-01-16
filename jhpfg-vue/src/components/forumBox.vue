@@ -1,7 +1,7 @@
 <template>
   <div id="forumBox">
     <ul class="list">
-      <li v-for="(item) in forumList" :key="item.id">
+      <li v-for="(item) in forumList" :key="item.postid" @click="itemClick(item.postid)">
         <el-tag>{{item.zone}}</el-tag>
         <h6>{{item.title}}</h6>
         <span>{{item.author}}</span>
@@ -22,6 +22,11 @@
 export default {
   props:{
     'forumList': Array
+  },
+  methods:{
+    itemClick(id) {
+      this.$emit('itemClick',id);
+    }
   }
 };
 </script>

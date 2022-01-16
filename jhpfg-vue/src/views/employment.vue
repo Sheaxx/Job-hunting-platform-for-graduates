@@ -53,6 +53,7 @@
             v-model="certification"
             active-text="只看学校认证"
             inactive-text="展示所有岗位"
+            active-color="#72b3f0"
           >
           </el-switch>
         </li>
@@ -65,6 +66,7 @@
           class="employmentItem"
           v-for="item in employmentList"
           :key="item.id"
+          @click="toDetails"
         >
           <p class="salary">{{ item.salary }}</p>
           <p class="station">{{ item.station }}</p>
@@ -238,6 +240,11 @@ export default {
       },
     };
   },
+  methods:{
+    toDetails() {
+      this.isDetails = true
+    }
+  }
 };
 </script>
 
@@ -245,23 +252,23 @@ export default {
 #employment {
   position: relative;
 }
-.searchInput {
+#employment .searchInput {
   font-size: 0.9rem !important;
   margin-top: 3vh;
   margin-bottom: 2vh;
 }
-.el-select .el-input {
+#employment .el-select .el-input {
   width: 130px;
 }
-.searchButton {
+#employment .searchButton {
   width: 125px;
   color: #fff !important;
   font-size: 1rem !important;
 }
-.searchButton:first-of-type {
+#employment .searchButton:first-of-type {
   background: #9b9dc3 !important;
 }
-.searchButton:last-of-type {
+#employment .searchButton:last-of-type {
   background: #bea4d4 !important;
 }
 #filter {
@@ -279,7 +286,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
 }
-.employmentItem {
+#employment .employmentItem {
   flex: 0 1 auto;
   background: #fff;
   margin: 0 0.9%;
@@ -289,73 +296,77 @@ export default {
   border: #8e909421 1px solid;
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.05);
 }
-.employmentItem .salary {
+#employment .employmentItem .salary {
   float: right;
   color: #72b3f0;
   font-size: 1.2rem;
 }
-.employmentItem .jobMsg,
-.employmentItem .companyMsg {
+#employment .employmentItem .jobMsg,
+#employment .employmentItem .companyMsg {
   color: #8e9094;
   margin-top: 2.5%;
   font-size: 0.8rem;
 }
-.employmentItem .companyMsg {
+#employment .employmentItem .companyMsg {
   border-top: #8e90943d 1px solid;
   padding-top: 3%;
 }
-.employmentItem span {
+#employment .employmentItem span {
   margin-right: 3%;
 }
-.employmentItem:hover {
+#employment .employmentItem:hover {
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
 }
 .employmentItem:hover .station {
   color: #72b3f0;
 }
-.el-pagination {
+#employment .el-switch__label.el-switch__label--right.is-active,
+#employment .el-switch__label.el-switch__label--left.is-active {
+  color: #72b3f0;
+}
+#employment .el-pagination {
   text-align: center;
 }
-.toList {
+#employment .toList {
   float: right;
 }
-.topBar {
+#employment .topBar {
   clear: both;
   width: 100%;
 }
-.topBar h5 {
+#employment .topBar h5 {
   float: left;
   margin-right: 4vw;
   font-size: 1.5rem;
 }
-.topBar h6 {
+#employment .topBar h6 {
   font-size: 1.5rem;
   color: #72b3f0;
 }
-.topBar .jobMsg {
+#employment .topBar .jobMsg {
   margin-top: 2vh;
 }
-.topBar .jobMsg span {
+#employment .topBar .jobMsg span {
   margin-right: 1vw;
   color: #8e9094;
 }
-.section {
+#employment .section {
   margin-top: 5vh;
   width: 70%;
 }
-.sectionTitle {
+#employment .sectionTitle {
   font-size: 1.1rem;
-  color: #2E4E74;
+  color: #70728f;
   font-weight: 700;
   margin-bottom: 2vh;
 }
-.sectionIcon {
+#employment .sectionIcon {
   margin-right: 0.5vw;
 }
-.sectionContent {
+#employment .sectionContent {
   line-height: 1.6rem;
 }
-.companyBar {
+#employment .companyBar {
   position: fixed;
   width: 25%;
   height: 70vh;

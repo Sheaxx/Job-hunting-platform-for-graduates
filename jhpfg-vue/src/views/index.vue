@@ -35,7 +35,7 @@ body {
   left: 7vw;
   width: 85vw;
   min-height: 82.5vh;
-  max-height: 150vh;
+  max-height: 160vh;
   background: #fff;
   padding: 3% 3% 0.5% 3%;
   border-radius: 25px;
@@ -55,5 +55,9 @@ body {
 .index-boxTitle {
   float: left;
   margin-top: -0.5rem;
+}
+.el-input__inner:focus,
+.el-textarea__inner:focus {
+  border-color: #99BDDF!important;
 }
 </style>
