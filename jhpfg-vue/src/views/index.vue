@@ -1,12 +1,15 @@
 <template>
   <div id="index">
-    <div class="routerView">
-      <router-view> </router-view>
-      <slot name="icon"></slot>
-      <slot name="boxTitle"></slot>
-    </div>
     <User></User>
+    <div class="routerViewBox">
+      <div class="routerView">
+        <router-view></router-view>
+        <slot name="icon"></slot>
+        <slot name="boxTitle"></slot>
+      </div>
+    </div>
     <Menu></Menu>
+    <div id="block"></div>
   </div>
 </template>
 
@@ -28,16 +31,23 @@ body {
 }
 .routerView {
   position: absolute;
-  top: 10vh;
+  top: 8.5vh;
   left: 7vw;
   width: 85vw;
-  height: 75vh;
-  /* background: rosybrown; */
+  min-height: 82.5vh;
+  max-height: 150vh;
   background: #fff;
-  padding: 3%;
+  padding: 3% 3% 0.5% 3%;
   border-radius: 25px;
   box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 3vh;
 }
+/* .routerViewBox {
+  width: 85vw;
+  min-height: 72vh;
+  height: 120vh;
+  background: red;
+} */
 .index-icon {
   float: left;
   margin: -0.5rem 1rem 0 -0.5rem;
