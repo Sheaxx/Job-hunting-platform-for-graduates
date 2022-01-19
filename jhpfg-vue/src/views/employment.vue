@@ -1,6 +1,6 @@
 <template>
   <div id="employment">
-    <i class="el-icon-s-flag index-icon" slot="icon"></i>
+    <i class="el-icon-suitcase-1 index-icon" slot="icon"></i>
     <h4 class="index-boxTitle" slot="boxTitle">招聘信息</h4>
     <div id="employmentListBox" v-if="!isDetails">
       <el-input
@@ -90,7 +90,21 @@
       </el-pagination>
     </div>
     <div id="employmentDetailsBox" v-else>
-      <el-button round @click="" class="toList">返回</el-button>
+      <el-button round @click="toList" class="toList">返回</el-button>
+      <el-link
+        icon="el-icon-star-off"
+        class="collect"
+        v-if="!details.isCollect"
+        @click="collect"
+        >收藏</el-link
+      >
+       <el-link
+        icon="el-icon-star-on"
+        class="collect"
+        v-else
+        @click="cancelCollect"
+        >已收藏</el-link
+      >
       <div class="topBar">
         <h5>{{ details.station }}</h5>
         <h6>{{ details.salary }}</h6>
@@ -100,16 +114,19 @@
         </p>
       </div>
       <div class="introduction section">
-        <h5 class="sectionTitle"><i class="el-icon-suitcase sectionIcon"></i>职位介绍</h5>
-        <p class="sectionContent">{{details.introduction}}</p>
+        <h5 class="sectionTitle">
+          <i class="el-icon-suitcase sectionIcon"></i>职位介绍
+        </h5>
+        <p class="sectionContent">{{ details.introduction }}</p>
       </div>
       <div class="requirements section">
-        <h5 class="sectionTitle"><i class="el-icon-notebook-2 sectionIcon"></i>职位要求</h5>
-        <p class="sectionContent">{{details.requirements}}</p>
+        <h5 class="sectionTitle">
+          <i class="el-icon-notebook-2 sectionIcon"></i>职位要求
+        </h5>
+        <p class="sectionContent">{{ details.requirements }}</p>
       </div>
       <div class="companyBar">
         <h5>公司基本信息</h5>
-        
       </div>
     </div>
   </div>
@@ -227,6 +244,7 @@ export default {
       details: {
         //某个招聘信息的详情
         employmentid: 1,
+        isCollect: true, //是否收藏该招聘信息
         isFullTime: true,
         station: "高级产品经理",
         salary: "10-20k",
@@ -235,16 +253,31 @@ export default {
         company: "字节跳动",
         trade: "互联网",
         level: "已上市",
-        introduction:"1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        requirements:"1、具备良好的沟通表达能力和组织协调能力，懂政府语言，团队意识强，抗压能力强，有激情，勇于接受挑战，善于开拓创新。2、至少精通生物医药、新一代信息技术等战新产业体系中的一个，熟悉行业领域格局。可独立宇客户进行业务交流。具备需求调研、服务解决方案设计能力。3、5年以上车联网、人工智能、生物医药、文旅行业领域从业经验，过往工作经历中有产业研究，信息化咨询、解决方案售前等相关工作经验，获得相关证书者优先。"
+        introduction:
+          "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
+        requirements:
+          "1、具备良好的沟通表达能力和组织协调能力，懂政府语言，团队意识强，抗压能力强，有激情，勇于接受挑战，善于开拓创新。2、至少精通生物医药、新一代信息技术等战新产业体系中的一个，熟悉行业领域格局。可独立宇客户进行业务交流。具备需求调研、服务解决方案设计能力。3、5年以上车联网、人工智能、生物医药、文旅行业领域从业经验，过往工作经历中有产业研究，信息化咨询、解决方案售前等相关工作经验，获得相关证书者优先。",
       },
     };
   },
-  methods:{
+  methods: {
+    //查看详情
     toDetails() {
-      this.isDetails = true
+      this.isDetails = true;
+    },
+    //详情返回列表
+    toList() {
+      this.isDetails = false;
+    },
+    //收藏招聘信息
+    collect() {
+      this.details.isCollect = true;
+    },
+    //取消收藏招聘信息
+    cancelCollect() {
+      this.details.isCollect = false;
     }
-  }
+  },
 };
 </script>
 
@@ -329,6 +362,11 @@ export default {
 }
 #employment .toList {
   float: right;
+}
+#employment .collect {
+  float: right;
+  line-height: 5vh;
+  margin-right: 2vw;
 }
 #employment .topBar {
   clear: both;

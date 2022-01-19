@@ -14,23 +14,23 @@
       <el-button icon="el-icon-arrow-right" circle @click="changeCollapse" v-if="isCollapse"></el-button>
       <el-button icon="el-icon-arrow-left" circle @click="changeCollapse" v-if="!isCollapse"></el-button>
       <el-menu-item index="/employment">
-        <i class="el-icon-s-flag"></i>
+        <i class="el-icon-suitcase-1"></i>
         <span>招聘信息</span>
       </el-menu-item>
       <el-menu-item index="/forum">
-        <i class="el-icon-s-comment"></i>
+        <i class="el-icon-chat-dot-square"></i>
         <span>论坛</span>
       </el-menu-item>
       <el-menu-item index="/calendar">
-        <i class="el-icon-s-management"></i>
+        <i class="el-icon-date"></i>
         <span>日程表</span>
       </el-menu-item>
       <el-menu-item index="/messages">
-        <i class="el-icon-message-solid"></i>
+        <i class="el-icon-bell"></i>
         <span>消息列表</span>
       </el-menu-item>
       <el-menu-item index="/user">
-        <i class="el-icon-user-solid"></i>
+        <i class="el-icon-user"></i>
         <span>个人信息</span>
       </el-menu-item>
     </el-menu>
@@ -85,5 +85,9 @@ export default {
 .el-menu-item:hover,
 .el-menu-item:active {
   background-color: rgb(243, 241, 241)!important;
+}
+.el-menu-item i {
+  font-size: 21px!important;
+  margin-right: 10px!important;
 }
 </style>

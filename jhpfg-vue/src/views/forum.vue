@@ -1,6 +1,6 @@
 <template>
   <div id="forum">
-    <i class="el-icon-s-comment index-icon" slot="icon"></i>
+    <i class="el-icon-chat-dot-square index-icon" slot="icon"></i>
     <h4 class="index-boxTitle" slot="boxTitle">论坛</h4>
     <div id="forumList" v-if="!isDetails">
       <el-button round type="primary" @click="" class="addPost"
@@ -28,7 +28,7 @@
       </el-tabs>
     </div>
     <div id="forumDetailsBox" v-else>
-      <el-button round @click="" class="toList">返回</el-button>
+      <el-button round @click="toList" class="toList">返回</el-button>
       <div class="topBar">
         <el-tag>{{ details.zone }}</el-tag>
         <h5>{{ details.title }}</h5>
@@ -156,6 +156,10 @@ export default {
     toDetails(postid) {
       this.isDetails = true;
     },
+    //帖子详情页返回列表
+    toList() {
+      this.isDetails = false;
+    }
   },
 };
 </script>
@@ -164,7 +168,7 @@ export default {
 #forum .searchInput {
   position: absolute;
   width: 35%;
-  top: 4vh;
+  top: 7vh;
   left: 45vw;
 }
 #forum .el-tabs.el-tabs--top {

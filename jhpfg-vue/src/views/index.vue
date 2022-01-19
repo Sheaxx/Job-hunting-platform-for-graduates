@@ -56,8 +56,43 @@ body {
   float: left;
   margin-top: -0.5rem;
 }
+/* 全局修改elementUI样式 */
+/* 输入框 */
 .el-input__inner:focus,
 .el-textarea__inner:focus {
   border-color: #99BDDF!important;
+}
+/* 按钮 */
+.el-button.el-button--primary.is-round {
+  background: #99BDDF;
+  border-color: #99BDDF;
+}
+.el-button.el-button--default.is-round:hover,
+.el-button.el-button--default.is-round:focus {
+  border-color: #99BDDF;
+  color: #99BDDF;
+  background: #EEF7FB;
+}
+/* 导航栏 */
+.el-tabs__item.is-top.is-active,
+.el-tabs__item.is-left.is-active,
+.el-tabs__item.is-top:hover,
+.el-tabs__item.is-left:hover  {
+  color: #99BDDF;
+
+}
+.el-tabs__active-bar.is-top,
+.el-tabs__active-bar.is-left {
+  background:#99BDDF;
+}
+/* 日历 */
+.current.is-today .el-calendar-day{
+  color: #99BDDF;
+}
+.el-button.el-button--plain.el-button--mini:hover,
+.el-button.el-button--plain.el-button--mini:focus {
+  border-color: #99BDDF;
+  color: #99BDDF;
+  background: #EEF7FB;
 }
 </style>
