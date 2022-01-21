@@ -140,7 +140,10 @@
             <div id="campusExperienceRead">
               <h6>校内经历</h6>
               <ul>
-                <li v-for="item in campusExperienceInfo" :key="item.campusExperienceId">
+                <li
+                  v-for="item in campusExperienceInfo"
+                  :key="item.campusExperienceId"
+                >
                   <div class="row1">
                     <p class="name">{{ item.name }}</p>
                     <p class="duration">{{ item.duration }}</p>
@@ -181,7 +184,23 @@
             <div class="block"></div>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="我的收藏">角色管理</el-tab-pane>
+        <el-tab-pane label="我的收藏" class="collection">
+          <ul>
+            <li v-for="item in collectionList" :key="item.employmentid">
+              <p class="salary">{{ item.salary }}</p>
+              <p class="station">{{ item.station }}</p>
+              <p class="jobMsg">
+                <span>{{ item.location }}</span>
+                <span>{{ item.education }}</span>
+              </p>
+              <p class="companyMsg">
+                <span>{{ item.company }}</span>
+                <span>{{ item.trade }}</span>
+                <span>{{ item.level }}</span>
+              </p>
+            </li>
+          </ul>
+        </el-tab-pane>
         <el-tab-pane label="我的投递">定时任务补偿</el-tab-pane>
       </el-tabs>
     </div>
@@ -260,10 +279,101 @@ export default {
           username: "",
           name: "计算机学院团委红十字会", //部门或活动名称
           role: "副部长", //在部门或活动中担任的角色
-          duration: "2018.9-2022.7",//时间段
-          content: "带领小干策划组织游园、防艾讲座、成分血献血等活动。◆ 获得红十字会先进个人及 2019-2020 年度优秀学生干部奖学金。", //部门工作内容或活动内容
+          duration: "2018.9-2022.7", //时间段
+          content:
+            "带领小干策划组织游园、防艾讲座、成分血献血等活动。◆ 获得红十字会先进个人及 2019-2020 年度优秀学生干部奖学金。", //部门工作内容或活动内容
         },
       ],
+      collectionList: [
+        {
+          employmentid: 1,
+          isFullTime: true,
+          station: "高级产品经理",
+          salary: "10-20k",
+          location: "北京",
+          education: "本科",
+          company: "字节跳动",
+          trade: "互联网",
+          level: "已上市",
+        },
+        {
+          employmentid: 1,
+          isFullTime: true,
+          station: "高级产品经理",
+          salary: "10-20k",
+          location: "北京",
+          education: "本科",
+          company: "字节跳动",
+          trade: "互联网",
+          level: "已上市",
+        },
+        {
+          employmentid: 1,
+          isFullTime: true,
+          station: "高级产品经理",
+          salary: "10-20k",
+          location: "北京",
+          education: "本科",
+          company: "字节跳动",
+          trade: "互联网",
+          level: "已上市",
+        },
+        {
+          employmentid: 1,
+          isFullTime: true,
+          station: "高级产品经理",
+          salary: "10-20k",
+          location: "北京",
+          education: "本科",
+          company: "字节跳动",
+          trade: "互联网",
+          level: "已上市",
+        },
+        {
+          employmentid: 1,
+          isFullTime: true,
+          station: "高级产品经理",
+          salary: "10-20k",
+          location: "北京",
+          education: "本科",
+          company: "字节跳动",
+          trade: "互联网",
+          level: "已上市",
+        },
+        {
+          employmentid: 1,
+          isFullTime: true,
+          station: "高级产品经理",
+          salary: "10-20k",
+          location: "北京",
+          education: "本科",
+          company: "字节跳动",
+          trade: "互联网",
+          level: "已上市",
+        },
+        {
+          employmentid: 1,
+          isFullTime: true,
+          station: "高级产品经理",
+          salary: "10-20k",
+          location: "北京",
+          education: "本科",
+          company: "字节跳动",
+          trade: "互联网",
+          level: "已上市",
+        },
+        {
+          employmentid: 1,
+          isFullTime: true,
+          station: "高级产品经理",
+          salary: "10-20k",
+          location: "北京",
+          education: "本科",
+          company: "字节跳动",
+          trade: "互联网",
+          level: "已上市",
+        },
+      ], //收藏招聘信息列表
     };
   },
   methods: {
@@ -419,7 +529,7 @@ export default {
 #educationRead .row1,
 #internshipRead .row1,
 #projectRead .row1,
-#campusExperienceRead .row1{  
+#campusExperienceRead .row1 {
   margin-bottom: 15px;
 }
 #educationRead .row2 p {
@@ -462,5 +572,40 @@ export default {
 #userInfo .block {
   width: 85%;
   height: 100px;
+}
+/* 我的收藏 */
+#user .collection {
+  width: 87%;
+  padding: 1%;
+  height: 500px;
+  overflow: auto;
+}
+#user .collection li {
+  width: 95%;
+  height: 18%;
+  padding: 1.8%;
+  margin-bottom: 2%;
+  border: #8e909421 1px solid;
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.05);
+}
+#user .collection .salary {
+  float: right;
+  color: #72b3f0;
+  font-size: 1.2rem;
+}
+#user .collection .jobMsg,
+#user .collection .companyMsg {
+  color: #8e9094;
+  margin-top: 1%;
+  font-size: 0.8rem;
+}
+#user .collection li:hover {
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+}
+#user .collection li:hover .station{
+  color: #72b3f0;
+}
+#user .collection span {
+  margin-right: 0.5%;
 }
 </style>
