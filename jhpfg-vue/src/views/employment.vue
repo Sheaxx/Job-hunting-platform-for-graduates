@@ -89,46 +89,14 @@
       >
       </el-pagination>
     </div>
-    <div id="employmentDetailsBox" v-else>
-      <el-button round @click="toList" class="toList">返回</el-button>
-      <el-link
-        icon="el-icon-star-off"
-        class="collect"
-        v-if="!details.isCollect"
-        @click="collect"
-        >收藏</el-link
-      >
-       <el-link
-        icon="el-icon-star-on"
-        class="collect"
-        v-else
-        @click="cancelCollect"
-        >已收藏</el-link
-      >
-      <div class="topBar">
-        <h5>{{ details.station }}</h5>
-        <h6>{{ details.salary }}</h6>
-        <p class="jobMsg">
-          <span>{{ details.location }}</span>
-          <span>{{ details.education }}</span>
-        </p>
-      </div>
-      <div class="introduction section">
-        <h5 class="sectionTitle">
-          <i class="el-icon-suitcase sectionIcon"></i>职位介绍
-        </h5>
-        <p class="sectionContent">{{ details.introduction }}</p>
-      </div>
-      <div class="requirements section">
-        <h5 class="sectionTitle">
-          <i class="el-icon-notebook-2 sectionIcon"></i>职位要求
-        </h5>
-        <p class="sectionContent">{{ details.requirements }}</p>
-      </div>
-      <div class="companyBar">
-        <h5>公司基本信息</h5>
-      </div>
-    </div>
+    <employment-details
+      v-else
+      :details="details"
+      @toList="toList"
+      @collect="collect"
+      @cancelCollect="cancelCollect"
+      @sendResume="sendResume"
+    ></employment-details>
   </div>
 </template>
 
@@ -138,8 +106,10 @@ import {
   CodeToText,
   TextToCode,
 } from "element-china-area-data";
+import EmploymentDetails from "../components/employmentDetails.vue";
 
 export default {
+  components: { EmploymentDetails },
   data() {
     return {
       isDetails: false, //是否是详情页，默认为否
@@ -276,6 +246,10 @@ export default {
     //取消收藏招聘信息
     cancelCollect() {
       this.details.isCollect = false;
+    },
+    //投递简历
+    sendResume() {
+      
     }
   },
 };
@@ -359,57 +333,5 @@ export default {
 }
 #employment .el-pagination {
   text-align: center;
-}
-#employment .toList {
-  float: right;
-}
-#employment .collect {
-  float: right;
-  line-height: 5vh;
-  margin-right: 2vw;
-}
-#employment .topBar {
-  clear: both;
-  width: 100%;
-}
-#employment .topBar h5 {
-  float: left;
-  margin-right: 4vw;
-  font-size: 1.5rem;
-}
-#employment .topBar h6 {
-  font-size: 1.5rem;
-  color: #72b3f0;
-}
-#employment .topBar .jobMsg {
-  margin-top: 2vh;
-}
-#employment .topBar .jobMsg span {
-  margin-right: 1vw;
-  color: #8e9094;
-}
-#employment .section {
-  margin-top: 5vh;
-  width: 70%;
-}
-#employment .sectionTitle {
-  font-size: 1.1rem;
-  color: #70728f;
-  font-weight: 700;
-  margin-bottom: 2vh;
-}
-#employment .sectionIcon {
-  margin-right: 0.5vw;
-}
-#employment .sectionContent {
-  line-height: 1.6rem;
-}
-#employment .companyBar {
-  position: fixed;
-  width: 25%;
-  height: 70vh;
-  background: red;
-  top: 25vh;
-  left: 71vw;
 }
 </style>

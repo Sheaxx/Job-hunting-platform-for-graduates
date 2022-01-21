@@ -5,7 +5,7 @@
     <div id="userInfo">
       <el-tabs tab-position="left" style="height: 500px">
         <el-tab-pane label="我的个人信息" class="user">
-          <h5>个人信息</h5>
+          <h5 class="boxTitle">个人信息</h5>
           <ul>
             <li>
               <span class="itemTitle">用户名：{{ userInfo.username }}</span>
@@ -47,7 +47,6 @@
           <el-button type="primary" round @click="" id="updateResume"
             >更新简历</el-button
           >
-          <h5>简历信息</h5>
           <div id="resumeReadBox">
             <div id="resumeRead">
               <p>{{ resumeInfo.realname }}</p>
@@ -88,7 +87,7 @@
               </ul>
             </div>
             <div id="educationRead">
-              <h6>教育经历</h6>
+              <h6 class="readTitle">教育经历</h6>
               <ul>
                 <li v-for="item in educationInfo" :key="item.educationid">
                   <div class="row1">
@@ -104,7 +103,7 @@
               </ul>
             </div>
             <div id="internshipRead">
-              <h6>实习经历</h6>
+              <h6 class="readTitle">实习经历</h6>
               <ul>
                 <li v-for="item in internshipInfo" :key="item.internshipid">
                   <div class="row1">
@@ -121,7 +120,7 @@
               </ul>
             </div>
             <div id="projectRead">
-              <h6>项目经历</h6>
+              <h6 class="readTitle">项目经历</h6>
               <ul>
                 <li v-for="item in projectInfo" :key="item.projectid">
                   <div class="row1">
@@ -138,7 +137,7 @@
               </ul>
             </div>
             <div id="campusExperienceRead">
-              <h6>校内经历</h6>
+              <h6 class="readTitle">校内经历</h6>
               <ul>
                 <li
                   v-for="item in campusExperienceInfo"
@@ -159,7 +158,7 @@
             </div>
             <div id="skillCertificateBox">
               <div id="skillRead">
-                <h6>技能</h6>
+                <h6 class="readTitle">技能</h6>
                 <ul>
                   <li v-for="(item, index) in skillInfo" :key="index">
                     <img
@@ -185,8 +184,8 @@
           </div>
         </el-tab-pane>
         <el-tab-pane label="我的收藏" class="collection">
-          <ul>
-            <li v-for="item in collectionList" :key="item.employmentid">
+          <ul v-if="!isDetails">
+            <li v-for="item in collectionList" :key="item.employmentid" @click="toDetails">
               <p class="salary">{{ item.salary }}</p>
               <p class="station">{{ item.station }}</p>
               <p class="jobMsg">
@@ -203,15 +202,27 @@
         </el-tab-pane>
         <el-tab-pane label="我的投递">定时任务补偿</el-tab-pane>
       </el-tabs>
+      <employment-details
+            v-if="isDetails"
+            :details="details"
+            @toList="toList"
+            @collect="collect"
+            @cancelCollect="cancelCollect"
+            @sendResume="sendResume"
+          ></employment-details>
     </div>
   </div>
 </template>
 
 <script>
+import EmploymentDetails from "../components/employmentDetails.vue";
+
 export default {
+  components: { EmploymentDetails },
   data() {
     return {
       isUpdatePassword: false, //修改密码界面，默认为否
+      isDetails: false, //是否是详情页，默认为否
       oldPassword: "", //旧密码
       newPassword: "", //新密码
       userInfo: {
@@ -374,6 +385,23 @@ export default {
           level: "已上市",
         },
       ], //收藏招聘信息列表
+      details: {
+        //某个招聘信息的详情
+        employmentid: 1,
+        isCollect: true, //是否收藏该招聘信息
+        isFullTime: true,
+        station: "高级产品经理",
+        salary: "10-20k",
+        location: "北京",
+        education: "本科",
+        company: "字节跳动",
+        trade: "互联网",
+        level: "已上市",
+        introduction:
+          "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
+        requirements:
+          "1、具备良好的沟通表达能力和组织协调能力，懂政府语言，团队意识强，抗压能力强，有激情，勇于接受挑战，善于开拓创新。2、至少精通生物医药、新一代信息技术等战新产业体系中的一个，熟悉行业领域格局。可独立宇客户进行业务交流。具备需求调研、服务解决方案设计能力。3、5年以上车联网、人工智能、生物医药、文旅行业领域从业经验，过往工作经历中有产业研究，信息化咨询、解决方案售前等相关工作经验，获得相关证书者优先。",
+      },
     };
   },
   methods: {
@@ -394,11 +422,34 @@ export default {
       this.oldPassword = "";
       this.newPassword = "";
     },
+    //查看招聘信息详情
+    toDetails() {
+      this.isDetails = true;
+    },
+    //招聘信息详情返回列表
+    toList() {
+      this.isDetails = false;
+    },
+    //收藏招聘信息
+    collect() {
+      this.details.isCollect = true;
+    },
+    //取消收藏招聘信息
+    cancelCollect() {
+      this.details.isCollect = false;
+    },
+    //投递简历
+    sendResume() {
+
+    }
   },
 };
 </script>
 
 <style>
+#user {
+  position: relative;
+}
 #userInfo {
   clear: both;
   width: 100%;
@@ -407,10 +458,13 @@ export default {
   margin-top: 5vh;
   margin-left: 3vw;
 }
+#userInfo .el-tabs__header.is-left {
+  z-index: 999!important;
+}
 #userInfo .el-tab-pane {
   margin-left: 2vw;
 }
-#userInfo h5 {
+#userInfo .boxTitle {
   width: 100%;
   font-size: 1.1rem;
   height: 5vh;
@@ -484,13 +538,13 @@ export default {
   margin-right: 5px;
 }
 /* 板块标题样式 */
-#userInfo h6 {
+#userInfo .readTitle {
   font-size: 1.2rem;
   padding-bottom: 10px;
   margin-bottom: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.11);
 }
-#userInfo h6::before {
+#userInfo .readTitle::before {
   content: "";
   display: inline-block;
   width: 5px;
@@ -602,10 +656,12 @@ export default {
 #user .collection li:hover {
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
 }
-#user .collection li:hover .station{
+#user .collection li:hover .station {
   color: #72b3f0;
 }
 #user .collection span {
   margin-right: 0.5%;
 }
+/* 我的收藏-招聘信息详情 */
+
 </style>
