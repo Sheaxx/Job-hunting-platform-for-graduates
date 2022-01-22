@@ -37,7 +37,14 @@
       <p class="sectionContent">{{ details.requirements }}</p>
     </div>
     <div class="companyBar">
-      <h5>公司基本信息</h5>
+      <img src="../assets/image/avatar.png" alt="公司logo" />
+      <p class="companyName">{{ companyDetails.name }}</p>
+      <div class="msg">
+        <span class="location">{{ companyDetails.location }}</span>
+        <span class="trade">{{ companyDetails.trade }}</span>
+        <span class="level">{{ companyDetails.level }}</span>
+      </div>
+      <p class="introduction">{{ companyDetails.introduction }}</p>
     </div>
   </div>
 </template>
@@ -49,6 +56,7 @@ export default {
   },
   props: {
     details: Object,
+    companyDetails: Object,
   },
   methods: {
     //详情返回列表
@@ -127,12 +135,47 @@ export default {
 #employmentDetails .sectionContent {
   line-height: 1.6rem;
 }
+/* 公司信息 */
 #employmentDetails .companyBar {
   position: fixed;
   width: 22%;
   height: 70vh;
-  background: red;
+  /* background: red; */
   top: 25vh;
   left: 71vw;
+  border-left: #8e909444 1px solid;
+}
+/* 全部居中 */
+#employmentDetails img,
+#employmentDetails .companyName,
+#employmentDetails .msg,
+#employmentDetails .companyBar .introduction {
+  position: absolute;
+  transform: translate(-50%,-50%);
+  left: 50%;
+}
+#employmentDetails img {
+  width: 50px;
+  height: 50px;
+  top: 15%;
+}
+#employmentDetails .companyName {
+  top: 28%;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+#employmentDetails .msg {
+  top: 35%;
+  font-size: 0.9rem;
+  color: #75777a;
+}
+#employmentDetails .msg span:not(.level) {
+  margin-right: 5px;
+}
+#employmentDetails .companyBar .introduction {
+  top: 63%;
+  width: 85%;
+  line-height: 1.5rem;
+  font-size: 0.9rem;
 }
 </style>
