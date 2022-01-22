@@ -61,6 +61,12 @@ body {
 .el-textarea__inner:focus {
   border-color: #99BDDF!important;
 }
+.el-textarea__inner {
+  font-size: 1rem!important;
+  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+}
 /* 按钮 */
 .el-button.el-button--primary {
   background: #99BDDF!important;

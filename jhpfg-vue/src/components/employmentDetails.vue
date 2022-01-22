@@ -1,7 +1,7 @@
 <template>
   <div id="employmentDetails">
     <el-button round @click="toList">返回</el-button>
-    <el-button type="primary" round @click="sendResumeAsk">投递简历</el-button>
+    <el-button type="primary" round @click="openSendResume">投递简历</el-button>
     <el-link
       icon="el-icon-star-off"
       class="collect"
@@ -46,7 +46,7 @@
       </div>
       <p class="introduction">{{ companyDetails.introduction }}</p>
     </div>
-    <div id="sendResumeAsk" v-if="isSendResumeAsk">
+    <div id="openSendResume" v-if="isOpenSendResume">
       <div class="askBox">
         <i class="el-icon-s-promotion"></i>
         <p>将投递您的在线简历，是否继续？</p>
@@ -61,7 +61,7 @@
 export default {
   data() {
     return {
-      isSendResumeAsk: false,
+      isOpenSendResume: false,
     };
   },
   props: {
@@ -82,8 +82,9 @@ export default {
       this.$emit("cancelCollect");
     },
     //点击投递简历按钮
-    sendResumeAsk() {
-      this.isSendResumeAsk = true;
+    openSendResume() {
+      this.isOpenSendResume = true;
+      document.documentElement.style.overflow='hidden';
     },
     //确定投递简历
     sendResume() {
@@ -91,7 +92,7 @@ export default {
     },
     //取消投递简历
     cancelSendResume() {
-      this.isSendResumeAsk = false;
+      this.isOpenSendResume = false;
     },
   },
 };
@@ -194,16 +195,16 @@ export default {
   line-height: 1.5rem;
   font-size: 0.9rem;
 }
-#sendResumeAsk {
+#openSendResume {
   position: absolute;
   z-index: 9;
-  width: 99.8vw;
-  height: 99.2vh;
-  top: -16.5vh;
+  width: 100vw;
+  height: 100vh;
+  top: -16.8vh;
   left: -10vw;
   background: rgba(0, 0, 0, 0.3);
 }
-#sendResumeAsk .askBox {
+#openSendResume .askBox {
   background: #fff;
   width: 38%;
   height: 20%;
@@ -212,12 +213,12 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
 }
-#sendResumeAsk i {
+#openSendResume i {
   margin: 7% 1% auto 15%;
   font-size: 1.5rem;
   float: left;
 }
-#sendResumeAsk p {
+#openSendResume p {
   margin: 8% auto 4% 18%;
 }
 </style>

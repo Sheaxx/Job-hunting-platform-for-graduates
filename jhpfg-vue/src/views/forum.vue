@@ -3,7 +3,7 @@
     <i class="el-icon-chat-dot-square index-icon" slot="icon"></i>
     <h4 class="index-boxTitle" slot="boxTitle">论坛</h4>
     <div id="forumList" v-if="!isDetails">
-      <el-button round type="primary" @click="" class="addPost"
+      <el-button round type="primary" @click="openAddPost" class="addPost"
         >我要发布</el-button
       >
       <el-input
@@ -70,6 +70,31 @@
       </div>
       <div class="block"></div>
     </div>
+    <div id="addPost" v-if="isAddPost">
+      <div class="addBox">
+        <el-form ref="editPost" :model="editPost" label-width="40px">
+          <el-form-item label="标题">
+            <el-input v-model="editPost.title"></el-input>
+          </el-form-item>
+          <el-form-item label="板块">
+            <el-select v-model="editPost.zone">
+              <el-option label="我要提问" value="1"></el-option>
+              <el-option label="笔试经验" value="2"></el-option>
+              <el-option label="面试经验" value="3"></el-option>
+              <el-option label="工作分享" value="4"></el-option>
+              <el-option label="企业招聘" value="5"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="内容">
+            <el-input type="textarea" v-model="editPost.content" resize="none" :rows="15"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="addPost">立即发布</el-button>
+            <el-button @click="cancelAddPost">取消</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -81,6 +106,7 @@ export default {
   data() {
     return {
       isDetails: false, //是否是详情页，默认为否
+      isAddPost: false, //是否打开发布帖子窗口，默认为否
       searchValue: "", //搜索内容
       forumList: [
         {
@@ -149,6 +175,15 @@ export default {
         createTime: "2021.04.07",
         zone: "我要提问",
       },
+      editPost: {
+        //添加或修改帖子
+        postid: "",
+        title: "",
+        content: "",
+        author: "发布者",
+        createTime: "2021.04.07",
+        zone: "",
+      },
     };
   },
   methods: {
@@ -159,6 +194,19 @@ export default {
     //帖子详情页返回列表
     toList() {
       this.isDetails = false;
+    },
+    //点击我要发布按钮
+    openAddPost() {
+      this.isAddPost = true;
+      document.documentElement.style.overflow = "hidden";
+    },
+    //确定发布帖子
+    addPost() {
+      this.isAddPost = false;
+    },
+    //取消发布帖子
+    cancelAddPost() {
+      this.isAddPost = false;
     }
   },
 };
@@ -228,5 +276,32 @@ export default {
   margin-top: 76px;
   margin-left: 30px;
 }
-
+#addPost {
+  position: absolute;
+  z-index: 9;
+  width: 100vw;
+  height: 100vh;
+  top: -8.5vh;
+  left: -7vw;
+  background: rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+#addPost .addBox {
+  background: #fff;
+  width: 70%;
+  height: 75%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 4% 0;
+}
+#addPost .el-form-item {
+  width: 85%;
+  margin: 0 auto 2% auto;
+}
+#addPost .el-form-item:last-of-type .el-button {
+  float: right;
+  margin-left: 2%;
+}
 </style>
