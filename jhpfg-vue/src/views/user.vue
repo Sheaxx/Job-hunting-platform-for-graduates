@@ -185,7 +185,11 @@
         </el-tab-pane>
         <el-tab-pane label="我的收藏" class="collection">
           <ul v-if="!isDetails">
-            <li v-for="item in collectionList" :key="item.employmentid" @click="toDetails">
+            <li
+              v-for="item in collectionList"
+              :key="item.employmentid"
+              @click="toDetails"
+            >
               <p class="salary">{{ item.salary }}</p>
               <p class="station">{{ item.station }}</p>
               <p class="jobMsg">
@@ -200,16 +204,26 @@
             </li>
           </ul>
         </el-tab-pane>
-        <el-tab-pane label="我的投递">定时任务补偿</el-tab-pane>
+        <el-tab-pane label="我的投递" class="resumeSent">
+          <ul>
+            <li v-for="item in resumeSentList" :key="item.sentid">
+              <p class="company">{{ item.company }}</p>
+              <p class="position">{{ item.position }}</p>
+              <el-steps :active="item.now" finish-status="success" :process-status="item.state">
+                <el-step v-for="(item2,index) in item.total" :key="index" :title="item2"></el-step>
+              </el-steps>
+            </li>
+          </ul>
+        </el-tab-pane>
       </el-tabs>
       <employment-details
-            v-if="isDetails"
-            :details="details"
-            @toList="toList"
-            @collect="collect"
-            @cancelCollect="cancelCollect"
-            @sendResume="sendResume"
-          ></employment-details>
+        v-if="isDetails"
+        :details="details"
+        @toList="toList"
+        @collect="collect"
+        @cancelCollect="cancelCollect"
+        @sendResume="sendResume"
+      ></employment-details>
     </div>
   </div>
 </template>
@@ -402,6 +416,17 @@ export default {
         requirements:
           "1、具备良好的沟通表达能力和组织协调能力，懂政府语言，团队意识强，抗压能力强，有激情，勇于接受挑战，善于开拓创新。2、至少精通生物医药、新一代信息技术等战新产业体系中的一个，熟悉行业领域格局。可独立宇客户进行业务交流。具备需求调研、服务解决方案设计能力。3、5年以上车联网、人工智能、生物医药、文旅行业领域从业经验，过往工作经历中有产业研究，信息化咨询、解决方案售前等相关工作经验，获得相关证书者优先。",
       },
+      resumeSentList: [
+        {
+          sentid: 1,
+          username: "",
+          company: "字节跳动", //投递的公司
+          position: "前端开发", //投递的职位
+          total:["笔试","面试","面试"],//各个流程名字
+          now: 1, //现在在第几个流程
+          state: "error", //当前流程的状态
+        },
+      ], //已经投递的简历列表
     };
   },
   methods: {
@@ -439,9 +464,7 @@ export default {
       this.details.isCollect = false;
     },
     //投递简历
-    sendResume() {
-
-    }
+    sendResume() {},
   },
 };
 </script>
@@ -459,7 +482,7 @@ export default {
   margin-left: 3vw;
 }
 #userInfo .el-tabs__header.is-left {
-  z-index: 999!important;
+  z-index: 999 !important;
 }
 #userInfo .el-tab-pane {
   margin-left: 2vw;
@@ -662,6 +685,36 @@ export default {
 #user .collection span {
   margin-right: 0.5%;
 }
-/* 我的收藏-招聘信息详情 */
-
+/* 投递简历 */
+#user .resumeSent {
+  width: 87%;
+  overflow: auto;
+  height: 500px;
+}
+#user .resumeSent li {
+  width: 95%;
+  height: 18%;
+  padding: 1.8%;
+  margin-bottom: 2%;
+  border: #8e909421 1px solid;
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.05);
+}
+#user .resumeSent .company {
+  float: left;
+  font-weight: 600;
+  margin-right: 2%;
+}
+#user .resumeSent .position {
+  font-size: 0.9rem;
+  font-weight: 600;
+  height: 1.2rem;
+  line-height: 1.2rem;
+  vertical-align: bottom;
+}
+#user .resumeSent .el-steps {
+  margin-top: 2%;
+}
+#user .resumeSent .el-step__title {
+  font-size: 0.9rem;
+}
 </style>
