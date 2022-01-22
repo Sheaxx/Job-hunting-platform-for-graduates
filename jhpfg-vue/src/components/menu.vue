@@ -61,7 +61,6 @@ export default {
 <style>
 #menu {
   position: fixed;
-  z-index: 998;
   top: 0;
   left: 0;
 }

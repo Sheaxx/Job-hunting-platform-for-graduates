@@ -13,10 +13,10 @@
           <el-option label="搜公司" value="2"></el-option>
         </el-select>
         <el-button slot="append" icon="el-icon-search" class="searchButton"
-          >找全职</el-button
+          >找实习</el-button
         >
         <el-button slot="append" icon="el-icon-search" class="searchButton"
-          >找实习</el-button
+          >找全职</el-button
         >
       </el-input>
       <ul id="filter">
@@ -98,6 +98,7 @@
       @cancelCollect="cancelCollect"
       @sendResume="sendResume"
     ></employment-details>
+    
   </div>
 </template>
 
@@ -229,16 +230,17 @@ export default {
         requirements:
           "1、具备良好的沟通表达能力和组织协调能力，懂政府语言，团队意识强，抗压能力强，有激情，勇于接受挑战，善于开拓创新。2、至少精通生物医药、新一代信息技术等战新产业体系中的一个，熟悉行业领域格局。可独立宇客户进行业务交流。具备需求调研、服务解决方案设计能力。3、5年以上车联网、人工智能、生物医药、文旅行业领域从业经验，过往工作经历中有产业研究，信息化咨询、解决方案售前等相关工作经验，获得相关证书者优先。",
       },
-      companyDetails:{
+      companyDetails: {
         //详情页面的公司信息
-        companyid:1,
-        logo:"",
-        name:"字节跳动",
-        trade:"互联网",
-        level:"已上市",
-        location:"北京",
-        introduction:"1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-      }
+        companyid: 1,
+        logo: "",
+        name: "字节跳动",
+        trade: "互联网",
+        level: "已上市",
+        location: "北京",
+        introduction:
+          "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
+      },
     };
   },
   methods: {
@@ -261,7 +263,7 @@ export default {
     //投递简历
     sendResume() {
       
-    }
+    },
   },
 };
 </script>

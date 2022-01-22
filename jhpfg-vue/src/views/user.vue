@@ -3,7 +3,7 @@
     <i class="el-icon-user index-icon" slot="icon"></i>
     <h4 class="index-boxTitle" slot="boxTitle">个人中心</h4>
     <div id="userInfo">
-      <el-tabs tab-position="left" style="height: 500px">
+      <el-tabs tab-position="left" style="height: 500px" v-if="!isDetails">
         <el-tab-pane label="我的个人信息" class="user">
           <h5 class="boxTitle">个人信息</h5>
           <ul>
@@ -169,7 +169,7 @@
                 </ul>
               </div>
               <div id="certificateRead">
-                <h6>证书</h6>
+                <h6 class="readTitle">证书</h6>
                 <ul>
                   <li v-for="(item, index) in certificateInfo" :key="index">
                     <img
@@ -209,8 +209,16 @@
             <li v-for="item in resumeSentList" :key="item.sentid">
               <p class="company">{{ item.company }}</p>
               <p class="position">{{ item.position }}</p>
-              <el-steps :active="item.now" finish-status="success" :process-status="item.state">
-                <el-step v-for="(item2,index) in item.total" :key="index" :title="item2"></el-step>
+              <el-steps
+                :active="item.now"
+                finish-status="success"
+                :process-status="item.state"
+              >
+                <el-step
+                  v-for="(item2, index) in item.total"
+                  :key="index"
+                  :title="item2"
+                ></el-step>
               </el-steps>
             </li>
           </ul>
@@ -219,6 +227,7 @@
       <employment-details
         v-if="isDetails"
         :details="details"
+        :companyDetails="companyDetails"
         @toList="toList"
         @collect="collect"
         @cancelCollect="cancelCollect"
@@ -416,13 +425,24 @@ export default {
         requirements:
           "1、具备良好的沟通表达能力和组织协调能力，懂政府语言，团队意识强，抗压能力强，有激情，勇于接受挑战，善于开拓创新。2、至少精通生物医药、新一代信息技术等战新产业体系中的一个，熟悉行业领域格局。可独立宇客户进行业务交流。具备需求调研、服务解决方案设计能力。3、5年以上车联网、人工智能、生物医药、文旅行业领域从业经验，过往工作经历中有产业研究，信息化咨询、解决方案售前等相关工作经验，获得相关证书者优先。",
       },
+      companyDetails: {
+        //详情页面的公司信息
+        companyid: 1,
+        logo: "",
+        name: "字节跳动",
+        trade: "互联网",
+        level: "已上市",
+        location: "北京",
+        introduction:
+          "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
+      },
       resumeSentList: [
         {
           sentid: 1,
           username: "",
           company: "字节跳动", //投递的公司
           position: "前端开发", //投递的职位
-          total:["笔试","面试","面试"],//各个流程名字
+          total: ["笔试", "面试", "面试"], //各个流程名字
           now: 1, //现在在第几个流程
           state: "error", //当前流程的状态
         },
@@ -480,9 +500,6 @@ export default {
   float: left;
   margin-top: 5vh;
   margin-left: 3vw;
-}
-#userInfo .el-tabs__header.is-left {
-  z-index: 999 !important;
 }
 #userInfo .el-tab-pane {
   margin-left: 2vw;

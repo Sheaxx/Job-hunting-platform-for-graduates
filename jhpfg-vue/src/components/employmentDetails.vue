@@ -1,7 +1,7 @@
 <template>
   <div id="employmentDetails">
     <el-button round @click="toList">返回</el-button>
-    <el-button type="primary" round @click="sendResume">投递简历</el-button>
+    <el-button type="primary" round @click="sendResumeAsk">投递简历</el-button>
     <el-link
       icon="el-icon-star-off"
       class="collect"
@@ -46,13 +46,23 @@
       </div>
       <p class="introduction">{{ companyDetails.introduction }}</p>
     </div>
+    <div id="sendResumeAsk" v-if="isSendResumeAsk">
+      <div class="askBox">
+        <i class="el-icon-s-promotion"></i>
+        <p>将投递您的在线简历，是否继续？</p>
+        <el-button type="primary" plain @click="sendResume">确定</el-button>
+        <el-button plain @click="cancelSendResume">取消</el-button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   data() {
-    return {};
+    return {
+      isSendResumeAsk: false,
+    };
   },
   props: {
     details: Object,
@@ -71,9 +81,17 @@ export default {
     cancelCollect() {
       this.$emit("cancelCollect");
     },
-    //投递简历
+    //点击投递简历按钮
+    sendResumeAsk() {
+      this.isSendResumeAsk = true;
+    },
+    //确定投递简历
     sendResume() {
       this.$emit("sendResume");
+    },
+    //取消投递简历
+    cancelSendResume() {
+      this.isSendResumeAsk = false;
     },
   },
 };
@@ -85,10 +103,8 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 99999999;
   background: #fff;
   height: 80vh;
-  overflow: auto;
 }
 #employmentDetails .el-button {
   float: right;
@@ -151,7 +167,7 @@ export default {
 #employmentDetails .msg,
 #employmentDetails .companyBar .introduction {
   position: absolute;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   left: 50%;
 }
 #employmentDetails img {
@@ -177,5 +193,31 @@ export default {
   width: 85%;
   line-height: 1.5rem;
   font-size: 0.9rem;
+}
+#sendResumeAsk {
+  position: absolute;
+  z-index: 9;
+  width: 99.8vw;
+  height: 99.2vh;
+  top: -16.5vh;
+  left: -10vw;
+  background: rgba(0, 0, 0, 0.3);
+}
+#sendResumeAsk .askBox {
+  background: #fff;
+  width: 38%;
+  height: 20%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#sendResumeAsk i {
+  margin: 7% 1% auto 15%;
+  font-size: 1.5rem;
+  float: left;
+}
+#sendResumeAsk p {
+  margin: 8% auto 4% 18%;
 }
 </style>

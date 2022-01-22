@@ -9,7 +9,6 @@
       </div>
     </div>
     <Menu></Menu>
-    <div id="block"></div>
   </div>
 </template>
 
@@ -63,15 +62,18 @@ body {
   border-color: #99BDDF!important;
 }
 /* 按钮 */
-.el-button.el-button--primary.is-round {
-  background: #99BDDF;
-  border-color: #99BDDF;
+.el-button.el-button--primary {
+  background: #99BDDF!important;
+  border-color: #99BDDF!important;
+  color: #fff!important;
 }
-.el-button.el-button--default.is-round:hover,
-.el-button.el-button--default.is-round:focus {
-  border-color: #99BDDF;
-  color: #99BDDF;
-  background: #EEF7FB;
+.el-button.el-button--primary:hover,
+.el-button.el-button--primary:focus,
+.el-button.el-button--default:hover,
+.el-button.el-button--default:focus {
+  border-color: #99BDDF!important;
+  color: #99BDDF!important;
+  background: #EEF7FB!important;
 }
 /* 导航栏 */
 .el-tabs__item.is-top.is-active,
