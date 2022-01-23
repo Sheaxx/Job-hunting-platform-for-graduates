@@ -89,10 +89,13 @@ export default {
     //确定投递简历
     sendResume() {
       this.$emit("sendResume");
+      this.isOpenSendResume = false;
+      document.documentElement.style.overflow = "auto";
     },
     //取消投递简历
     cancelSendResume() {
       this.isOpenSendResume = false;
+      document.documentElement.style.overflow = "auto";
     },
   },
 };

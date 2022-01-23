@@ -44,144 +44,15 @@
           </div>
         </el-tab-pane>
         <el-tab-pane label="我的简历" class="resume">
-          <el-button type="primary" round @click="" id="updateResume"
-            >更新简历</el-button
-          >
-          <div id="resumeReadBox">
-            <div id="resumeRead">
-              <p>{{ resumeInfo.realname }}</p>
-              <ul class="row1">
-                <li>
-                  {{ resumeInfo.sex }}
-                </li>
-                <li>
-                  <img src="../assets/image/icon/birth.svg" alt="生日图标" />
-                  {{ resumeInfo.birth }}
-                </li>
-                <li>
-                  <img
-                    src="../assets/image/icon/education.svg"
-                    alt="学历图标"
-                  />
-                  {{ resumeInfo.highesteducation }}
-                </li>
-              </ul>
-              <ul class="row2">
-                <li>
-                  <img src="../assets/image/icon/tel.svg" alt="电话图标" />
-                  {{ resumeInfo.tel }}
-                </li>
-                <li>
-                  <img
-                    src="../assets/image/icon/email.svg"
-                    alt="电子邮箱图标"
-                  />
-                  {{ resumeInfo.email }}
-                </li>
-              </ul>
-              <ul class="row3">
-                <li>
-                  <img src="../assets/image/icon/position.svg" alt="职位图标" />
-                  {{ resumeInfo.expectedPosition }}
-                </li>
-              </ul>
-            </div>
-            <div id="educationRead">
-              <h6 class="readTitle">教育经历</h6>
-              <ul>
-                <li v-for="item in educationInfo" :key="item.educationid">
-                  <div class="row1">
-                    <p class="school">{{ item.school }}</p>
-                    <p class="duration">{{ item.duration }}</p>
-                  </div>
-                  <div class="row2">
-                    <p class="qualification">{{ item.qualification }}</p>
-                    <p class="specialty">{{ item.specialty }}</p>
-                    <p class="gpa">{{ item.gpa }}</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div id="internshipRead">
-              <h6 class="readTitle">实习经历</h6>
-              <ul>
-                <li v-for="item in internshipInfo" :key="item.internshipid">
-                  <div class="row1">
-                    <p class="company">{{ item.company }}</p>
-                    <p class="duration">{{ item.duration }}</p>
-                  </div>
-                  <div class="row2">
-                    <p class="position">{{ item.position }}</p>
-                  </div>
-                  <div class="row3">
-                    <p class="content">{{ item.content }}</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div id="projectRead">
-              <h6 class="readTitle">项目经历</h6>
-              <ul>
-                <li v-for="item in projectInfo" :key="item.projectid">
-                  <div class="row1">
-                    <p class="name">{{ item.name }}</p>
-                    <p class="duration">{{ item.duration }}</p>
-                  </div>
-                  <div class="row2">
-                    <p class="role">{{ item.role }}</p>
-                  </div>
-                  <div class="row3">
-                    <p class="content">{{ item.content }}</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div id="campusExperienceRead">
-              <h6 class="readTitle">校内经历</h6>
-              <ul>
-                <li
-                  v-for="item in campusExperienceInfo"
-                  :key="item.campusExperienceId"
-                >
-                  <div class="row1">
-                    <p class="name">{{ item.name }}</p>
-                    <p class="duration">{{ item.duration }}</p>
-                  </div>
-                  <div class="row2">
-                    <p class="role">{{ item.role }}</p>
-                  </div>
-                  <div class="row3">
-                    <p class="content">{{ item.content }}</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div id="skillCertificateBox">
-              <div id="skillRead">
-                <h6 class="readTitle">技能</h6>
-                <ul>
-                  <li v-for="(item, index) in skillInfo" :key="index">
-                    <img
-                      src="../assets/image/icon/skill.svg"
-                      alt="技能图标"
-                    />{{ item }}
-                  </li>
-                </ul>
-              </div>
-              <div id="certificateRead">
-                <h6 class="readTitle">证书</h6>
-                <ul>
-                  <li v-for="(item, index) in certificateInfo" :key="index">
-                    <img
-                      src="../assets/image/icon/certificate.svg"
-                      alt="证书图标"
-                    />{{ item }}
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div class="block"></div>
-          </div>
+          <resume
+            :resumeInfo="resumeInfo"
+            :educationInfo="educationInfo"
+            :internshipInfo="internshipInfo"
+            :projectInfo="projectInfo"
+            :campusExperienceInfo="campusExperienceInfo"
+            :skillInfo="skillInfo"
+            :certificateInfo="certificateInfo"
+          ></resume>
         </el-tab-pane>
         <el-tab-pane label="我的收藏" class="collection">
           <ul v-if="!isDetails">
@@ -238,10 +109,11 @@
 </template>
 
 <script>
+import Resume from "../components/resume.vue";
 import EmploymentDetails from "../components/employmentDetails.vue";
 
 export default {
-  components: { EmploymentDetails },
+  components: { Resume, EmploymentDetails },
   data() {
     return {
       isUpdatePassword: false, //修改密码界面，默认为否
@@ -504,6 +376,9 @@ export default {
 #userInfo .el-tab-pane {
   margin-left: 2vw;
 }
+#userInfo .el-tabs__content {
+  position: static;
+}
 #userInfo .boxTitle {
   width: 100%;
   font-size: 1.1rem;
@@ -520,152 +395,6 @@ export default {
 }
 #updatePassword .el-input {
   margin-bottom: 2vh;
-}
-#updateResume {
-  float: right;
-  margin-right: 3vw;
-}
-/* 模块样式 */
-#resumeRead,
-#educationRead,
-#internshipRead,
-#projectRead,
-#campusExperienceRead {
-  padding-bottom: 30px;
-}
-#resumeReadBox {
-  width: 85%;
-  height: 500px;
-  overflow: auto;
-}
-/* 简历信息 */
-#resumeRead p {
-  font-size: 1.4rem;
-  height: 4vh;
-  line-height: 4vh;
-  margin-bottom: 25px;
-  font-weight: 600;
-}
-#resumeRead ul {
-  width: 100%;
-}
-#resumeRead li:not(:last-child) {
-  float: left;
-}
-#resumeRead li {
-  font-size: 14px;
-  height: 15px;
-  line-height: 15px;
-  vertical-align: middle;
-}
-#resumeRead .row1,
-#resumeRead .row2 {
-  margin-bottom: 18px;
-}
-#resumeRead li:not(:last-child)::after {
-  content: "";
-  display: inline-block;
-  height: 12px;
-  width: 1px;
-  background: #70707077;
-  vertical-align: middle;
-  margin: 0 20px;
-}
-#resumeRead img {
-  width: 15px;
-  height: 15px;
-  vertical-align: middle;
-  margin-right: 5px;
-}
-/* 板块标题样式 */
-#userInfo .readTitle {
-  font-size: 1.2rem;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.11);
-}
-#userInfo .readTitle::before {
-  content: "";
-  display: inline-block;
-  width: 5px;
-  height: 14px;
-  background: #99bddf;
-  margin-right: 10px;
-}
-/* 教育经历，实习经历，项目经历，校内经历 */
-#educationRead li,
-#internshipRead li,
-#projectRead li,
-#campusExperienceRead li {
-  padding: 20px 50px;
-  font-size: 0.9rem;
-}
-#educationRead p:not(.duration, .gpa),
-#internshipRead .company,
-#projectRead .name,
-#campusExperienceRead .name {
-  float: left;
-}
-#educationRead .school,
-#internshipRead .company,
-#projectRead .name,
-#campusExperienceRead .name {
-  margin-right: 20px;
-  font-weight: 600;
-  font-size: 1rem;
-}
-#educationRead .duration,
-#internshipRead .duration,
-#projectRead .duration,
-#campusExperienceRead .duration {
-  color: #707070be;
-}
-#educationRead .row1,
-#internshipRead .row1,
-#projectRead .row1,
-#campusExperienceRead .row1 {
-  margin-bottom: 15px;
-}
-#educationRead .row2 p {
-  margin-right: 10px;
-}
-#internshipRead .row2 p,
-#projectRead .row2 p,
-#campusExperienceRead .row2 p {
-  margin-bottom: 15px;
-  font-weight: 700;
-  color: #707070;
-}
-#userInfo .content {
-  line-height: 1.5rem;
-}
-/* 技能，证书 */
-#skillCertificateBox {
-  display: flex;
-}
-#skillRead,
-#certificateRead {
-  width: 50%;
-  flex: 1;
-}
-#skillRead img,
-#certificateRead img {
-  width: 1.2rem;
-  height: 1.2rem;
-  vertical-align: middle;
-  margin-right: 10px;
-}
-#skillRead li,
-#certificateRead li {
-  margin-left: 50px;
-  font-size: 0.9rem;
-  height: 2rem;
-  line-height: 2rem;
-  vertical-align: middle;
-}
-#userInfo .block {
-  width: 85%;
-  height: 100px;
 }
 /* 我的收藏 */
 #user .collection {

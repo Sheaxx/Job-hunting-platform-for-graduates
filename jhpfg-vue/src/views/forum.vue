@@ -18,13 +18,21 @@
         <el-tab-pane label="全部帖子" name="all">
           <forum-box :forumList="forumList" @itemClick="toDetails"></forum-box>
         </el-tab-pane>
-        <el-tab-pane label="我要提问" name="question">配置管理</el-tab-pane>
-        <el-tab-pane label="笔试经验" name="writtenTest">角色管理</el-tab-pane>
-        <el-tab-pane label="面试经验" name="interview"
-          >定时任务补偿</el-tab-pane
-        >
-        <el-tab-pane label="工作分享" name="jobSharing">角色管理</el-tab-pane>
-        <el-tab-pane label="企业招聘" name="recruitment">角色管理</el-tab-pane>
+        <el-tab-pane label="我要提问" name="question">
+          <forum-box :forumList="forumList" @itemClick="toDetails"></forum-box>
+        </el-tab-pane>
+        <el-tab-pane label="笔试经验" name="writtenTest">
+          <forum-box :forumList="forumList" @itemClick="toDetails"></forum-box>
+        </el-tab-pane>
+        <el-tab-pane label="面试经验" name="interview">
+          <forum-box :forumList="forumList" @itemClick="toDetails"></forum-box>
+        </el-tab-pane>
+        <el-tab-pane label="工作分享" name="jobSharing">
+          <forum-box :forumList="forumList" @itemClick="toDetails"></forum-box>
+        </el-tab-pane>
+        <el-tab-pane label="企业招聘" name="recruitment">
+          <forum-box :forumList="forumList" @itemClick="toDetails"></forum-box>
+        </el-tab-pane>
       </el-tabs>
     </div>
     <div id="forumDetailsBox" v-else>
@@ -38,22 +46,10 @@
       <div class="rightBar"></div>
       <el-divider><i class="el-icon-chat-line-round"></i></el-divider>
       <el-timeline>
-        <el-timeline-item timestamp="2018/4/12" placement="top">
+        <el-timeline-item v-for="item in commentList" :key="item.commentid" :timestamp="item.time" placement="top">
           <el-card>
-            <h4>更新 Github 模板</h4>
-            <p>王小虎 提交于 2018/4/12 20:46</p>
-          </el-card>
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/3" placement="top">
-          <el-card>
-            <h4>更新 Github 模板</h4>
-            <p>王小虎 提交于 2018/4/3 20:46</p>
-          </el-card>
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/2" placement="top">
-          <el-card>
-            <h4>更新 Github 模板</h4>
-            <p>王小虎 提交于 2018/4/2 20:46</p>
+            <h4>{{item.content}}</h4>
+            <p>{{item.author}}</p>
           </el-card>
         </el-timeline-item>
       </el-timeline>
@@ -86,7 +82,12 @@
             </el-select>
           </el-form-item>
           <el-form-item label="内容">
-            <el-input type="textarea" v-model="editPost.content" resize="none" :rows="15"></el-input>
+            <el-input
+              type="textarea"
+              v-model="editPost.content"
+              resize="none"
+              :rows="15"
+            ></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="addPost">立即发布</el-button>
@@ -184,6 +185,15 @@ export default {
         createTime: "2021.04.07",
         zone: "",
       },
+      commentList:[
+        //评论列表
+        {
+          commentid:1,
+          content:"更新 Github 模板",
+          author:"王小虎",
+          time:"2018/4/3 20:46"
+        }
+      ]
     };
   },
   methods: {
@@ -203,11 +213,13 @@ export default {
     //确定发布帖子
     addPost() {
       this.isAddPost = false;
+      document.documentElement.style.overflow = "auto";
     },
     //取消发布帖子
     cancelAddPost() {
       this.isAddPost = false;
-    }
+      document.documentElement.style.overflow = "auto";
+    },
   },
 };
 </script>
@@ -251,21 +263,26 @@ export default {
   margin-top: 7vh;
   line-height: 1.6rem;
   min-height: 60vh;
-  background: royalblue;
 }
 #forumDetailsBox .rightBar {
   position: absolute;
   width: 25%;
   height: 70vh;
-  background: red;
   top: 16vh;
   left: 65vw;
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+
 }
 #forumDetailsBox .el-divider {
   width: 70%;
 }
 #forumDetailsBox .el-timeline {
   width: 70%;
+}
+#forumDetailsBox .el-timeline p {
+  margin-top: 1%;
+  font-size: 0.8rem;
+  color: #8e9094;
 }
 #forumDetailsBox .commentEdit {
   float: left;
@@ -284,7 +301,6 @@ export default {
   top: -8.5vh;
   left: -7vw;
   background: rgba(0, 0, 0, 0.3);
-  overflow: hidden;
 }
 #addPost .addBox {
   background: #fff;
