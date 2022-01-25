@@ -3,8 +3,13 @@
     <i class="el-icon-user index-icon" slot="icon"></i>
     <h4 class="index-boxTitle" slot="boxTitle">个人中心</h4>
     <div id="userInfo">
-      <el-tabs tab-position="left" style="height: 500px" v-if="!isDetails">
-        <el-tab-pane label="我的个人信息" class="user">
+      <el-tabs
+        tab-position="left"
+        style="height: 500px"
+        v-if="!isEmploymentDetails && !isPostDetails"
+        :value="tabValue"
+      >
+        <el-tab-pane label="我的个人信息" class="user" :name="1">
           <h5 class="boxTitle">个人信息</h5>
           <ul>
             <li>
@@ -43,7 +48,7 @@
             >
           </div>
         </el-tab-pane>
-        <el-tab-pane label="我的简历" class="resume">
+        <el-tab-pane label="我的简历" class="resume" :name="2">
           <resume
             :resumeInfo="resumeInfo"
             :educationInfo="educationInfo"
@@ -54,12 +59,12 @@
             :certificateInfo="certificateInfo"
           ></resume>
         </el-tab-pane>
-        <el-tab-pane label="我的收藏" class="collection">
-          <ul v-if="!isDetails">
+        <el-tab-pane label="我的收藏" class="collection" :name="3">
+          <ul v-if="!isEmploymentDetails">
             <li
               v-for="item in collectionList"
               :key="item.employmentid"
-              @click="toDetails"
+              @click="toEmploymentDetails"
             >
               <p class="salary">{{ item.salary }}</p>
               <p class="station">{{ item.station }}</p>
@@ -75,7 +80,7 @@
             </li>
           </ul>
         </el-tab-pane>
-        <el-tab-pane label="我的投递" class="resumeSent">
+        <el-tab-pane label="我的投递" class="resumeSent" :name="4">
           <ul>
             <li v-for="item in resumeSentList" :key="item.sentid">
               <p class="company">{{ item.company }}</p>
@@ -94,16 +99,29 @@
             </li>
           </ul>
         </el-tab-pane>
+        <el-tab-pane label="我的发布" :name="5">
+          <forum-box
+            :forumList="postList"
+            @itemClick="toPostDetails"
+          ></forum-box>
+        </el-tab-pane>
       </el-tabs>
       <employment-details
-        v-if="isDetails"
-        :details="details"
+        v-if="isEmploymentDetails"
+        :details="employmentDetails"
         :companyDetails="companyDetails"
-        @toList="toList"
+        @toList="toEmploymentList"
         @collect="collect"
         @cancelCollect="cancelCollect"
         @sendResume="sendResume"
       ></employment-details>
+      <forum-details
+        v-if="isPostDetails"
+        :details="postDetails"
+        :commentList="commentList"
+        @toList="toPostList"
+        @addComment="addComment"
+      ></forum-details>
     </div>
   </div>
 </template>
@@ -111,13 +129,17 @@
 <script>
 import Resume from "../components/resume.vue";
 import EmploymentDetails from "../components/employmentDetails.vue";
+import ForumBox from "../components/forumBox.vue";
+import ForumDetails from "../components/forumDetails.vue";
 
 export default {
-  components: { Resume, EmploymentDetails },
+  components: { Resume, EmploymentDetails, ForumBox, ForumDetails },
   data() {
     return {
+      tabValue:1,//选项卡的值，默认为第一个
       isUpdatePassword: false, //修改密码界面，默认为否
-      isDetails: false, //是否是详情页，默认为否
+      isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
+      isPostDetails: false, //是否是帖子详情页，默认为否
       oldPassword: "", //旧密码
       newPassword: "", //新密码
       userInfo: {
@@ -280,7 +302,7 @@ export default {
           level: "已上市",
         },
       ], //收藏招聘信息列表
-      details: {
+      employmentDetails: {
         //某个招聘信息的详情
         employmentid: 1,
         isCollect: true, //是否收藏该招聘信息
@@ -319,6 +341,31 @@ export default {
           state: "error", //当前流程的状态
         },
       ], //已经投递的简历列表
+      postList: [
+        {
+          postid: 1,
+          title: "hhh",
+          author: "发布者",
+          createTime: "2021.06.07",
+          zone: "我要提问",
+        },
+        {
+          postid: 2,
+          title: "hhh",
+          author: "发布者",
+          createTime: "2021.06.07",
+          zone: "我要提问",
+        },
+      ], //发布的帖子列表
+      postDetails: {
+        //某个帖子的详情
+        postid: 1,
+        title: "hhh",
+        content: "hahaha",
+        author: "发布者",
+        createTime: "2021.04.07",
+        zone: "我要提问",
+      },
     };
   },
   methods: {
@@ -340,23 +387,37 @@ export default {
       this.newPassword = "";
     },
     //查看招聘信息详情
-    toDetails() {
-      this.isDetails = true;
+    toEmploymentDetails() {
+      this.isEmploymentDetails = true;
+      this.tabValue = 3;
     },
     //招聘信息详情返回列表
-    toList() {
-      this.isDetails = false;
+    toEmploymentList() {
+      this.isEmploymentDetails = false;
     },
     //收藏招聘信息
     collect() {
-      this.details.isCollect = true;
+      this.employmentDetails.isCollect = true;
     },
     //取消收藏招聘信息
     cancelCollect() {
-      this.details.isCollect = false;
+      this.employmentDetails.isCollect = false;
     },
     //投递简历
     sendResume() {},
+    //查看我发布的帖子详情
+    toPostDetails() {
+      this.isPostDetails = true;
+      this.tabValue = 5;
+    },
+    //帖子详情返回列表
+    toPostList() {
+      this.isPostDetails = false;
+    },
+    //发布评论
+    addComment() {
+      
+    },
   },
 };
 </script>
@@ -462,5 +523,13 @@ export default {
 }
 #user .resumeSent .el-step__title {
   font-size: 0.9rem;
+}
+/* 我的发布 */
+#user #forumBox {
+  width: 87%;
+  padding-top: 1%;
+}
+#user #forumBox ul {
+  height: 440px;
 }
 </style>

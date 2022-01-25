@@ -35,37 +35,13 @@
         </el-tab-pane>
       </el-tabs>
     </div>
-    <div id="forumDetailsBox" v-else>
-      <el-button round @click="toList" class="toList">返回</el-button>
-      <div class="topBar">
-        <el-tag>{{ details.zone }}</el-tag>
-        <h5>{{ details.title }}</h5>
-        <h6>发布于：{{ details.createTime }}</h6>
-      </div>
-      <p class="content">{{ details.content }}</p>
-      <div class="rightBar"></div>
-      <el-divider><i class="el-icon-chat-line-round"></i></el-divider>
-      <el-timeline>
-        <el-timeline-item v-for="item in commentList" :key="item.commentid" :timestamp="item.time" placement="top">
-          <el-card>
-            <h4>{{item.content}}</h4>
-            <p>{{item.author}}</p>
-          </el-card>
-        </el-timeline-item>
-      </el-timeline>
-      <el-input
-        type="textarea"
-        rows="5"
-        resize="none"
-        class="commentEdit"
-      ></el-input>
-      <div>
-        <el-button type="primary" class="addComment" @click="addComment"
-          >发布评论</el-button
-        >
-      </div>
-      <div class="block"></div>
-    </div>
+    <forum-details
+      v-else
+      :details="details"
+      :commentList="commentList"
+      @toList="toList"
+      @addComment="addComment"
+    ></forum-details>
     <div id="addPost" v-if="isAddPost">
       <div class="addBox">
         <el-form ref="editPost" :model="editPost" label-width="40px">
@@ -101,9 +77,10 @@
 
 <script>
 import ForumBox from "../components/forumBox.vue";
+import ForumDetails from "../components/forumDetails.vue";
 
 export default {
-  components: { ForumBox },
+  components: { ForumBox, ForumDetails },
   data() {
     return {
       isDetails: false, //是否是详情页，默认为否
@@ -185,15 +162,15 @@ export default {
         createTime: "2021.04.07",
         zone: "",
       },
-      commentList:[
+      commentList: [
         //评论列表
         {
-          commentid:1,
-          content:"更新 Github 模板",
-          author:"王小虎",
-          time:"2018/4/3 20:46"
-        }
-      ]
+          commentid: 1,
+          content: "更新 Github 模板",
+          author: "王小虎",
+          time: "2018/4/3 20:46",
+        },
+      ],
     };
   },
   methods: {
@@ -204,6 +181,10 @@ export default {
     //帖子详情页返回列表
     toList() {
       this.isDetails = false;
+    },
+    //发布评论
+    addComment() {
+
     },
     //点击我要发布按钮
     openAddPost() {
@@ -225,10 +206,13 @@ export default {
 </script>
 
 <style>
+#forum {
+  position: relative;
+}
 #forum .searchInput {
   position: absolute;
   width: 35%;
-  top: 7vh;
+  top: 1vh;
   left: 45vw;
 }
 #forum .el-tabs.el-tabs--top {
@@ -238,60 +222,6 @@ export default {
 #forum .addPost,
 #forum .toList {
   float: right;
-}
-#forumDetailsBox .topBar {
-  clear: both;
-  width: 100%;
-  height: 4vh;
-  line-height: 4vh;
-}
-#forumDetailsBox .el-tag {
-  float: left;
-  margin-right: 1vw;
-}
-#forumDetailsBox h5 {
-  font-size: 1.5rem;
-}
-#forumDetailsBox h6 {
-  margin-top: 1vh;
-  width: 100%;
-  font-size: 0.8rem;
-  color: #8e9094;
-}
-#forumDetailsBox .content {
-  width: 70%;
-  margin-top: 7vh;
-  line-height: 1.6rem;
-  min-height: 60vh;
-}
-#forumDetailsBox .rightBar {
-  position: absolute;
-  width: 25%;
-  height: 70vh;
-  top: 16vh;
-  left: 65vw;
-  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
-
-}
-#forumDetailsBox .el-divider {
-  width: 70%;
-}
-#forumDetailsBox .el-timeline {
-  width: 70%;
-}
-#forumDetailsBox .el-timeline p {
-  margin-top: 1%;
-  font-size: 0.8rem;
-  color: #8e9094;
-}
-#forumDetailsBox .commentEdit {
-  float: left;
-  width: 70%;
-  margin-bottom: 10vh;
-}
-#forumDetailsBox .addComment {
-  margin-top: 76px;
-  margin-left: 30px;
 }
 #addPost {
   position: absolute;

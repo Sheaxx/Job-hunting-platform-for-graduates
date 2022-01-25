@@ -558,6 +558,7 @@ export default {
     },
     //确定更新简历
     updateResume() {
+      this.$message.success("更新成功");
       this.isUpdateResume = false;
     },
     //取消更新简历
