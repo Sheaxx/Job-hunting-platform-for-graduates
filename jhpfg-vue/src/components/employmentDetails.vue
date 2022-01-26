@@ -160,7 +160,6 @@ export default {
   position: fixed;
   width: 22%;
   height: 70vh;
-  /* background: red; */
   top: 25vh;
   left: 71vw;
   border-left: #8e909444 1px solid;
@@ -198,6 +197,7 @@ export default {
   line-height: 1.5rem;
   font-size: 0.9rem;
 }
+/* 投递简历提示窗口 */
 #openSendResume {
   position: absolute;
   z-index: 9;
