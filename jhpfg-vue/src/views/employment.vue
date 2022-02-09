@@ -4,7 +4,7 @@
     <h4 class="index-boxTitle" slot="boxTitle">招聘信息</h4>
     <div
       id="employmentListBox"
-      v-if="!isEmploymentDetails && !isCompanyDetails"
+      v-show="!isEmploymentDetails && !isCompanyDetails && !isSchoolDetails"
     >
       <el-input
         placeholder="请输入内容"
@@ -47,7 +47,7 @@
       </el-input>
       <div
         id="employmentContainer"
-        v-if="searchSelect == 1 || searchSelect == ''"
+        v-show="searchSelect == 1 || searchSelect == ''"
       >
         <ul id="filter">
           <li>筛选岗位：</li>
@@ -116,7 +116,7 @@
         <ul id="companyList">
           <li
             class="companyItem"
-            v-for="(item,index) in companyList"
+            v-for="(item, index) in companyList"
             :key="item.companyid"
             @click="toCompanyDetails(index)"
           >
@@ -134,8 +134,9 @@
         <ul id="schoolList">
           <li
             class="schoolItem"
-            v-for="item in schoolList"
+            v-for="(item,index) in schoolList"
             :key="item.schoolid"
+            @click="toSchoolDetails(index)"
           >
             <img src="../assets/image/avatar.png" alt="学校logo" class="logo" />
             <p class="name">{{ item.name }}</p>
@@ -166,26 +167,26 @@
       <el-button round @click="companyToList">返回</el-button>
       <div class="listBar">
         <ul class="list">
-        <li v-for="(item,index) in employmentList" :key="item.employmentid">
-          <p class="authorMsg">
-            <span>发布者名字</span>
-            <span>她的职位</span>
-          </p>
-          <p class="station">{{ item.station }}</p>
-          <p class="msg">
-            <span class="salary">{{ item.salary }}</span>
-            <span>{{ item.location }}</span>
-            <span>{{ item.education }}</span>
-          </p>
-        </li>
-      </ul>
-      <el-pagination
-        :page-size="7"
-        :pager-count="11"
-        layout="prev, pager, next"
-        :total="1000"
-      >
-      </el-pagination>
+          <li v-for="(item, index) in employmentList" :key="item.employmentid">
+            <p class="authorMsg">
+              <span>发布者名字</span>
+              <span>她的职位</span>
+            </p>
+            <p class="station">{{ item.station }}</p>
+            <p class="msg">
+              <span class="salary">{{ item.salary }}</span>
+              <span>{{ item.location }}</span>
+              <span>{{ item.education }}</span>
+            </p>
+          </li>
+        </ul>
+        <el-pagination
+          :page-size="7"
+          :pager-count="11"
+          layout="prev, pager, next"
+          :total="1000"
+        >
+        </el-pagination>
       </div>
       <div class="companyBar">
         <img src="../assets/image/avatar.png" alt="公司logo" />
@@ -196,6 +197,41 @@
           <span class="level">{{ companyDetails.level }}</span>
         </div>
         <p class="introduction">{{ companyDetails.introduction }}</p>
+      </div>
+    </div>
+    <div id="schoolDetails" v-if="isSchoolDetails">
+      <el-button round @click="schoolToList">返回</el-button>
+      <el-carousel :interval="4000" type="card" height="200px">
+        <el-carousel-item v-for="item in 6" :key="item">
+          <h3 class="medium">{{ item }}</h3>
+        </el-carousel-item>
+      </el-carousel>
+      <div class="concat">
+        <ul>
+          <li>
+            <img src="../assets/image/avatar.png" alt="联系人头像" />
+            <p class="name">李老师</p>
+            <p class="tel">13700000000</p>
+            <el-button
+              type="primary"
+              icon="el-icon-chat-line-round"
+              circle
+            ></el-button>
+          </li>
+          <li>
+            <img src="../assets/image/avatar.png" alt="联系人头像" />
+            <p class="name">李老师</p>
+            <p class="tel">13700000000</p>
+            <el-button
+              type="primary"
+              icon="el-icon-chat-line-round"
+              circle
+            ></el-button>
+          </li>
+        </ul>
+      </div>
+      <div class="content">
+        ggggggggggggggggg
       </div>
     </div>
   </div>
@@ -214,10 +250,10 @@ export default {
   data() {
     return {
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
-      isCompanyDetails: true, //是否是公司详情页，默认为否
+      isCompanyDetails: false, //是否是公司详情页，默认为否
       isSchoolDetails: false, //是否是学校详情页，默认为否
       searchValue: "", //搜索内容
-      searchSelect: "2", //选择搜索的类别
+      searchSelect: "", //选择搜索的类别
       educationFilter: "", //筛选学历
       salaryFilter: "", //筛选薪资
       locationOptions: provinceAndCityDataPlus,
@@ -514,12 +550,12 @@ export default {
       this.isCompanyDetails = false;
     },
     //查看学校详情
-    toSchoolDetails() {
+    toSchoolDetails(index) {
       this.isSchoolDetails = true;
     },
     //学校详情返回列表
     schoolToList() {
-      this.isCompanyDetails = false;
+      this.isSchoolDetails = false;
     },
   },
 };
@@ -658,10 +694,12 @@ export default {
   color: #72b3f0;
 }
 /* 公司详情 */
-#companyDetails .listBar{
+#companyDetails .listBar {
   width: 70%;
 }
-#companyDetails .el-button {
+/* 公司详情，学校详情的返回按钮 */
+#companyDetails .el-button,
+#schoolDetails .el-button {
   float: right;
   margin-right: 3%;
 }
@@ -694,9 +732,15 @@ export default {
 #companyDetails .authorMsg {
   float: right;
   margin-top: 10px;
+  font-size: 0.9rem;
 }
-#companyDetails .authorMsg span {
-  margin-left: 10px;
+#companyDetails .authorMsg span:last-of-type::before {
+  content: "";
+  width: 1px;
+  height: 1rem;
+  background: #8e909483;
+  display: inline-block;
+  margin: 0 20px -3px 20px;
 }
 /* 公司信息 */
 #companyDetails .companyBar {
@@ -739,5 +783,57 @@ export default {
   width: 85%;
   line-height: 1.5rem;
   font-size: 0.9rem;
+}
+/* 学校详情 */
+/* 走马灯 */
+#schoolDetails .el-carousel {
+  clear: both;
+}
+#schoolDetails .el-carousel__item h3 {
+  color: #475669;
+  font-size: 14px;
+  opacity: 0.75;
+  line-height: 200px;
+  margin: 0;
+}
+#schoolDetails .el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
+
+#schoolDetails .el-carousel__item:nth-child(2n + 1) {
+  background-color: #d3dce6;
+}
+/* 学校详情-联系人列表 */
+#schoolDetails .concat ul {
+  width: 30%;
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.1);
+  float: left;
+}
+#schoolDetails .concat li {
+  position: relative;
+  padding: 15px;
+  font-size: 0.9rem;
+}
+#schoolDetails .concat img {
+  width: 48px;
+  height: 48px;
+}
+#schoolDetails .concat .name,
+#schoolDetails .concat .tel {
+  position: absolute;
+  top: 25px;
+  left: 80px;
+}
+#schoolDetails .concat .tel {
+  top: 45px;
+}
+#schoolDetails .concat .el-button {
+  margin-top: 5px;
+}
+/* 学校详情-介绍内容 */
+#schoolDetails .content {
+  width: 66%;
+  margin-left: 30%;
+  padding: 2%;
 }
 </style>
