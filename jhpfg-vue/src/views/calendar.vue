@@ -100,10 +100,12 @@
         type="primary"
         round
         @click="editJobFair"
+        class="affirm"
       >确认修改</el-button>
       <el-button
         round
         @click="cancelEditJobFair"
+        class="cancel"
       >取消</el-button>
       <ul>
         <li
@@ -137,9 +139,34 @@
                 placeholder="请输入招聘会或宣讲会地点"
               ></el-input>
             </el-form-item>
+            <el-form-item>
+              <el-link
+                type="danger"
+                @click="openDeleteJobFair(index)"
+                class="delete"
+                icon="el-icon-delete"
+              >删除</el-link>
+            </el-form-item>
           </el-form>
         </li>
       </ul>
+      <div id="deleteJobFair" v-if="isDelete">
+        <div class="deleteBox">
+          <i class="el-icon-s-promotion"></i>
+          <p>是否删除该项招聘会或宣讲会活动？</p>
+          <el-button
+            type="primary"
+            plain
+            @click="deleteJobFair"
+            class="affirm"
+          >确定</el-button>
+          <el-button
+            plain
+            @click="cancelDeleteJobFair"
+            class="cancel"
+          >取消</el-button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -150,6 +177,7 @@ export default {
     return {
       isAdd: false, //是否打开添加窗口，默认为否
       isEdit: false, //是否打开修改窗口，默认为否
+      isDelete: false, //是否打开删除窗口，默认为否
       dayMap: [], //{招聘会名字，地点，时间}
       jobFair: {}, //日期：[招聘会名字]
       editContent: {
@@ -199,6 +227,21 @@ export default {
     //取消修改
     cancelEditJobFair() {
       this.isEdit = false;
+    },
+    //点击删除
+    openDeleteJobFair(index) {
+      this.isDelete = true;
+      document.documentElement.style.overflow='hidden';
+    },
+    //确认删除
+    deleteJobFair() {
+      this.isDelete = false;
+      document.documentElement.style.overflow = "auto";
+    },
+    //取消删除
+    cancelDeleteJobFair() {
+      this.isDelete = false;
+      document.documentElement.style.overflow = "auto";
     },
   },
   computed: {
@@ -300,12 +343,13 @@ export default {
   top: 30px;
   font-weight: 600;
 }
-#editJobFair .el-button {
+#editJobFair .affirm,
+#editJobFair .cancel {
   position: relative;
   left: 73vw;
   top: -0.65vh;
 }
-#editJobFair .el-button:first-of-type {
+#editJobFair .affirmEdit {
   left: 72vw;
 }
 #editJobFair ul {
@@ -331,5 +375,50 @@ export default {
 }
 #editJobFair .el-form-item:last-of-type {
   margin-left: -6%;
+}
+#editJobFair .delete {
+  margin-left: 60px;
+}
+/* 删除窗口 */
+#deleteJobFair {
+  position: absolute;
+  z-index: 9;
+  width: 100vw;
+  height: 100vh;
+  top: -8.8vh;
+  left: -7vw;
+  background: rgba(0, 0, 0, 0.3);
+}
+#deleteJobFair .deleteBox {
+  background: #fff;
+  width: 38%;
+  height: 20%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#deleteJobFair i {
+  margin: 7% 1% auto 15%;
+  font-size: 1.5rem;
+  float: left;
+}
+#deleteJobFair p {
+  margin: 8% auto 4% 18%;
+}
+#deleteJobFair .el-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#deleteJobFair .affirm {
+  position: absolute;
+  top: 80px;
+  left: 400px;
+}
+#deleteJobFair .cancel {
+  position: absolute;
+  top: 80px;
+  left: 480px;
 }
 </style>
