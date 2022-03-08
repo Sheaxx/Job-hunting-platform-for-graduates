@@ -12,46 +12,41 @@
       <div class="leftBox">
         <div class="header">近期消息</div>
         <ul class="chatList">
-          <li class="chatItem active">
+          <li
+            class="chatItem"
+            v-for="(item,index) in list"
+            :key="item.username"
+            @click="openChat(index)"
+          >
             <img
               src="../assets/image/avatar.png"
               alt="联系人头像"
             >
-            <h5 class="username">哈哈</h5>
-            <p class="msgOmitted">我说嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻gggggggggggggg嘻嘻嘻</p>
-            <b>1</b>
-          </li>
-          <li class="chatItem">
-            <img
-              src="../assets/image/avatar.png"
-              alt="联系人头像"
-            >
-            <h5 class="username">哈哈</h5>
-            <p class="msgOmitted">我说嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻gggggggggggggg嘻嘻嘻</p>
+            <h5 class="username">{{item.username}}</h5>
+            <p class="msgOmitted">{{item.newest}}</p>
             <b>1</b>
           </li>
         </ul>
       </div>
       <div class="rightBox">
         <div class="header">
-          <h5>哈哈</h5>
+          <h5>{{currentUser}}</h5>
         </div>
         <div class="chatBox">
-          <div class="message my_message">
-            <p>Hig gggggggggggggggg gggggggggggggggg gggggggggggggggggggggggggggggg<br><span>12:15</span></p>
-          </div>
-          <div class="message other_message">
-            <p>Hi<br><span>12:15</span></p>
+          <div
+            class="message"
+            v-for="item in currentMessages"
+            :key="item.id"
+          >
+            <p>{{item.content}}<br><span>{{item.time}}</span></p>
           </div>
         </div>
         <div class="chatInput">
-          <el-input
-            v-model="searchValue"
-            class="searchInput"
-          >
+          <el-input v-model="value">
             <el-button
               slot="append"
               icon="el-icon-s-promotion"
+              @click="send"
             ></el-button>
           </el-input>
         </div>
@@ -61,7 +56,112 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      list: [
+        {
+          username: "哈哈",
+          avatar: "",
+          newest: "我说嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻gggggggggggggg嘻嘻嘻",
+        },
+        {
+          username: "呜呜",
+          avatar: "",
+          newest: "我说嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻gggggggggggggg嘻嘻嘻",
+        },
+      ], //用户列表显示最新消息内容
+      currentUser: "", //当前打开的聊天框对方用户名
+      currentMessages: [], //当前聊天记录
+      total: [
+        {
+          id: 1,
+          sender: "wo",
+          receiver: "哈哈",
+          content: "Hi",
+          time: "18:51",
+          status: 1,
+        },
+        {
+          id: 2,
+          sender: "哈哈",
+          receiver: "wo",
+          content: "Hello",
+          time: "18:51",
+          status: 1,
+        },
+      ], //与我有关的所有聊天记录
+      value: "", //输入框的内容
+    };
+  },
+  methods: {
+    //打开私聊窗口
+    openChat(index) {
+      this.currentUser = this.list[index].username;
+      this.currentMessages = [];
+      //切换左侧用户列表样式
+      let lis = document.getElementsByClassName("chatItem");
+      let currentActive = document.getElementsByClassName("active")[0];
+      lis[index].classList.add("active");
+      currentActive.classList.remove("active");
+      //从total中挑聊天记录
+      for (let i = 0; i < this.total.length; i++) {
+        if (
+          this.total[i].sender == "哈哈" ||
+          this.total[i].receiver == "哈哈"
+        ) {
+          let obj = Object.assign({}, this.total[i]);
+          this.currentMessages.push(obj);
+        }
+      }
+    },
+    //发送消息
+    send() {
+      new Promise((resolve, reject) => {
+        let obj = {
+          sender: "wo",
+          receiver: this.currentUser,
+          content: this.value,
+          time: "13:41",
+        };
+        this.currentMessages.push(obj);
+        this.value = "";
+        resolve(obj);
+      }).then((obj) => {
+        let newMsgList = document.getElementsByClassName("message");
+        let newLi = newMsgList[newMsgList.length - 1];
+        newLi.classList.add("my_message");
+        this.$socket.emit('send',obj)
+      });
+    },
+  },
+  beforeMount() {
+    //从total中挑聊天记录
+    for (let i = 0; i < this.total.length; i++) {
+      if (
+        this.total[i].sender == this.list[0].username ||
+        this.total[i].receiver == this.list[0].username
+      ) {
+        let obj = Object.assign({}, this.total[i]);
+        this.currentMessages.push(obj);
+      }
+    }
+  },
+  mounted() {
+    let li = document.getElementsByClassName("chatItem")[0];
+    li.classList.add("active");
+    this.currentUser = this.list[0].username;
+    //区分自己发送和接收的消息
+    let messages = document.getElementsByClassName("message");
+    for (let i = 0; i < this.currentMessages.length; i++) {
+      if (this.currentMessages[i].sender == "wo") {
+        messages[i].classList.add("my_message");
+      } else {
+        messages[i].classList.add("other_message");
+      }
+    }
+  },
+};
 </script>
 
 <style>
