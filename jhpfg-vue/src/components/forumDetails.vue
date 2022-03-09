@@ -1,9 +1,13 @@
 <template>
   <div id="forumDetails">
-    <el-button round @click="toList" class="toList">返回</el-button>
+    <el-button
+      round
+      @click="toList"
+      class="toList"
+    >返回</el-button>
     <div id="postContent">
       <div class="topBar">
-        <el-tag>{{ details.zone }}</el-tag>
+        <el-tag>{{ showZone(details.zone) }}</el-tag>
         <h5>{{ details.title }}</h5>
         <h6>发布于：{{ details.createTime }}</h6>
       </div>
@@ -30,9 +34,11 @@
         v-model="commentValue"
       ></el-input>
       <div>
-        <el-button type="primary" class="addComment" @click="addComment"
-          >发布评论</el-button
-        >
+        <el-button
+          type="primary"
+          class="addComment"
+          @click="addComment"
+        >发布评论</el-button>
       </div>
     </div>
     <div class="rightBar"></div>
@@ -43,7 +49,7 @@
 export default {
   data() {
     return {
-      commentValue:"",//评论输入框的值
+      commentValue: "", //评论输入框的值
     };
   },
   props: {
@@ -51,6 +57,21 @@ export default {
     commentList: Array,
   },
   methods: {
+    //根据zone显示文字
+    showZone(zone) {
+      switch (zone) {
+        case 1:
+          return "我要提问";
+        case 2:
+          return "笔试经验";
+        case 3:
+          return "面试经验";
+        case 4:
+          return "工作分享";
+        case 5:
+          return "企业招聘";
+      }
+    },
     //返回列表
     toList() {
       this.$emit("toList");
