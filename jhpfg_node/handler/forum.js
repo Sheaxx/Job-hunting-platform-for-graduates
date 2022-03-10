@@ -1,4 +1,5 @@
 const db = require('../config/db')
+const moment = require('moment')
 
 //分页获取帖子列表
 exports.getAccountListByPage = (req, res) => {
@@ -15,13 +16,16 @@ exports.getAccountListByPage = (req, res) => {
     // 执行sql语句 （查询对应页码的数据）
     db.query(sql, (err, results) => {
       if (err) throw err;
+      for(let item in results) {
+        results[item].createTime = moment(results[item].createTime).format('YYYY-MM-DD HH:mm:ss');
+      }
       // 把数据返回给前端 两个数据 数据总条数 total 和 对应页码的数据 data
       res.send({
         total,
         results
       });
     });
-  })
+  });
 }
 
 //根据所属板块分页获取
@@ -40,6 +44,9 @@ exports.getAccountListByPageAndZone = (req, res) => {
     db.query(sql, (err, results) => {
       if (err) throw err;
       // 把数据返回给前端 两个数据 数据总条数 total 和 对应页码的数据 data
+      for(let item in results) {
+        results[item].createTime = moment(results[item].createTime).format('YYYY-MM-DD HH:mm:ss');
+      }
       res.send({
         total,
         results
@@ -52,15 +59,35 @@ exports.getAccountListByPageAndZone = (req, res) => {
 exports.getPostById = (req, res) => {
   let id = req.params.id;
   let sql = 'select * from forum where id=' + id;
-  db.query(sql, (err,results) => {
+  db.query(sql, (err, results) => {
     if (err) throw err;
-    res.send(results[0])
+    results[0].createTime = moment(results[0].createTime).format('YYYY-MM-DD HH:mm:ss');
+    res.send(results[0]);
   })
+}
+
+//根据关键字进行搜索
+exports.getPostByKeyword = (req, res) => {
+  let keyword = req.body.keyword;
+  let sql = 'select * from forum order by id desc';
+  db.query(sql, (err, results) => {
+    if (err) throw err;
+    let arr = [];
+    for(let item in results) {
+      if (results[item].title.search(keyword) != -1) {
+        results[item].createTime = moment(results[item].createTime).format('YYYY-MM-DD HH:mm:ss');
+        arr.push(results[item])
+      }
+    }
+    res.send(arr)
+  })
+
 }
 
 //发布帖子
 exports.addPost = (req, res) => {
-  let post = req.body
+  let post = req.body;
+  post.createTime = moment().format('YYYY-MM-DD HH:mm:ss');
   let sql1 = 'select max(id) as maxid from forum';
   db.query(sql1, (err, results) => {
     if (err) throw err;
@@ -70,5 +97,15 @@ exports.addPost = (req, res) => {
       if (err) throw err;
       res.send('success')
     })
+  })
+}
+
+//删除帖子
+exports.deletePost = (req, res) => {
+  let id = req.params.id;
+  let sql = 'delete from forum where id=' + id;
+  db.query(sql, (err, results) => {
+    if (err) throw err;
+    res.send('success')
   })
 }

@@ -15,8 +15,14 @@ router.get('/getAccountListByPageAndZone/:currentPage/:zone', handler.getAccount
 //根据id搜索某一条帖子
 router.get('/getPostById/:id', handler.getPostById);
 
+//根据关键字进行搜索
+router.post('/getPostByKeyword/', handler.getPostByKeyword);
+
 //发布帖子
 router.post('/addPost', handler.addPost);
+
+//删除帖子
+router.post('/deletePost/:id', handler.deletePost);
 
 // 向外共享路由对象
 module.exports = router

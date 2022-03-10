@@ -5,6 +5,11 @@
       @click="toList"
       class="toList"
     >返回</el-button>
+    <el-link
+      icon="el-icon-delete"
+      class="delete"
+      @click="openDelete"
+    >删除</el-link>
     <div id="postContent">
       <div class="topBar">
         <el-tag>{{ showZone(details.zone) }}</el-tag>
@@ -42,6 +47,24 @@
       </div>
     </div>
     <div class="rightBar"></div>
+    <div
+      class="deleteBox"
+      v-if="isOpenDelete"
+    >
+      <div class="askBox">
+        <i class="el-icon-delete-solid"></i>
+        <p>将删除该帖子，是否继续？</p>
+        <el-button
+          type="primary"
+          plain
+          @click="deletePost"
+        >确定</el-button>
+        <el-button
+          plain
+          @click="cancelDelete"
+        >取消</el-button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -49,6 +72,7 @@
 export default {
   data() {
     return {
+      isOpenDelete: false, //是否打开删除帖子窗口，默认为否
       commentValue: "", //评论输入框的值
     };
   },
@@ -76,6 +100,25 @@ export default {
     toList() {
       this.$emit("toList");
     },
+    //点击删除按钮
+    openDelete() {
+      this.isOpenDelete = true;
+      document.documentElement.style.overflow = "hidden";
+    },
+    //确定删除
+    deletePost() {
+      this.$ajax.post("/forum/deletePost/" + this.details.id).then((res) => {
+        this.isOpenDelete = false;
+        document.documentElement.style.overflow = "auto";
+        this.toList();
+        this.$message.success("删除成功");
+      });
+    },
+    //取消删除
+    cancelDelete() {
+      this.isOpenDelete = false;
+      document.documentElement.style.overflow = "auto";
+    },
     //点击发布评论按钮
     addComment() {
       this.$message.success("评论成功");
@@ -98,6 +141,11 @@ export default {
 #forumDetails .el-button {
   float: right;
   margin-right: 3%;
+}
+#forumDetails .delete {
+  float: right;
+  line-height: 5vh;
+  margin-right: 2vw;
 }
 #postContent {
   width: 70%;
@@ -157,5 +205,32 @@ export default {
 }
 #forumDetails .addComment {
   margin-top: -100px;
+}
+/* 删除帖子提示窗口 */
+#forumDetails .deleteBox {
+  position: absolute;
+  z-index: 9;
+  width: 100vw;
+  height: 100vh;
+  top: -16.8vh;
+  left: -10vw;
+  background: rgba(0, 0, 0, 0.3);
+}
+#forumDetails .deleteBox .askBox {
+  background: #fff;
+  width: 38%;
+  height: 20%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#forumDetails .deleteBox i {
+  margin: 7% 1% auto 15%;
+  font-size: 1.5rem;
+  float: left;
+}
+#forumDetails .deleteBox p {
+  margin: 8% auto 4% 18%;
 }
 </style>

@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import qs from "qs";
+
 export default {
   props: {
     tab: Number,
@@ -35,6 +37,7 @@ export default {
       total: 0, // 数据总条数
       pageSize: 10, // 每页条数
       list: [], //帖子列表
+      isShowList: false, //是否是搜索后出来的列表，默认为否
     };
   },
   watch: {
@@ -115,6 +118,8 @@ export default {
       this.currentPage = val; // 保存当前页码
       this.getAccountListByPage(); // 调用分页函数
     },
+    //根据关键字搜索
+    search() {},
   },
   mounted() {
     this.$ajax.get("/forum/getAccountListByPage/1").then((res) => {
