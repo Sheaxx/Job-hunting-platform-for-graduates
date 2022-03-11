@@ -1,24 +1,42 @@
 <template>
   <div id="employmentDetails">
-    <el-button round @click="toList">返回</el-button>
-    <el-button type="primary" round @click="openSendResume">投递简历</el-button>
-    <el-link
-      icon="el-icon-star-off"
-      class="collect"
-      v-if="!details.isCollect"
-      @click="collect"
-      >收藏</el-link
+    <el-button
+      round
+      @click="toList"
+    >返回</el-button>
+    <el-button
+      type="primary"
+      round
+      @click="openSendResume"
+    >投递简历</el-button>
+    <div
+      class="collectBox"
+      v-if="false"
     >
-    <el-link
-      icon="el-icon-star-on"
-      class="collect"
-      v-else
-      @click="cancelCollect"
-      >已收藏</el-link
-    >
+      <el-link
+        icon="el-icon-star-off"
+        class="collect"
+        v-if="!details.isCollect"
+        @click="collect"
+      >收藏</el-link>
+      <el-link
+        icon="el-icon-star-on"
+        class="collect"
+        v-else
+        @click="cancelCollect"
+      >已收藏</el-link>
+    </div>
+    <div class="deleteLink">
+      <el-link
+        icon="el-icon-delete"
+        class="delete"
+        @click="openDelete"
+      >删除</el-link>
+    </div>
     <div class="topBar">
+      <el-tag class="isFullTime">{{showIsFullTime(details.isFullTime)}}</el-tag>
       <h5>{{ details.station }}</h5>
-      <h6>{{ details.salary }}</h6>
+      <h6><span>{{ details.salaryStart }}</span> - <span>{{ details.salaryEnd }}</span></h6>
       <p class="jobMsg">
         <span>{{ details.location }}</span>
         <span>{{ details.education }}</span>
@@ -37,7 +55,10 @@
       <p class="sectionContent">{{ details.requirements }}</p>
     </div>
     <div class="companyBar">
-      <img src="../assets/image/avatar.png" alt="公司logo" />
+      <img
+        src="../assets/image/avatar.png"
+        alt="公司logo"
+      />
       <p class="companyName">{{ companyDetails.name }}</p>
       <div class="msg">
         <span class="location">{{ companyDetails.location }}</span>
@@ -46,12 +67,40 @@
       </div>
       <p class="introduction">{{ companyDetails.introduction }}</p>
     </div>
-    <div id="openSendResume" v-if="isOpenSendResume">
+    <div
+      id="openSendResume"
+      v-if="isOpenSendResume"
+    >
       <div class="askBox">
         <i class="el-icon-s-promotion"></i>
         <p>将投递您的在线简历，是否继续？</p>
-        <el-button type="primary" plain @click="sendResume">确定</el-button>
-        <el-button plain @click="cancelSendResume">取消</el-button>
+        <el-button
+          type="primary"
+          plain
+          @click="sendResume"
+        >确定</el-button>
+        <el-button
+          plain
+          @click="cancelSendResume"
+        >取消</el-button>
+      </div>
+    </div>
+    <div
+      class="deleteBox"
+      v-if="isOpenDelete"
+    >
+      <div class="askBox">
+        <i class="el-icon-delete-solid"></i>
+        <p>将删除该帖子，是否继续？</p>
+        <el-button
+          type="primary"
+          plain
+          @click="deleteEmployment"
+        >确定</el-button>
+        <el-button
+          plain
+          @click="cancelDelete"
+        >取消</el-button>
       </div>
     </div>
   </div>
@@ -61,7 +110,8 @@
 export default {
   data() {
     return {
-      isOpenSendResume: false,
+      isOpenSendResume: false, //是否打开投递简历窗口，默认为否
+      isOpenDelete: false, //是否打开删除招聘信息窗口，默认为否
     };
   },
   props: {
@@ -69,6 +119,15 @@ export default {
     companyDetails: Object,
   },
   methods: {
+    //实习或全职转文字显示
+    showIsFullTime(val) {
+      switch (val) {
+        case 0:
+          return "实习";
+        case 1:
+          return "全职";
+      }
+    },
     //详情返回列表
     toList() {
       this.$emit("toList");
@@ -84,7 +143,7 @@ export default {
     //点击投递简历按钮
     openSendResume() {
       this.isOpenSendResume = true;
-      document.documentElement.style.overflow='hidden';
+      document.documentElement.style.overflow = "hidden";
     },
     //确定投递简历
     sendResume() {
@@ -97,6 +156,32 @@ export default {
       this.isOpenSendResume = false;
       document.documentElement.style.overflow = "auto";
     },
+    //点击删除按钮
+    openDelete() {
+      this.isOpenDelete = true;
+      document.documentElement.style.overflow = "hidden";
+    },
+    //确定删除
+    deleteEmployment() {
+      let that = this;
+      this.$ajax
+        .post("/employment/deleteEmployment/" + this.details.id)
+        .then((res) => {
+          this.isOpenDelete = false;
+          document.documentElement.style.overflow = "auto";
+          this.$message.success("删除成功");
+          this.toList();
+          this.$emit("refresh");
+        });
+    },
+    //取消删除
+    cancelDelete() {
+      this.isOpenDelete = false;
+      document.documentElement.style.overflow = "auto";
+    },
+  },
+  mounted() {
+    
   },
 };
 </script>
@@ -114,7 +199,7 @@ export default {
   float: right;
   margin-right: 3%;
 }
-#employmentDetails .collect {
+#employmentDetails .el-link {
   float: right;
   line-height: 5vh;
   margin-right: 2vw;
@@ -122,6 +207,10 @@ export default {
 #employmentDetails .topBar {
   clear: both;
   width: 100%;
+}
+#employmentDetails .isFullTime {
+  float: left;
+  margin-right: 1vw;
 }
 #employmentDetails .topBar h5 {
   float: left;
@@ -222,6 +311,33 @@ export default {
   float: left;
 }
 #openSendResume p {
+  margin: 8% auto 4% 18%;
+}
+/* 删除招聘信息提示窗口 */
+#employmentDetails .deleteBox {
+  position: absolute;
+  z-index: 9;
+  width: 100vw;
+  height: 100vh;
+  top: -16.8vh;
+  left: -10vw;
+  background: rgba(0, 0, 0, 0.3);
+}
+#employmentDetails .deleteBox .askBox {
+  background: #fff;
+  width: 38%;
+  height: 20%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#employmentDetails .deleteBox i {
+  margin: 7% 1% auto 15%;
+  font-size: 1.5rem;
+  float: left;
+}
+#employmentDetails .deleteBox p {
   margin: 8% auto 4% 18%;
 }
 </style>

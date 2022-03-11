@@ -16,10 +16,11 @@ app.use(cors())
 
 app.use(express.urlencoded({ extended: false }))
 
-//论坛
-const forumRouter = require('./router/forum')
-app.use('/forum', forumRouter)
-
+//路由
+const router = require('./router/index')
+app.use('/forum', router.forumRouter)
+app.use('/employment', router.employmentRouter)
+app.use('/company', router.companyRouter)
 
 io.sockets.on('connection', function (socket) {
   console.log('a user connected');

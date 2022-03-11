@@ -1,7 +1,13 @@
 <template>
   <div id="employment">
-    <i class="el-icon-suitcase-1 index-icon" slot="icon"></i>
-    <h4 class="index-boxTitle" slot="boxTitle">招聘信息</h4>
+    <i
+      class="el-icon-suitcase-1 index-icon"
+      slot="icon"
+    ></i>
+    <h4
+      class="index-boxTitle"
+      slot="boxTitle"
+    >招聘信息</h4>
     <div
       id="employmentListBox"
       v-show="!isEmploymentDetails && !isCompanyDetails && !isSchoolDetails"
@@ -11,39 +17,48 @@
         v-model="searchValue"
         class="input-with-select searchInput"
       >
-        <el-select v-model="searchSelect" slot="prepend" placeholder="请选择">
-          <el-option label="搜岗位" value="1"></el-option>
-          <el-option label="搜公司" value="2"></el-option>
-          <el-option label="搜学校" value="3"></el-option>
+        <el-select
+          v-model="searchSelect"
+          slot="prepend"
+          placeholder="请选择"
+        >
+          <el-option
+            label="搜岗位"
+            value="1"
+          ></el-option>
+          <el-option
+            label="搜公司"
+            value="2"
+          ></el-option>
+          <el-option
+            label="搜学校"
+            value="3"
+          ></el-option>
         </el-select>
         <el-button
           slot="append"
           icon="el-icon-search"
           class="searchButton"
           v-if="searchSelect == 1 || searchSelect == ''"
-          >找实习</el-button
-        >
+        >找实习</el-button>
         <el-button
           slot="append"
           icon="el-icon-search"
           class="searchButton"
           v-if="searchSelect == 1 || searchSelect == ''"
-          >找全职</el-button
-        >
+        >找全职</el-button>
         <el-button
           slot="append"
           icon="el-icon-search"
           class="searchButton"
           v-if="searchSelect == 2"
-          >找公司</el-button
-        >
+        >找公司</el-button>
         <el-button
           slot="append"
           icon="el-icon-search"
           class="searchButton"
           v-if="searchSelect == 3"
-          >找学校</el-button
-        >
+        >找学校</el-button>
       </el-input>
       <div
         id="employmentContainer"
@@ -52,7 +67,10 @@
         <ul id="filter">
           <li>筛选岗位：</li>
           <li>
-            <el-select v-model="educationFilter" placeholder="学历要求">
+            <el-select
+              v-model="educationFilter"
+              placeholder="学历要求"
+            >
               <el-option value="不限"></el-option>
               <el-option value="大专"></el-option>
               <el-option value="本科"></el-option>
@@ -61,7 +79,10 @@
             </el-select>
           </li>
           <li>
-            <el-select v-model="salaryFilter" placeholder="薪资待遇">
+            <el-select
+              v-model="salaryFilter"
+              placeholder="薪资待遇"
+            >
               <el-option value="不限"></el-option>
               <el-option value="3K以下"></el-option>
               <el-option value="3-5K"></el-option>
@@ -88,7 +109,10 @@
             </el-switch>
           </li>
           <li>
-            <el-button round icon="el-icon-refresh-left">重置</el-button>
+            <el-button
+              round
+              icon="el-icon-refresh-left"
+            >重置</el-button>
           </li>
         </ul>
         <ul id="employmentList">
@@ -96,31 +120,39 @@
             class="employmentItem"
             v-for="item in employmentList"
             :key="item.id"
-            @click="toEmploymentDetails"
+            @click="toEmploymentDetails(item.id)"
           >
-            <p class="salary">{{ item.salary }}</p>
+            <p class="salary"><span>{{ item.salaryStart }}</span> - <span>{{ item.salaryEnd }}</span></p>
+            <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
             <p class="station">{{ item.station }}</p>
             <p class="jobMsg">
               <span>{{ item.location }}</span>
               <span>{{ item.education }}</span>
             </p>
             <p class="companyMsg">
-              <span>{{ item.company }}</span>
+              <span>{{ item.companyName }}</span>
               <span>{{ item.trade }}</span>
               <span>{{ item.level }}</span>
             </p>
           </li>
         </ul>
       </div>
-      <div id="companyContainer" v-if="searchSelect == 2">
+      <div
+        id="companyContainer"
+        v-if="searchSelect == 2"
+      >
         <ul id="companyList">
           <li
             class="companyItem"
             v-for="(item, index) in companyList"
-            :key="item.companyid"
-            @click="toCompanyDetails(index)"
+            :key="item.id"
+            @click="toCompanyDetails(item.id)"
           >
-            <img src="../assets/image/avatar.png" alt="公司logo" class="logo" />
+            <img
+              src="../assets/image/avatar.png"
+              alt="公司logo"
+              class="logo"
+            />
             <p class="name">{{ item.name }}</p>
             <p class="msg">
               <span>{{ item.location }}</span>
@@ -130,7 +162,10 @@
           </li>
         </ul>
       </div>
-      <div id="schoolContainer" v-if="searchSelect == 3">
+      <div
+        id="schoolContainer"
+        v-if="searchSelect == 3"
+      >
         <ul id="schoolList">
           <li
             class="schoolItem"
@@ -138,7 +173,11 @@
             :key="item.schoolid"
             @click="toSchoolDetails(index)"
           >
-            <img src="../assets/image/avatar.png" alt="学校logo" class="logo" />
+            <img
+              src="../assets/image/avatar.png"
+              alt="学校logo"
+              class="logo"
+            />
             <p class="name">{{ item.name }}</p>
             <p class="msg">
               <span>{{ item.location }}</span>
@@ -147,10 +186,11 @@
         </ul>
       </div>
       <el-pagination
-        :page-size="20"
-        :pager-count="11"
+        :page-size="9"
+        :current-page="currentPage"
+        :total="total"
         layout="prev, pager, next"
-        :total="1000"
+        @current-change="handleCurrentChange"
       >
       </el-pagination>
     </div>
@@ -162,34 +202,48 @@
       @collect="collect"
       @cancelCollect="cancelCollect"
       @sendResume="sendResume"
+      @refresh="getAccountListByPage"
     ></employment-details>
-    <div id="companyDetails" v-if="isCompanyDetails">
-      <el-button round @click="companyToList">返回</el-button>
+    <div
+      id="companyDetails"
+      v-if="isCompanyDetails"
+    >
+      <el-button
+        round
+        @click="companyToList"
+      >返回</el-button>
       <div class="listBar">
         <ul class="list">
-          <li v-for="(item, index) in employmentList" :key="item.employmentid">
+          <li
+            v-for="(item, index) in company_employmentList"
+            :key="item.id"
+          >
             <p class="authorMsg">
               <span>发布者名字</span>
               <span>她的职位</span>
             </p>
             <p class="station">{{ item.station }}</p>
             <p class="msg">
-              <span class="salary">{{ item.salary }}</span>
+              <span class="salary"><span>{{ item.salaryStart }}</span> - <span>{{ item.salaryEnd }}</span></span>
               <span>{{ item.location }}</span>
               <span>{{ item.education }}</span>
             </p>
           </li>
         </ul>
-        <el-pagination
-          :page-size="7"
-          :pager-count="11"
+        <!-- <el-pagination
+          :page-size="9"
+          :current-page="currentPage"
+          :total="total"
           layout="prev, pager, next"
-          :total="1000"
+          @current-change="handleCurrentChange"
         >
-        </el-pagination>
+        </el-pagination> -->
       </div>
       <div class="companyBar">
-        <img src="../assets/image/avatar.png" alt="公司logo" />
+        <img
+          src="../assets/image/avatar.png"
+          alt="公司logo"
+        />
         <p class="companyName">{{ companyDetails.name }}</p>
         <div class="msg">
           <span class="location">{{ companyDetails.location }}</span>
@@ -199,17 +253,33 @@
         <p class="introduction">{{ companyDetails.introduction }}</p>
       </div>
     </div>
-    <div id="schoolDetails" v-if="isSchoolDetails">
-      <el-button round @click="schoolToList">返回</el-button>
-      <el-carousel :interval="4000" type="card" height="200px">
-        <el-carousel-item v-for="item in 6" :key="item">
+    <div
+      id="schoolDetails"
+      v-if="isSchoolDetails"
+    >
+      <el-button
+        round
+        @click="schoolToList"
+      >返回</el-button>
+      <el-carousel
+        :interval="4000"
+        type="card"
+        height="200px"
+      >
+        <el-carousel-item
+          v-for="item in 6"
+          :key="item"
+        >
           <h3 class="medium">{{ item }}</h3>
         </el-carousel-item>
       </el-carousel>
       <div class="concat">
         <ul>
           <li>
-            <img src="../assets/image/avatar.png" alt="联系人头像" />
+            <img
+              src="../assets/image/avatar.png"
+              alt="联系人头像"
+            />
             <p class="name">李老师</p>
             <p class="tel">13700000000</p>
             <el-button
@@ -219,7 +289,10 @@
             ></el-button>
           </li>
           <li>
-            <img src="../assets/image/avatar.png" alt="联系人头像" />
+            <img
+              src="../assets/image/avatar.png"
+              alt="联系人头像"
+            />
             <p class="name">李老师</p>
             <p class="tel">13700000000</p>
             <el-button
@@ -252,6 +325,8 @@ export default {
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
       isCompanyDetails: false, //是否是公司详情页，默认为否
       isSchoolDetails: false, //是否是学校详情页，默认为否
+      currentPage: 1, // 当前页
+      total: 0, // 数据总条数
       searchValue: "", //搜索内容
       searchSelect: "", //选择搜索的类别
       educationFilter: "", //筛选学历
@@ -259,231 +334,9 @@ export default {
       locationOptions: provinceAndCityDataPlus,
       locationSelectedOptions: [], //工作地点选择的两个变量
       certification: false, //筛选学校认证
-      employmentList: [
-        //首页招聘信息列表
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-      ],
-      companyList: [
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-        {
-          //详情页面的公司信息
-          companyid: 1,
-          logo: "../assets/image/avatar.png",
-          name: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-          location: "北京",
-          introduction:
-            "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        },
-      ], //公司列表
+      employmentList: [], //首页招聘信息列表
+      companyList: [], //公司列表
+      company_employmentList:[],//某个公司的招聘信息列表
       schoolList: [
         {
           schoolid: 1,
@@ -492,40 +345,32 @@ export default {
           location: "北京",
         },
       ], //学校列表
-      employmentDetails: {
-        //某个招聘信息的详情
-        employmentid: 1,
-        isCollect: true, //是否收藏该招聘信息
-        isFullTime: true,
-        station: "高级产品经理",
-        salary: "10-20k",
-        location: "北京",
-        education: "本科",
-        company: "字节跳动",
-        trade: "互联网",
-        level: "已上市",
-        introduction:
-          "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        requirements:
-          "1、具备良好的沟通表达能力和组织协调能力，懂政府语言，团队意识强，抗压能力强，有激情，勇于接受挑战，善于开拓创新。2、至少精通生物医药、新一代信息技术等战新产业体系中的一个，熟悉行业领域格局。可独立宇客户进行业务交流。具备需求调研、服务解决方案设计能力。3、5年以上车联网、人工智能、生物医药、文旅行业领域从业经验，过往工作经历中有产业研究，信息化咨询、解决方案售前等相关工作经验，获得相关证书者优先。",
-      },
-      companyDetails: {
-        //详情页面的公司信息
-        companyid: 1,
-        logo: "",
-        name: "字节跳动",
-        trade: "互联网",
-        level: "已上市",
-        location: "北京",
-        introduction:
-          "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-      },
+      employmentDetails: {}, //某个招聘信息的详情
+      companyDetails: {}, //招聘信息详情页面的公司信息
     };
   },
   methods: {
+    //实习或全职转文字显示
+    showIsFullTime(val) {
+      switch (val) {
+        case 0:
+          return "实习";
+        case 1:
+          return "全职";
+      }
+    },
     //查看招聘详情
-    toEmploymentDetails() {
+    toEmploymentDetails(id) {
       this.isEmploymentDetails = true;
+      let that = this;
+      this.$ajax.get("/employment/getEmploymentById/" + id).then((res) => {
+        that.employmentDetails = res.data;
+        that.$ajax
+          .get("/company/getCompanyById/" + that.employmentDetails.companyId)
+          .then((res) => {
+            that.companyDetails = res.data;
+          });
+      });
     },
     //招聘详情返回列表
     employmentToList() {
@@ -542,8 +387,15 @@ export default {
     //投递简历
     sendResume() {},
     //查看公司详情
-    toCompanyDetails(index) {
+    toCompanyDetails(id) {
       this.isCompanyDetails = true;
+      let that = this;
+      this.$ajax.get("/company/getCompanyById/" + id).then((res) => {
+        that.companyDetails = res.data;
+      });
+      this.$ajax.get("/company/getAllEmployment/" + id).then(res => {
+        that.company_employmentList = res.data;
+      })
     },
     //公司详情返回列表
     companyToList() {
@@ -557,6 +409,46 @@ export default {
     schoolToList() {
       this.isSchoolDetails = false;
     },
+    // 按照分页显示数据的函数
+    getAccountListByPage() {
+      // 收集当前页码 和 每页显示条数
+      let currentPage = this.currentPage;
+      // 发送ajax请求 把分页数据发送给后端
+      this.$ajax
+        .get("/employment/getAccountListByPage/" + currentPage)
+        .then((response) => {
+          // 接收后端返回的数据总条数 total 和 对应页码的数据 data
+          let { total, results } = response.data;
+          // 赋值给对应的变量即可
+          this.total = total;
+          this.employmentList = results;
+          // 如果当前页没有数据 且 排除第一页
+          if (!data.length && this.currentPage !== 1) {
+            // 页码减去 1
+            this.currentPage -= 1;
+            // 再调用自己
+            this.getAccountListByPage();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    // 当前页码改变 就会触发这个函数
+    handleCurrentChange(val) {
+      this.currentPage = val; // 保存当前页码
+      this.getAccountListByPage(); // 调用分页函数
+    },
+  },
+  mounted() {
+    let that = this;
+    this.$ajax.get("/employment/getAccountListByPage/1").then((res) => {
+      that.employmentList = res.data.results;
+      that.total = res.data.total;
+    });
+    this.$ajax.get("/company/getAccountListByPage/1").then((res) => {
+      that.companyList = res.data.results;
+    });
   },
 };
 </script>
@@ -618,10 +510,15 @@ export default {
   border: #8e909421 1px solid;
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.05);
 }
+#employment .employmentItem .isFullTime {
+  float: left;
+}
 #employment .employmentItem .salary {
   float: right;
   color: #72b3f0;
   font-size: 1.2rem;
+  width: 40%;
+  text-align: right;
 }
 #employment .employmentItem .jobMsg,
 #employment .employmentItem .companyMsg {

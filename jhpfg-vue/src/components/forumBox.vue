@@ -14,10 +14,9 @@
     </ul>
     <el-pagination
       :current-page="currentPage"
-      :page-size="pageSize"
-      layout="prev, pager, next"
+      :page-size="10"
       :total="total"
-      @size-change="handleSizeChange"
+      layout="prev, pager, next"
       @current-change="handleCurrentChange"
     >
     </el-pagination>
@@ -25,8 +24,6 @@
 </template>
 
 <script>
-import qs from "qs";
-
 export default {
   props: {
     tab: Number,
@@ -35,7 +32,6 @@ export default {
     return {
       currentPage: 1, // 当前页
       total: 0, // 数据总条数
-      pageSize: 10, // 每页条数
       list: [], //帖子列表
       isShowList: false, //是否是搜索后出来的列表，默认为否
     };
@@ -86,7 +82,6 @@ export default {
     getAccountListByPage() {
       // 收集当前页码 和 每页显示条数
       let currentPage = this.currentPage;
-
       // 发送ajax请求 把分页数据发送给后端
       this.$ajax
         .get("/forum/getAccountListByPage/" + currentPage)
@@ -108,23 +103,17 @@ export default {
           console.log(err);
         });
     },
-    // 每页显示条数改变 就会触发这个函数
-    handleSizeChange(val) {
-      this.pageSize = val; // 保存每页显示的条数
-      this.getAccountListByPage(); // 调用分页函数
-    },
     // 当前页码改变 就会触发这个函数
     handleCurrentChange(val) {
       this.currentPage = val; // 保存当前页码
       this.getAccountListByPage(); // 调用分页函数
-    },
-    //根据关键字搜索
-    search() {},
+    }
   },
   mounted() {
+    let that = this;
     this.$ajax.get("/forum/getAccountListByPage/1").then((res) => {
-      this.list = res.data.results;
-      this.total = res.data.total;
+      that.list = res.data.results;
+      that.total = res.data.total;
     });
   },
 };
