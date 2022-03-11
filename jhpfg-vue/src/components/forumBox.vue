@@ -14,7 +14,7 @@
     </ul>
     <el-pagination
       :current-page="currentPage"
-      :page-size="10"
+      :page-size="pageSize"
       :total="total"
       layout="prev, pager, next"
       @current-change="handleCurrentChange"
@@ -27,6 +27,7 @@
 export default {
   props: {
     tab: Number,
+    pageSize: Number,
   },
   data() {
     return {
@@ -39,14 +40,15 @@ export default {
   watch: {
     tab: function (val) {
       this.currentPage = 1;
+      let that = this;
       if (val == 0) {
-        this.$ajax.get("/forum/getAccountListByPage/1").then((res) => {
+        this.$ajax.get("/forum/getAccountListByPage/1/" + that.pageSize).then((res) => {
           this.list = res.data.results;
           this.total = res.data.total;
         });
       } else {
         this.$ajax
-          .get("/forum/getAccountListByPageAndZone/1/" + val)
+          .get("/forum/getAccountListByPageAndZone/1/" + that.pageSize + "/" +val)
           .then((res) => {
             this.list = res.data.results;
             this.total = res.data.total;
@@ -80,11 +82,9 @@ export default {
     },
     // 按照分页显示数据的函数
     getAccountListByPage() {
-      // 收集当前页码 和 每页显示条数
-      let currentPage = this.currentPage;
       // 发送ajax请求 把分页数据发送给后端
       this.$ajax
-        .get("/forum/getAccountListByPage/" + currentPage)
+        .get("/forum/getAccountListByPage/" + this.currentPage + "/" + this.pageSize)
         .then((response) => {
           // 接收后端返回的数据总条数 total 和 对应页码的数据 data
           let { total, results } = response.data;
@@ -111,7 +111,7 @@ export default {
   },
   mounted() {
     let that = this;
-    this.$ajax.get("/forum/getAccountListByPage/1").then((res) => {
+    this.$ajax.get("/forum/getAccountListByPage/1/" + this.pageSize).then((res) => {
       that.list = res.data.results;
       that.total = res.data.total;
     });
@@ -128,6 +128,8 @@ export default {
 #forumBox .list li {
   width: 96%;
   padding: 2%;
+}
+#forumBox .list li:not(:last-of-type) {
   border-bottom: #8e90943d 1px solid;
 }
 #forumBox .list h6 {

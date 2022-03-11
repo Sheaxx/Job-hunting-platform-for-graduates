@@ -71,6 +71,7 @@
         </el-tabs>
         <forum-box
           :tab="tab"
+          :pageSize="10"
           @itemClick="toDetails"
         ></forum-box>
       </div>

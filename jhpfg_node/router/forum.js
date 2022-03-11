@@ -7,10 +7,10 @@ const router = express.Router()
 const handler = require('../handler/forum')
 
 // 分页获取帖子列表
-router.get('/getAccountListByPage/:currentPage', handler.getAccountListByPage);
+router.get('/getAccountListByPage/:currentPage/:pageSize', handler.getAccountListByPage);
 
 // 根据所属板块分页获取
-router.get('/getAccountListByPageAndZone/:currentPage/:zone', handler.getAccountListByPageAndZone);
+router.get('/getAccountListByPageAndZone/:currentPage/:pageSize/:zone', handler.getAccountListByPageAndZone);
 
 //根据id搜索某一条帖子
 router.get('/getPostById/:id', handler.getPostById);

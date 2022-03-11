@@ -3,8 +3,7 @@ const moment = require('moment')
 
 //分页获取帖子列表
 exports.getAccountListByPage = (req, res) => {
-  let pageSize = 10;
-  let { currentPage } = req.params;
+  let { pageSize,currentPage } = req.params;
   let sql = 'select * from forum order by id desc';
   db.query(sql, (err, results) => {
     if (err) return res.send("error")
@@ -30,8 +29,7 @@ exports.getAccountListByPage = (req, res) => {
 
 //根据所属板块分页获取
 exports.getAccountListByPageAndZone = (req, res) => {
-  let pageSize = 10;
-  let { currentPage, zone } = req.params;
+  let { pageSize, currentPage, zone } = req.params;
   let sql = 'select * from forum where zone=' + zone + ' order by id desc'
   db.query(sql, (err, results) => {
     if (err) return res.send(err.message)
@@ -91,6 +89,12 @@ exports.getPostByKeyword = (req, res) => {
     }
     res.send(arr)
   })
+}
+
+//根据用户名搜索所发布的帖子
+exports.getPostByUsername = (req, res) => {
+  let username = req.params.username;
+  
 }
 
 //发布帖子

@@ -21,6 +21,7 @@ const router = require('./router/index')
 app.use('/forum', router.forumRouter)
 app.use('/employment', router.employmentRouter)
 app.use('/company', router.companyRouter)
+app.use('/user', router.userRouter)
 
 io.sockets.on('connection', function (socket) {
   console.log('a user connected');

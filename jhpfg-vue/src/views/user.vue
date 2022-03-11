@@ -9,7 +9,7 @@
         v-if="!isEmploymentDetails && !isPostDetails"
         :value="tabValue"
       >
-        <el-tab-pane label="我的个人信息" class="user" :name="1">
+        <el-tab-pane label="我的个人信息" class="user" name="1">
           <h5 class="boxTitle">个人信息</h5>
           <ul>
             <li>
@@ -48,7 +48,7 @@
             >
           </div>
         </el-tab-pane>
-        <el-tab-pane label="我的简历" class="resume" :name="2">
+        <el-tab-pane label="我的简历" class="resume" name="2">
           <resume
             :resumeInfo="resumeInfo"
             :educationInfo="educationInfo"
@@ -59,28 +59,29 @@
             :certificateInfo="certificateInfo"
           ></resume>
         </el-tab-pane>
-        <el-tab-pane label="我的收藏" class="collection" :name="3">
+        <el-tab-pane label="我的收藏" class="collection" name="3">
           <ul v-if="!isEmploymentDetails">
             <li
               v-for="item in collectionList"
               :key="item.employmentid"
               @click="toEmploymentDetails"
             >
-              <p class="salary">{{ item.salary }}</p>
+              <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
+              <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
               <p class="station">{{ item.station }}</p>
               <p class="jobMsg">
                 <span>{{ item.location }}</span>
                 <span>{{ item.education }}</span>
               </p>
               <p class="companyMsg">
-                <span>{{ item.company }}</span>
+                <span>{{ item.companyName }}</span>
                 <span>{{ item.trade }}</span>
                 <span>{{ item.level }}</span>
               </p>
             </li>
           </ul>
         </el-tab-pane>
-        <el-tab-pane label="我的投递" class="resumeSent" :name="4">
+        <el-tab-pane label="我的投递" class="resumeSent" name="4">
           <ul>
             <li v-for="item in resumeSentList" :key="item.sentid">
               <p class="company">{{ item.company }}</p>
@@ -99,9 +100,11 @@
             </li>
           </ul>
         </el-tab-pane>
-        <el-tab-pane label="我的发布" :name="5">
+        <el-tab-pane label="我的发布" name="5">
           <forum-box
-            :forumList="postList"
+            class="forumBox"
+            :tab="0"
+            :pageSize="6"
             @itemClick="toPostDetails"
           ></forum-box>
         </el-tab-pane>
@@ -136,7 +139,7 @@ export default {
   components: { Resume, EmploymentDetails, ForumBox, ForumDetails },
   data() {
     return {
-      tabValue:1,//选项卡的值，默认为第一个
+      tabValue:"1",//选项卡的值，默认为第一个
       isUpdatePassword: false, //修改密码界面，默认为否
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
       isPostDetails: false, //是否是帖子详情页，默认为否
@@ -149,159 +152,14 @@ export default {
         role: "学生", //角色身份
         collections: [], //收藏的招聘信息列表
       },
-      resumeInfo: {
-        //简历信息
-        resumeid: "", //简历编号
-        username: "",
-        realname: "查理苏", //真实姓名
-        birth: "1998.1.2", //出生日期
-        sex: "男", //性别
-        tel: "13711447629", //联系方式
-        email: "605697557@qq.com", //电子邮箱
-        highesteducation: "本科", //最高学历
-        school: "", //毕业学校
-        expectedPosition: "总裁", //期望职位
-      },
-      educationInfo: [
-        //教育信息
-        {
-          educationid: 1, //教育信息编号
-          username: "",
-          school: "哈佛大学", //学校名
-          duration: "2018.9-2022.7", //时间段
-          qualification: "本科", //学历
-          specialty: "挖掘机", //专业
-          gpa: "4.0", //绩点
-        },
-      ],
-      internshipInfo: [
-        //实习经历
-        {
-          internshipid: 1, //实习经历编号
-          username: "",
-          company: "某某公司", //公司名称
-          duration: "2018.9-2022.7", //时间段
-          position: "前端开发", //职位名称
-          content:
-            "◆ 实现商城平台及其管理，包含商品搜索、订单管理等功能。◆ 前端使用 layui 框架，后台使用 mybatis+springboot+springmvc 技术。", //工作内容
-        },
-      ],
-      projectInfo: [
-        //项目经历
-        {
-          projectid: 1, //项目经历编号
-          username: "",
-          name: "社区管理系统“社区小管家”", //项目名称
-          role: "前端开发", //项目角色
-          duration: "2018.9-2022.7", //时间段
-          content:
-            "为帮助社区管理而开发的系统，涵盖了社区内管理多项功能如车位管理、物业人员管理等。◆ 负责系统前端页面开发，独立完成管理员模块首页等功能开发，组件化开发网站菜单栏。◆ 使用 Vue 框架+elementUI 组件库，采用前后端分离进行开发", //项目内容
-        },
-      ],
-      skillInfo: ["html", "css"], //技能
-      certificateInfo: ["英语六级", "英语四级"], //证书
-      campusExperienceInfo: [
-        //校内经历
-        {
-          campusExperienceId: 1, //校内经历 大写的！！不行改！！！！！
-          username: "",
-          name: "计算机学院团委红十字会", //部门或活动名称
-          role: "副部长", //在部门或活动中担任的角色
-          duration: "2018.9-2022.7", //时间段
-          content:
-            "带领小干策划组织游园、防艾讲座、成分血献血等活动。◆ 获得红十字会先进个人及 2019-2020 年度优秀学生干部奖学金。", //部门工作内容或活动内容
-        },
-      ],
-      collectionList: [
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-        {
-          employmentid: 1,
-          isFullTime: true,
-          station: "高级产品经理",
-          salary: "10-20k",
-          location: "北京",
-          education: "本科",
-          company: "字节跳动",
-          trade: "互联网",
-          level: "已上市",
-        },
-      ], //收藏招聘信息列表
+      resumeInfo: {},//简历信息
+      educationInfo: [],//教育信息
+      internshipInfo: [],//实习经历
+      projectInfo: [],//项目经历
+      skillInfo: [], //技能
+      certificateInfo: [], //证书
+      campusExperienceInfo: [],//校内经历
+      collectionList: [], //收藏招聘信息列表
       employmentDetails: {
         //某个招聘信息的详情
         employmentid: 1,
@@ -386,6 +244,15 @@ export default {
       this.oldPassword = "";
       this.newPassword = "";
     },
+    //实习或全职转文字显示
+    showIsFullTime(val) {
+      switch (val) {
+        case 0:
+          return "实习";
+        case 1:
+          return "全职";
+      }
+    },
     //查看招聘信息详情
     toEmploymentDetails() {
       this.isEmploymentDetails = true;
@@ -419,6 +286,21 @@ export default {
       
     },
   },
+  mounted() {
+    let that = this;
+    this.$ajax.get("/user/getResume/" + "aaa").then(res => {
+      that.resumeInfo = res.data.resume;
+      that.educationInfo = res.data.education;
+      that.internshipInfo = res.data.internship;
+      that.projectInfo = res.data.project;
+      that.campusExperienceInfo = res.data.campusExperience;
+      that.skillInfo = res.data.skill;
+      that.certificateInfo = res.data.certificate;
+    })
+    this.$ajax.get("/user/getCollectList/" + "aaa").then(res => {
+      that.collectionList = res.data;
+    })
+  }
 };
 </script>
 
@@ -464,6 +346,10 @@ export default {
   height: 500px;
   overflow: auto;
 }
+#user .collection .isFullTime {
+  float: left;
+  margin-right: 20px;
+}
 #user .collection li {
   width: 95%;
   height: 18%;
@@ -476,6 +362,8 @@ export default {
   float: right;
   color: #72b3f0;
   font-size: 1.2rem;
+  width: 50%;
+  text-align: right;
 }
 #user .collection .jobMsg,
 #user .collection .companyMsg {
@@ -527,7 +415,7 @@ export default {
 /* 我的发布 */
 #user #forumBox {
   width: 87%;
-  padding-top: 1%;
+  margin-top: -11vh;
 }
 #user #forumBox ul {
   height: 440px;

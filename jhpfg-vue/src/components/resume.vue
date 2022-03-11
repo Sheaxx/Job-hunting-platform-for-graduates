@@ -5,9 +5,11 @@
       round
       v-if="!isUpdateResume"
       @click="openUpdateResume"
-      >更新简历</el-button
+    >更新简历</el-button>
+    <div
+      id="resumeReadBox"
+      v-if="!isUpdateResume"
     >
-    <div id="resumeReadBox" v-if="!isUpdateResume">
       <div id="resumeRead">
         <p>{{ resumeInfo.realname }}</p>
         <ul class="row1">
@@ -15,27 +17,42 @@
             {{ resumeInfo.sex }}
           </li>
           <li>
-            <img src="../assets/image/icon/birth.svg" alt="生日图标" />
+            <img
+              src="../assets/image/icon/birth.svg"
+              alt="生日图标"
+            />
             {{ resumeInfo.birth }}
           </li>
           <li>
-            <img src="../assets/image/icon/education.svg" alt="学历图标" />
+            <img
+              src="../assets/image/icon/education.svg"
+              alt="学历图标"
+            />
             {{ resumeInfo.highesteducation }}
           </li>
         </ul>
         <ul class="row2">
           <li>
-            <img src="../assets/image/icon/tel.svg" alt="电话图标" />
+            <img
+              src="../assets/image/icon/tel.svg"
+              alt="电话图标"
+            />
             {{ resumeInfo.tel }}
           </li>
           <li>
-            <img src="../assets/image/icon/email.svg" alt="电子邮箱图标" />
+            <img
+              src="../assets/image/icon/email.svg"
+              alt="电子邮箱图标"
+            />
             {{ resumeInfo.email }}
           </li>
         </ul>
         <ul class="row3">
           <li>
-            <img src="../assets/image/icon/position.svg" alt="职位图标" />
+            <img
+              src="../assets/image/icon/position.svg"
+              alt="职位图标"
+            />
             {{ resumeInfo.expectedPosition }}
           </li>
         </ul>
@@ -43,7 +60,10 @@
       <div id="educationRead">
         <h6 class="readTitle">教育经历</h6>
         <ul>
-          <li v-for="item in educationInfo" :key="item.educationid">
+          <li
+            v-for="item in educationInfo"
+            :key="item.id"
+          >
             <div class="row1">
               <p class="school">{{ item.school }}</p>
               <p class="duration">{{ item.duration }}</p>
@@ -59,7 +79,10 @@
       <div id="internshipRead">
         <h6 class="readTitle">实习经历</h6>
         <ul>
-          <li v-for="item in internshipInfo" :key="item.internshipid">
+          <li
+            v-for="item in internshipInfo"
+            :key="item.id"
+          >
             <div class="row1">
               <p class="company">{{ item.company }}</p>
               <p class="duration">{{ item.duration }}</p>
@@ -76,7 +99,10 @@
       <div id="projectRead">
         <h6 class="readTitle">项目经历</h6>
         <ul>
-          <li v-for="item in projectInfo" :key="item.projectid">
+          <li
+            v-for="item in projectInfo"
+            :key="item.id"
+          >
             <div class="row1">
               <p class="name">{{ item.name }}</p>
               <p class="duration">{{ item.duration }}</p>
@@ -95,7 +121,7 @@
         <ul>
           <li
             v-for="item in campusExperienceInfo"
-            :key="item.campusExperienceId"
+            :key="item.id"
           >
             <div class="row1">
               <p class="name">{{ item.name }}</p>
@@ -114,8 +140,14 @@
         <div id="skillRead">
           <h6 class="readTitle">技能</h6>
           <ul>
-            <li v-for="(item, index) in skillInfo" :key="index">
-              <img src="../assets/image/icon/skill.svg" alt="技能图标" />{{
+            <li
+              v-for="(item, index) in skillInfo"
+              :key="index"
+            >
+              <img
+                src="../assets/image/icon/skill.svg"
+                alt="技能图标"
+              />{{
                 item
               }}
             </li>
@@ -124,7 +156,10 @@
         <div id="certificateRead">
           <h6 class="readTitle">证书</h6>
           <ul>
-            <li v-for="(item, index) in certificateInfo" :key="index">
+            <li
+              v-for="(item, index) in certificateInfo"
+              :key="index"
+            >
               <img
                 src="../assets/image/icon/certificate.svg"
                 alt="证书图标"
@@ -134,22 +169,23 @@
         </div>
       </div>
     </div>
-    <div id="updateResume" v-if="isUpdateResume">
+    <div
+      id="updateResume"
+      v-if="isUpdateResume"
+    >
       <el-button
-      type="primary"
-      round
-      v-if="isUpdateResume"
-      @click="updateResume"
-      class="updateButton"
-      >确认更新</el-button
-    >
-    <el-button
-      round
-      v-if="isUpdateResume"
-      @click="cancelUpdateResume"
-      class="cancelButton"
-      >取消更新</el-button
-    >
+        type="primary"
+        round
+        v-if="isUpdateResume"
+        @click="updateResume"
+        class="updateButton"
+      >确认更新</el-button>
+      <el-button
+        round
+        v-if="isUpdateResume"
+        @click="cancelUpdateResume"
+        class="cancelButton"
+      >取消更新</el-button>
       <div id="updateResumeBox">
         <h5>个人信息</h5>
         <el-form
@@ -164,12 +200,21 @@
             <el-input v-model="editResume.resumeInfo.expectedPosition" />
           </el-form-item>
           <el-form-item label="出生日期">
-            <el-date-picker v-model="editResume.resumeInfo.birth" type="date" />
+            <el-date-picker
+              v-model="editResume.resumeInfo.birth"
+              type="date"
+            />
           </el-form-item>
           <el-form-item label="性别">
             <el-select v-model="editResume.resumeInfo.sex">
-              <el-option label="男" value="0"></el-option>
-              <el-option label="女" value="1"></el-option>
+              <el-option
+                label="男"
+                value="0"
+              ></el-option>
+              <el-option
+                label="女"
+                value="1"
+              ></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="联系方式">
@@ -272,7 +317,10 @@
             >
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="工作内容" class="content">
+          <el-form-item
+            label="工作内容"
+            class="content"
+          >
             <el-input
               type="textarea"
               v-model="editResume.internshipInfo[index].content"
@@ -326,7 +374,10 @@
             >
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="项目内容" class="content">
+          <el-form-item
+            label="项目内容"
+            class="content"
+          >
             <el-input
               type="textarea"
               v-model="editResume.projectInfo[index].content"
@@ -380,7 +431,10 @@
             >
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="内容" class="content">
+          <el-form-item
+            label="内容"
+            class="content"
+          >
             <el-input
               type="textarea"
               v-model="editResume.campusExperienceInfo[index].content"
@@ -467,6 +521,8 @@
 </template>
 
 <script>
+import qs from "qs";
+
 export default {
   data() {
     return {
@@ -479,11 +535,11 @@ export default {
       certificateLength: 2, //证书的长度
       editResume: {
         resumeInfo: {
-          resumeid: "", //简历编号
-          username: "",
+          id: 1, //简历编号
+          username: "aaa",
           realname: "查理苏", //真实姓名
           birth: "1998.1.2", //出生日期
-          sex: "男", //性别
+          sex: "女", //性别
           tel: "13711447629", //联系方式
           email: "605697557@qq.com", //电子邮箱
           highesteducation: "本科", //最高学历
@@ -492,8 +548,17 @@ export default {
         },
         educationInfo: [
           {
-            educationid: 1, //教育信息编号
-            username: "",
+            id: 1, //教育信息编号
+            username: "aaa",
+            school: "哈佛大学", //学校名
+            duration: [], //时间段
+            qualification: "本科", //学历
+            specialty: "挖掘机", //专业
+            gpa: "4.0", //绩点
+          },
+          {
+            id: 2, //教育信息编号
+            username: "aaa",
             school: "哈佛大学", //学校名
             duration: [], //时间段
             qualification: "本科", //学历
@@ -504,8 +569,8 @@ export default {
         internshipInfo: [
           //实习经历
           {
-            internshipid: 1, //实习经历编号
-            username: "",
+            id: 1, //实习经历编号
+            username: "aaa",
             company: "某某公司", //公司名称
             duration: [], //时间段
             position: "前端开发", //职位名称
@@ -516,8 +581,8 @@ export default {
         projectInfo: [
           //项目经历
           {
-            projectid: 1, //项目经历编号
-            username: "",
+            id: 1, //项目经历编号
+            username: "aaa",
             name: "社区管理系统“社区小管家”", //项目名称
             role: "前端开发", //项目角色
             duration: "2018.9-2022.7", //时间段
@@ -530,8 +595,8 @@ export default {
         campusExperienceInfo: [
           //校内经历
           {
-            campusExperienceId: 1, //校内经历 大写的！！不行改！！！！！
-            username: "",
+            id: 1, //校内经历编号
+            username: "aaa",
             name: "计算机学院团委红十字会", //部门或活动名称
             role: "副部长", //在部门或活动中担任的角色
             duration: [], //时间段
@@ -558,8 +623,65 @@ export default {
     },
     //确定更新简历
     updateResume() {
-      this.$message.success("更新成功");
-      this.isUpdateResume = false;
+      let skill = this.editResume.skillInfo.join(",");
+      let certificate = this.editResume.certificateInfo.join(",");
+      let obj = Object.assign({}, this.editResume.resumeInfo);
+      obj.skill = skill;
+      obj.certificate = certificate;
+      let that = this;
+      this.$ajax
+        .post("/user/updateResume", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then(() => {
+          for (let item in that.editResume.educationInfo) {
+            that.$ajax.post(
+              "/user/updateEducation",
+              qs.stringify(that.editResume.educationInfo[item]),
+              {
+                "content-type": "application/x-www-form-urlencoded",
+              }
+            );
+          }
+        })
+        .then(() => {
+          for (let item in that.editResume.internshipInfo) {
+            that.$ajax.post(
+              "/user/updateInternship",
+              qs.stringify(that.editResume.internshipInfo[item]),
+              {
+                "content-type": "application/x-www-form-urlencoded",
+              }
+            );
+            console.log(that.internshipInfo[item])
+          }
+        })
+        .then(() => {
+          for (let item in that.editResume.projectInfo) {
+            that.$ajax.post(
+              "/user/updateProject",
+              qs.stringify(that.editResume.projectInfo[item]),
+              {
+                "content-type": "application/x-www-form-urlencoded",
+              }
+            );
+          }
+        })
+        .then(() => {
+          for (let item in that.editResume.campusExperienceInfo) {
+            that.$ajax.post(
+              "/user/updateCampusExperience",
+              qs.stringify(that.editResume.campusExperienceInfo[item]),
+              {
+                "content-type": "application/x-www-form-urlencoded",
+              }
+            );
+          }
+        })
+        .then(() => {
+          that.$message.success("更新成功");
+          that.isUpdateResume = false;
+        });
     },
     //取消更新简历
     cancelUpdateResume() {

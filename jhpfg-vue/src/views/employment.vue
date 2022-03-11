@@ -122,7 +122,7 @@
             :key="item.id"
             @click="toEmploymentDetails(item.id)"
           >
-            <p class="salary"><span>{{ item.salaryStart }}</span> - <span>{{ item.salaryEnd }}</span></p>
+            <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
             <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
             <p class="station">{{ item.station }}</p>
             <p class="jobMsg">
