@@ -1,6 +1,9 @@
 <template>
   <div id="forum">
-    <div class="forumBox" v-if="!isSearchList">
+    <div
+      class="forumBox"
+      v-if="!isSearchList"
+    >
       <i
         class="el-icon-chat-dot-square index-icon"
         slot="icon"
@@ -76,7 +79,7 @@
         :details="details"
         :commentList="commentList"
         @toList="toList"
-        @addComment="addComment"
+        @refresh="toDetails"
       ></forum-details>
       <div
         id="addPost"
@@ -186,10 +189,10 @@ export default {
       isDetails: false, //是否是详情页，默认为否
       isAddPost: false, //是否打开发布帖子窗口，默认为否
       isSearchList: false, //是否是搜索结果列表，默认为否
-      fromSearch:false,//是否是从搜索列表打开详情，默认为否
+      fromSearch: false, //是否是从搜索列表打开详情，默认为否
       tab: 0, //当前选中的tab
       searchValue: "", //搜索内容
-      searchList:[],//搜索结果列表
+      searchList: [], //搜索结果列表
       details: {}, //某个帖子的详情
       editPost: {
         //添加或修改帖子
@@ -200,15 +203,7 @@ export default {
         createTime: "",
         zone: "",
       },
-      commentList: [
-        //评论列表
-        {
-          commentid: 1,
-          content: "更新 Github 模板",
-          author: "王小虎",
-          time: "2018/4/3 20:46",
-        },
-      ],
+      commentList: [], //评论列表
     };
   },
   methods: {
@@ -222,15 +217,14 @@ export default {
       this.isDetails = true;
       let that = this;
       this.$ajax.get("/forum/getPostById/" + id).then((res) => {
-        that.details = res.data;
+        that.details = res.data.post;
+        that.commentList = res.data.commentList;
       });
     },
     //帖子详情页返回列表
     toList() {
       this.isDetails = false;
     },
-    //发布评论
-    addComment() {},
     //点击我要发布按钮
     openAddPost() {
       this.isAddPost = true;
@@ -249,8 +243,6 @@ export default {
         this.$message.error("请将内容填写完整");
         return;
       }
-      this.isAddPost = false;
-      document.documentElement.style.overflow = "auto";
       let obj = Object.assign({}, this.editPost);
       let that = this;
       this.$ajax
@@ -267,6 +259,8 @@ export default {
               that.$router.go(0);
             }, 500);
           });
+          that.isAddPost = false;
+          document.documentElement.style.overflow = "auto";
         });
     },
     //取消发布帖子
@@ -298,7 +292,7 @@ export default {
       this.$ajax.get("/forum/getPostById/" + row.id).then((res) => {
         that.details = res.data;
       });
-    }
+    },
   },
 };
 </script>

@@ -224,7 +224,7 @@
             </p>
             <p class="station">{{ item.station }}</p>
             <p class="msg">
-              <span class="salary"><span>{{ item.salaryStart }}</span> - <span>{{ item.salaryEnd }}</span></span>
+              <span class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></span>
               <span>{{ item.location }}</span>
               <span>{{ item.education }}</span>
             </p>

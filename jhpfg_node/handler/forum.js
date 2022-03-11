@@ -16,7 +16,7 @@ exports.getAccountListByPage = (req, res) => {
     // 执行sql语句 （查询对应页码的数据）
     db.query(sql, (err, results) => {
       if (err) throw err;
-      for(let item in results) {
+      for (let item in results) {
         results[item].createTime = moment(results[item].createTime).format('YYYY-MM-DD HH:mm:ss');
       }
       // 把数据返回给前端 两个数据 数据总条数 total 和 对应页码的数据 data
@@ -44,7 +44,7 @@ exports.getAccountListByPageAndZone = (req, res) => {
     db.query(sql, (err, results) => {
       if (err) throw err;
       // 把数据返回给前端 两个数据 数据总条数 total 和 对应页码的数据 data
-      for(let item in results) {
+      for (let item in results) {
         results[item].createTime = moment(results[item].createTime).format('YYYY-MM-DD HH:mm:ss');
       }
       res.send({
@@ -58,11 +58,21 @@ exports.getAccountListByPageAndZone = (req, res) => {
 //根据id搜索某一条帖子
 exports.getPostById = (req, res) => {
   let id = req.params.id;
-  let sql = 'select * from forum where id=' + id;
-  db.query(sql, (err, results) => {
+  let sql1 = 'select * from forum where id=' + id;
+  db.query(sql1, (err, results) => {
     if (err) throw err;
     results[0].createTime = moment(results[0].createTime).format('YYYY-MM-DD HH:mm:ss');
-    res.send(results[0]);
+    let sql2 = 'select * from comment where postid=' + id
+    db.query(sql2, (err, list) => {
+      if (err) throw err;
+      for (let item in list) {
+        list[item].time = moment(list[item].time).format('YYYY-MM-DD HH:mm:ss');
+      }
+      res.send({ 
+        post: results[0], 
+        commentList: list
+      });
+    })
   })
 }
 
@@ -73,7 +83,7 @@ exports.getPostByKeyword = (req, res) => {
   db.query(sql, (err, results) => {
     if (err) throw err;
     let arr = [];
-    for(let item in results) {
+    for (let item in results) {
       if (results[item].title.search(keyword) != -1) {
         results[item].createTime = moment(results[item].createTime).format('YYYY-MM-DD HH:mm:ss');
         arr.push(results[item])
@@ -81,7 +91,6 @@ exports.getPostByKeyword = (req, res) => {
     }
     res.send(arr)
   })
-
 }
 
 //发布帖子
@@ -107,5 +116,21 @@ exports.deletePost = (req, res) => {
   db.query(sql, (err, results) => {
     if (err) throw err;
     res.send('success')
+  })
+}
+
+//帖子详情中发布评论
+exports.addComment = (req, res) => {
+  let comment = req.body;
+  comment.time = moment().format('YYYY-MM-DD HH:mm:ss');
+  let sql1 = 'select max(id) as maxid from comment';
+  db.query(sql1, (err, results) => {
+    if (err) throw err;
+    comment.id = results[0].maxid + 1
+    let sql2 = 'insert into comment set ?';
+    db.query(sql2, comment, (err, results) => {
+      if (err) throw err;
+      res.send('success')
+    })
   })
 }

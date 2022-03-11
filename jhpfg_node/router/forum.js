@@ -24,5 +24,8 @@ router.post('/addPost', handler.addPost);
 //删除帖子
 router.post('/deletePost/:id', handler.deletePost);
 
+//帖子详情中发布评论
+router.post('/addComment', handler.addComment);
+
 // 向外共享路由对象
 module.exports = router

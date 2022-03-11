@@ -69,6 +69,8 @@
 </template>
 
 <script>
+import qs from "qs";
+
 export default {
   data() {
     return {
@@ -121,9 +123,24 @@ export default {
     },
     //点击发布评论按钮
     addComment() {
-      this.$message.success("评论成功");
-      this.commentValue = "";
-      this.$emit("addComment");
+      if (!this.commentValue) {
+        this.$message.error("评论内容不得为空");
+        return;
+      }
+      let obj = {
+        content: this.commentValue,
+        postid: this.details.id,
+      };
+      let that = this;
+      this.$ajax
+        .post("/forum/addComment", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then(() => {
+          that.$emit("refresh", that.details.id);
+          that.$message.success("评论成功");
+          that.commentValue = "";
+        });
     },
   },
 };
