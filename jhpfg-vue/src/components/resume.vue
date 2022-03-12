@@ -66,7 +66,7 @@
           >
             <div class="row1">
               <p class="school">{{ item.school }}</p>
-              <p class="duration">{{ item.duration }}</p>
+              <p class="duration">{{ item.duration[0] }} 至 {{ item.duration[1] }}</p>
             </div>
             <div class="row2">
               <p class="qualification">{{ item.qualification }}</p>
@@ -85,7 +85,7 @@
           >
             <div class="row1">
               <p class="company">{{ item.company }}</p>
-              <p class="duration">{{ item.duration }}</p>
+              <p class="duration">{{ item.duration[0] }} 至 {{ item.duration[1] }}</p>
             </div>
             <div class="row2">
               <p class="position">{{ item.position }}</p>
@@ -105,7 +105,7 @@
           >
             <div class="row1">
               <p class="name">{{ item.name }}</p>
-              <p class="duration">{{ item.duration }}</p>
+              <p class="duration">{{ item.duration[0] }} 至 {{ item.duration[1] }}</p>
             </div>
             <div class="row2">
               <p class="role">{{ item.role }}</p>
@@ -125,7 +125,7 @@
           >
             <div class="row1">
               <p class="name">{{ item.name }}</p>
-              <p class="duration">{{ item.duration }}</p>
+              <p class="duration">{{ item.duration[0] }} 至 {{ item.duration[1] }}</p>
             </div>
             <div class="row2">
               <p class="role">{{ item.role }}</p>
@@ -242,7 +242,7 @@
           size="small"
         />
         <el-form
-          v-for="(item, index) in educationLength"
+          v-for="(item, index) in editResume.educationInfo"
           :key="index"
           :model="editResume.educationInfo[item]"
           label-width="80px"
@@ -294,7 +294,7 @@
           size="small"
         />
         <el-form
-          v-for="(item, index) in internshipLength"
+          v-for="(item, index) in editResume.internshipInfo"
           :key="index"
           :model="editResume.internshipInfo[item]"
           label-width="80px"
@@ -351,7 +351,7 @@
           size="small"
         />
         <el-form
-          v-for="(item, index) in projectLength"
+          v-for="(item, index) in editResume.projectInfo"
           :key="index"
           :model="editResume.projectInfo[item]"
           label-width="80px"
@@ -408,7 +408,7 @@
           size="small"
         />
         <el-form
-          v-for="(item, index) in campusExperienceLength"
+          v-for="(item, index) in editResume.campusExperienceInfo"
           :key="index"
           :model="editResume.campusExperienceInfo[item]"
           label-width="80px"
@@ -465,7 +465,7 @@
           size="small"
         />
         <el-form
-          v-for="(item, index) in skillLength"
+          v-for="(item, index) in editResume.skillInfo"
           :key="index"
           :model="editResume.skillInfo[item]"
           label-width="80px"
@@ -496,7 +496,7 @@
           size="small"
         />
         <el-form
-          v-for="(item, index) in certificateLength"
+          v-for="(item, index) in editResume.certificateInfo"
           :key="index"
           :model="editResume.certificateInfo[item]"
           label-width="80px"
@@ -527,83 +527,14 @@ export default {
   data() {
     return {
       isUpdateResume: false, //是否打开更新简历窗口，默认为否
-      educationLength: 1, //教育经历的长度
-      internshipLength: 1, //实习经历的长度
-      projectLength: 1, //项目经历的长度
-      campusExperienceLength: 1, //校内经历的长度
-      skillLength: 2, //技能的长度
-      certificateLength: 2, //证书的长度
       editResume: {
-        resumeInfo: {
-          id: 1, //简历编号
-          username: "aaa",
-          realname: "查理苏", //真实姓名
-          birth: "1998.1.2", //出生日期
-          sex: "女", //性别
-          tel: "13711447629", //联系方式
-          email: "605697557@qq.com", //电子邮箱
-          highesteducation: "本科", //最高学历
-          school: "", //毕业学校
-          expectedPosition: "总裁", //期望职位
-        },
-        educationInfo: [
-          {
-            id: 1, //教育信息编号
-            username: "aaa",
-            school: "哈佛大学", //学校名
-            duration: [], //时间段
-            qualification: "本科", //学历
-            specialty: "挖掘机", //专业
-            gpa: "4.0", //绩点
-          },
-          {
-            id: 2, //教育信息编号
-            username: "aaa",
-            school: "哈佛大学", //学校名
-            duration: [], //时间段
-            qualification: "本科", //学历
-            specialty: "挖掘机", //专业
-            gpa: "4.0", //绩点
-          },
-        ],
-        internshipInfo: [
-          //实习经历
-          {
-            id: 1, //实习经历编号
-            username: "aaa",
-            company: "某某公司", //公司名称
-            duration: [], //时间段
-            position: "前端开发", //职位名称
-            content:
-              "◆ 实现商城平台及其管理，包含商品搜索、订单管理等功能。◆ 前端使用 layui 框架，后台使用 mybatis+springboot+springmvc 技术。", //工作内容
-          },
-        ],
-        projectInfo: [
-          //项目经历
-          {
-            id: 1, //项目经历编号
-            username: "aaa",
-            name: "社区管理系统“社区小管家”", //项目名称
-            role: "前端开发", //项目角色
-            duration: "2018.9-2022.7", //时间段
-            content:
-              "为帮助社区管理而开发的系统，涵盖了社区内管理多项功能如车位管理、物业人员管理等。◆ 负责系统前端页面开发，独立完成管理员模块首页等功能开发，组件化开发网站菜单栏。◆ 使用 Vue 框架+elementUI 组件库，采用前后端分离进行开发", //项目内容
-          },
-        ],
-        skillInfo: ["html", "css"], //技能
-        certificateInfo: ["英语六级", "英语四级"], //证书
-        campusExperienceInfo: [
-          //校内经历
-          {
-            id: 1, //校内经历编号
-            username: "aaa",
-            name: "计算机学院团委红十字会", //部门或活动名称
-            role: "副部长", //在部门或活动中担任的角色
-            duration: [], //时间段
-            content:
-              "带领小干策划组织游园、防艾讲座、成分血献血等活动。◆ 获得红十字会先进个人及 2019-2020 年度优秀学生干部奖学金。", //部门工作内容或活动内容
-          },
-        ],
+        resumeInfo: {},
+        educationInfo: [],
+        internshipInfo: [],
+        projectInfo: [],//项目经历
+        skillInfo: [], //技能
+        certificateInfo: [], //证书
+        campusExperienceInfo: [],//校内经历
       },
     };
   },
@@ -620,6 +551,13 @@ export default {
     //点击更新简历按钮
     openUpdateResume() {
       this.isUpdateResume = true;
+      this.editResume.resumeInfo = Object.assign({}, this.resumeInfo);
+      this.editResume.educationInfo = Array.from(this.educationInfo);
+      this.editResume.internshipInfo = Array.from(this.internshipInfo);
+      this.editResume.projectInfo = Array.from(this.projectInfo);
+      this.editResume.skillInfo = Array.from(this.skillInfo);
+      this.editResume.certificateInfo = Array.from(this.certificateInfo);
+      this.editResume.campusExperienceInfo = Array.from(this.campusExperienceInfo);
     },
     //确定更新简历
     updateResume() {
@@ -629,58 +567,90 @@ export default {
       obj.skill = skill;
       obj.certificate = certificate;
       let that = this;
+      // 上传简历信息
       this.$ajax
         .post("/user/updateResume", qs.stringify(obj), {
           "content-type": "application/x-www-form-urlencoded",
         })
         .then(() => {
-          for (let item in that.editResume.educationInfo) {
-            that.$ajax.post(
-              "/user/updateEducation",
-              qs.stringify(that.editResume.educationInfo[item]),
-              {
-                "content-type": "application/x-www-form-urlencoded",
+          // 上传教育经历
+          that.$ajax.get("/user/getNewTableId/education").then((res) => {
+            let maxid = res.data.maxid + 1;
+            for (let item in that.editResume.educationInfo) {
+              if (!that.editResume.educationInfo[item].id) {
+                that.editResume.educationInfo[item].id = maxid;
+                maxid++;
               }
-            );
-          }
-        })
-        .then(() => {
-          for (let item in that.editResume.internshipInfo) {
-            that.$ajax.post(
-              "/user/updateInternship",
-              qs.stringify(that.editResume.internshipInfo[item]),
-              {
-                "content-type": "application/x-www-form-urlencoded",
+              that.editResume.educationInfo[item].duration =
+                that.editResume.educationInfo[item].duration.join(",");
+              that.$ajax.post(
+                "/user/updateTable/education",
+                qs.stringify(that.editResume.educationInfo[item]),
+                {
+                  "content-type": "application/x-www-form-urlencoded",
+                }
+              );
+            }
+          });
+          // 上传实习经历
+          that.$ajax.get("/user/getNewTableId/internship").then((res) => {
+            let maxid = res.data.maxid + 1;
+            for (let item in that.editResume.internshipInfo) {
+              if (!that.editResume.internshipInfo[item].id) {
+                that.editResume.internshipInfo[item].id = maxid;
+                maxid++;
               }
-            );
-            console.log(that.internshipInfo[item])
-          }
-        })
-        .then(() => {
-          for (let item in that.editResume.projectInfo) {
-            that.$ajax.post(
-              "/user/updateProject",
-              qs.stringify(that.editResume.projectInfo[item]),
-              {
-                "content-type": "application/x-www-form-urlencoded",
+              that.editResume.internshipInfo[item].duration =
+                that.editResume.internshipInfo[item].duration.join(",");
+              that.$ajax.post(
+                "/user/updateTable/internship",
+                qs.stringify(that.editResume.internshipInfo[item]),
+                {
+                  "content-type": "application/x-www-form-urlencoded",
+                }
+              );
+            }
+          });
+          // 上传项目经历
+          that.$ajax.get("/user/getNewTableId/project").then((res) => {
+            let maxid = res.data.maxid + 1;
+            for (let item in that.editResume.projectInfo) {
+              if (!that.editResume.projectInfo[item].id) {
+                that.editResume.projectInfo[item].id = maxid;
+                maxid++;
               }
-            );
-          }
-        })
-        .then(() => {
-          for (let item in that.editResume.campusExperienceInfo) {
-            that.$ajax.post(
-              "/user/updateCampusExperience",
-              qs.stringify(that.editResume.campusExperienceInfo[item]),
-              {
-                "content-type": "application/x-www-form-urlencoded",
+              that.editResume.projectInfo[item].duration =
+                that.editResume.projectInfo[item].duration.join(",");
+              that.$ajax.post(
+                "/user/updateTable/project",
+                qs.stringify(that.editResume.projectInfo[item]),
+                {
+                  "content-type": "application/x-www-form-urlencoded",
+                }
+              );
+            }
+          });
+          // 上传校内经历
+          that.$ajax.get("/user/getNewTableId/campusExperience").then((res) => {
+            let maxid = res.data.maxid + 1;
+            for (let item in that.editResume.campusExperienceInfo) {
+              if (!that.editResume.campusExperienceInfo[item].id) {
+                that.editResume.campusExperienceInfo[item].id = maxid;
+                maxid++;
               }
-            );
-          }
-        })
-        .then(() => {
-          that.$message.success("更新成功");
+              that.editResume.campusExperienceInfo[item].duration =
+                that.editResume.campusExperienceInfo[item].duration.join(",");
+              that.$ajax.post(
+                "/user/updateTable/campusExperience",
+                qs.stringify(that.editResume.campusExperienceInfo[item]),
+                {
+                  "content-type": "application/x-www-form-urlencoded",
+                }
+              );
+            }
+          });
           that.isUpdateResume = false;
+          that.$message.success("更新成功");
         });
     },
     //取消更新简历
@@ -690,97 +660,82 @@ export default {
     //添加一项教育经历
     addEducation() {
       let obj = {};
-      obj.educationid = "";
-      obj.username = "";
-      obj.school = "";
-      obj.duration = [];
-      obj.qualification = "";
-      obj.specialty = "";
-      obj.gpa = "";
-      this.editResume.educationInfo[this.editResume.educationInfo.length] = obj;
-      this.educationLength += 1;
-    },
-    //减少一项教育经历
-    reduceEducation(index) {
-      this.editResume.educationInfo.splice(index, 1);
-      this.educationLength -= 1;
-    },
-    //添加一项实习经历
-    addInternship() {
-      let obj = {};
-      obj.internshipid = "";
+      obj.id = "";
       obj.username = "";
       obj.company = "";
       obj.duration = [];
       obj.position = "";
       obj.content = "";
-      this.editResume.internshipInfo[this.editResume.internshipInfo.length] =
-        obj;
-      this.internshipLength += 1;
+      this.editResume.educationInfo.splice(this.editResume.educationInfo.length, 1, obj);
+    },
+    //减少一项教育经历
+    reduceEducation(index) {
+      this.editResume.educationInfo.splice(index, 1);
+    },
+    //添加一项实习经历
+    addInternship() {
+      let obj = {};
+      obj.id = "";
+      obj.username = "";
+      obj.company = "";
+      obj.duration = [];
+      obj.position = "";
+      obj.content = "";
+      this.editResume.internshipInfo.splice(this.editResume.internshipInfo.length, 1, obj);
     },
     //减少一项实习经历
     reduceInternship(index) {
       this.editResume.internshipInfo.splice(index, 1);
-      this.internshipLength -= 1;
     },
     //添加一项项目经历
     addProject() {
       let obj = {};
-      obj.projectid = "";
+      obj.id = "";
       obj.username = "";
       obj.name = "";
       obj.role = "";
       obj.duration = [];
       obj.content = "";
-      this.editResume.projectInfo[this.editResume.projectInfo.length] = obj;
-      this.projectLength += 1;
+      this.editResume.projectInfo.splice(this.editResume.projectInfo.length, 1, obj);
     },
     //减少一项项目经历
     reduceProject(index) {
       this.editResume.projectInfo.splice(index, 1);
-      this.projectLength -= 1;
     },
     //增加一项校内经历
     addCampusExperience() {
       let obj = {};
-      obj.campusExperienceId = "";
+      obj.id = "";
       obj.username = "";
       obj.name = "";
       obj.role = "";
       obj.duration = [];
       obj.content = "";
-      this.editResume.campusExperienceInfo[
-        this.editResume.campusExperienceInfo.length
-      ] = obj;
-      this.campusExperienceLength += 1;
+      this.editResume.campusExperienceInfo.splice(
+        this.editResume.campusExperienceInfo.length,
+        1,
+        obj
+      );
     },
     //减少一项校内经历
     reduceCampusExperience(index) {
       this.editResume.campusExperienceInfo.splice(index, 1);
-      this.campusExperienceLength -= 1;
     },
     //添加一项技能
     addSkill() {
-      let str = "";
-      this.editResume.skillInfo[this.editResume.skillInfo.length] = str;
-      this.skillLength += 1;
+      this.editResume.skillInfo.splice(this.editResume.skillInfo.length, 1, "");
     },
     //减少一项技能
     reduceSkill(index) {
       this.editResume.skillInfo.splice(index, 1);
-      this.skillLength -= 1;
     },
     //添加一项证书
     addCertificate() {
-      let str = "";
-      this.editResume.certificateInfo[this.editResume.certificateInfo.length] =
-        str;
-      this.certificateLength += 1;
+      this.editResume.certificateInfo.splice(this.editResume.certificateInfo.length, 1, "");
     },
     //减少一项证书
     reduceCertificate(index) {
       this.editResume.certificateInfo.splice(index, 1);
-      this.certificateLength -= 1;
     },
   },
 };

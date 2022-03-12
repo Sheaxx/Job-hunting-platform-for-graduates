@@ -12,16 +12,10 @@ router.get('/getCollectList/:username', handler.getCollectList)
 //更新用户的简历信息
 router.post('/updateResume', handler.updateResume)
 
-//更新用户的校园经历
-router.post('/updateEducation', handler.updateEducation)
+//获取各表的最新可用id
+router.get('/getNewTableId/:table', handler.getNewTableId)
 
-//更新用户的实习经历
-router.post('/updateInternship', handler.updateInternship)
-
-//更新用户的项目经历
-router.post('/updateProject', handler.updateProject)
-
-//更新用户的校内经历
-router.post('/updateCampusExperience', handler.updateCampusExperience)
+//更新用户的教育信息，实习经历，项目经历，校内经历
+router.post('/updateTable/:table', handler.updateTable)
 
 module.exports = router

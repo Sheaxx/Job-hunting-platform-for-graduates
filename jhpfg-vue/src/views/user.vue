@@ -296,6 +296,18 @@ export default {
       that.campusExperienceInfo = res.data.campusExperience;
       that.skillInfo = res.data.skill;
       that.certificateInfo = res.data.certificate;
+      for(let item in that.educationInfo) {
+        that.educationInfo[item].duration = that.educationInfo[item].duration.split(',')
+      }
+      for(let item in that.internshipInfo) {
+        that.internshipInfo[item].duration = that.internshipInfo[item].duration.split(',')
+      }
+      for(let item in that.projectInfo) {
+        that.projectInfo[item].duration = that.projectInfo[item].duration.split(',')
+      }
+      for(let item in that.campusExperienceInfo) {
+        that.campusExperienceInfo[item].duration = that.campusExperienceInfo[item].duration.split(',')
+      }
     })
     this.$ajax.get("/user/getCollectList/" + "aaa").then(res => {
       that.collectionList = res.data;
