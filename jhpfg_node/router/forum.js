@@ -16,7 +16,7 @@ router.get('/getAccountListByPageAndZone/:currentPage/:pageSize/:zone', handler.
 router.get('/getPostById/:id', handler.getPostById);
 
 //根据关键字进行搜索
-router.post('/getPostByKeyword/', handler.getPostByKeyword);
+router.post('/getPostByKeyword', handler.getPostByKeyword);
 
 //发布帖子
 router.post('/addPost', handler.addPost);

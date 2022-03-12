@@ -1,236 +1,239 @@
 <template>
   <div id="employment">
-    <i
-      class="el-icon-suitcase-1 index-icon"
-      slot="icon"
-    ></i>
-    <h4
-      class="index-boxTitle"
-      slot="boxTitle"
-    >招聘信息</h4>
-    <div
-      id="employmentListBox"
-      v-show="!isEmploymentDetails && !isCompanyDetails && !isSchoolDetails"
-    >
-      <el-input
-        placeholder="请输入内容"
-        v-model="searchValue"
-        class="input-with-select searchInput"
+    <div v-if="!isSearchList">
+      <i
+        class="el-icon-suitcase-1 index-icon"
+        slot="icon"
+      ></i>
+      <h4
+        class="index-boxTitle"
+        slot="boxTitle"
+      >招聘信息</h4>
+      <div
+        id="employmentListBox"
+        v-show="!isEmploymentDetails && !isCompanyDetails && !isSchoolDetails"
       >
-        <el-select
-          v-model="searchSelect"
-          slot="prepend"
-          placeholder="请选择"
+        <el-input
+          placeholder="请输入内容"
+          v-model="searchValue"
+          class="input-with-select searchInput"
         >
-          <el-option
-            label="搜岗位"
-            value="1"
-          ></el-option>
-          <el-option
-            label="搜公司"
-            value="2"
-          ></el-option>
-          <el-option
-            label="搜学校"
-            value="3"
-          ></el-option>
-        </el-select>
-        <el-button
-          slot="append"
-          icon="el-icon-search"
-          class="searchButton"
-          v-if="searchSelect == 1 || searchSelect == ''"
-        >找实习</el-button>
-        <el-button
-          slot="append"
-          icon="el-icon-search"
-          class="searchButton"
-          v-if="searchSelect == 1 || searchSelect == ''"
-        >找全职</el-button>
-        <el-button
-          slot="append"
-          icon="el-icon-search"
-          class="searchButton"
+          <el-select
+            v-model="searchSelect"
+            slot="prepend"
+            placeholder="请选择"
+          >
+            <el-option
+              label="搜岗位"
+              value="1"
+            ></el-option>
+            <el-option
+              label="搜公司"
+              value="2"
+            ></el-option>
+            <el-option
+              label="搜学校"
+              value="3"
+            ></el-option>
+          </el-select>
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            class="searchButton"
+            v-if="searchSelect == 1 || searchSelect == ''"
+            @click="searchEmployment(0)"
+          >找实习</el-button>
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            class="searchButton"
+            v-if="searchSelect == 1 || searchSelect == ''"
+            @click="searchEmployment(1)"
+          >找全职</el-button>
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            class="searchButton"
+            v-if="searchSelect == 2"
+          >找公司</el-button>
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            class="searchButton"
+            v-if="searchSelect == 3"
+          >找学校</el-button>
+        </el-input>
+        <div
+          id="employmentContainer"
+          v-show="searchSelect == 1 || searchSelect == ''"
+        >
+          <ul id="filter">
+            <li>筛选岗位：</li>
+            <li>
+              <el-select
+                v-model="educationFilter"
+                placeholder="学历要求"
+              >
+                <el-option value="不限"></el-option>
+                <el-option value="大专"></el-option>
+                <el-option value="本科"></el-option>
+                <el-option value="硕士"></el-option>
+                <el-option value="博士"></el-option>
+              </el-select>
+            </li>
+            <li>
+              <el-select
+                v-model="salaryFilter"
+                placeholder="薪资待遇"
+              >
+                <el-option value="不限"></el-option>
+                <el-option value="3K以下"></el-option>
+                <el-option value="3-5K"></el-option>
+                <el-option value="5-10K"></el-option>
+                <el-option value="10-20K"></el-option>
+                <el-option value="20K以上"></el-option>
+              </el-select>
+            </li>
+            <li>
+              <el-cascader
+                :options="locationOptions"
+                v-model="locationSelectedOptions"
+                placeholder="工作地点"
+              >
+              </el-cascader>
+            </li>
+            <li>
+              <el-switch
+                v-model="certification"
+                active-text="只看学校认证"
+                inactive-text="展示所有岗位"
+                active-color="#72b3f0"
+              >
+              </el-switch>
+            </li>
+            <li>
+              <el-button
+                round
+                icon="el-icon-refresh-left"
+              >重置</el-button>
+            </li>
+          </ul>
+          <ul id="employmentList">
+            <li
+              class="employmentItem"
+              v-for="item in employmentList"
+              :key="item.id"
+              @click="toEmploymentDetails(item.id)"
+            >
+              <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
+              <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
+              <p class="station">{{ item.station }}</p>
+              <p class="jobMsg">
+                <span>{{ item.location }}</span>
+                <span>{{ item.education }}</span>
+              </p>
+              <p class="companyMsg">
+                <span>{{ item.companyName }}</span>
+                <span>{{ item.trade }}</span>
+                <span>{{ item.level }}</span>
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div
+          id="companyContainer"
           v-if="searchSelect == 2"
-        >找公司</el-button>
-        <el-button
-          slot="append"
-          icon="el-icon-search"
-          class="searchButton"
+        >
+          <ul id="companyList">
+            <li
+              class="companyItem"
+              v-for="(item, index) in companyList"
+              :key="item.id"
+              @click="toCompanyDetails(item.id)"
+            >
+              <img
+                src="../assets/image/avatar.png"
+                alt="公司logo"
+                class="logo"
+              />
+              <p class="name">{{ item.name }}</p>
+              <p class="msg">
+                <span>{{ item.location }}</span>
+                <span>{{ item.trade }}</span>
+                <span>{{ item.level }}</span>
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div
+          id="schoolContainer"
           v-if="searchSelect == 3"
-        >找学校</el-button>
-      </el-input>
-      <div
-        id="employmentContainer"
-        v-show="searchSelect == 1 || searchSelect == ''"
-      >
-        <ul id="filter">
-          <li>筛选岗位：</li>
-          <li>
-            <el-select
-              v-model="educationFilter"
-              placeholder="学历要求"
+        >
+          <ul id="schoolList">
+            <li
+              class="schoolItem"
+              v-for="(item,index) in schoolList"
+              :key="item.schoolid"
+              @click="toSchoolDetails(index)"
             >
-              <el-option value="不限"></el-option>
-              <el-option value="大专"></el-option>
-              <el-option value="本科"></el-option>
-              <el-option value="硕士"></el-option>
-              <el-option value="博士"></el-option>
-            </el-select>
-          </li>
-          <li>
-            <el-select
-              v-model="salaryFilter"
-              placeholder="薪资待遇"
-            >
-              <el-option value="不限"></el-option>
-              <el-option value="3K以下"></el-option>
-              <el-option value="3-5K"></el-option>
-              <el-option value="5-10K"></el-option>
-              <el-option value="10-20K"></el-option>
-              <el-option value="20K以上"></el-option>
-            </el-select>
-          </li>
-          <li>
-            <el-cascader
-              :options="locationOptions"
-              v-model="locationSelectedOptions"
-              placeholder="工作地点"
-            >
-            </el-cascader>
-          </li>
-          <li>
-            <el-switch
-              v-model="certification"
-              active-text="只看学校认证"
-              inactive-text="展示所有岗位"
-              active-color="#72b3f0"
-            >
-            </el-switch>
-          </li>
-          <li>
-            <el-button
-              round
-              icon="el-icon-refresh-left"
-            >重置</el-button>
-          </li>
-        </ul>
-        <ul id="employmentList">
-          <li
-            class="employmentItem"
-            v-for="item in employmentList"
-            :key="item.id"
-            @click="toEmploymentDetails(item.id)"
-          >
-            <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
-            <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
-            <p class="station">{{ item.station }}</p>
-            <p class="jobMsg">
-              <span>{{ item.location }}</span>
-              <span>{{ item.education }}</span>
-            </p>
-            <p class="companyMsg">
-              <span>{{ item.companyName }}</span>
-              <span>{{ item.trade }}</span>
-              <span>{{ item.level }}</span>
-            </p>
-          </li>
-        </ul>
+              <img
+                src="../assets/image/avatar.png"
+                alt="学校logo"
+                class="logo"
+              />
+              <p class="name">{{ item.name }}</p>
+              <p class="msg">
+                <span>{{ item.location }}</span>
+              </p>
+            </li>
+          </ul>
+        </div>
+        <el-pagination
+          :page-size="9"
+          :current-page="currentPage"
+          :total="total"
+          layout="prev, pager, next"
+          @current-change="handleCurrentChange"
+        >
+        </el-pagination>
       </div>
+      <employment-details
+        v-if="isEmploymentDetails"
+        :details="employmentDetails"
+        :companyDetails="companyDetails"
+        @toList="employmentToList"
+        @collect="collect"
+        @cancelCollect="cancelCollect"
+        @sendResume="sendResume"
+        @refresh="getAccountListByPage"
+      ></employment-details>
       <div
-        id="companyContainer"
-        v-if="searchSelect == 2"
+        id="companyDetails"
+        v-if="isCompanyDetails"
       >
-        <ul id="companyList">
-          <li
-            class="companyItem"
-            v-for="(item, index) in companyList"
-            :key="item.id"
-            @click="toCompanyDetails(item.id)"
-          >
-            <img
-              src="../assets/image/avatar.png"
-              alt="公司logo"
-              class="logo"
-            />
-            <p class="name">{{ item.name }}</p>
-            <p class="msg">
-              <span>{{ item.location }}</span>
-              <span>{{ item.trade }}</span>
-              <span>{{ item.level }}</span>
-            </p>
-          </li>
-        </ul>
-      </div>
-      <div
-        id="schoolContainer"
-        v-if="searchSelect == 3"
-      >
-        <ul id="schoolList">
-          <li
-            class="schoolItem"
-            v-for="(item,index) in schoolList"
-            :key="item.schoolid"
-            @click="toSchoolDetails(index)"
-          >
-            <img
-              src="../assets/image/avatar.png"
-              alt="学校logo"
-              class="logo"
-            />
-            <p class="name">{{ item.name }}</p>
-            <p class="msg">
-              <span>{{ item.location }}</span>
-            </p>
-          </li>
-        </ul>
-      </div>
-      <el-pagination
-        :page-size="9"
-        :current-page="currentPage"
-        :total="total"
-        layout="prev, pager, next"
-        @current-change="handleCurrentChange"
-      >
-      </el-pagination>
-    </div>
-    <employment-details
-      v-if="isEmploymentDetails"
-      :details="employmentDetails"
-      :companyDetails="companyDetails"
-      @toList="employmentToList"
-      @collect="collect"
-      @cancelCollect="cancelCollect"
-      @sendResume="sendResume"
-      @refresh="getAccountListByPage"
-    ></employment-details>
-    <div
-      id="companyDetails"
-      v-if="isCompanyDetails"
-    >
-      <el-button
-        round
-        @click="companyToList"
-      >返回</el-button>
-      <div class="listBar">
-        <ul class="list">
-          <li
-            v-for="(item, index) in company_employmentList"
-            :key="item.id"
-          >
-            <p class="authorMsg">
-              <span>发布者名字</span>
-              <span>她的职位</span>
-            </p>
-            <p class="station">{{ item.station }}</p>
-            <p class="msg">
-              <span class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></span>
-              <span>{{ item.location }}</span>
-              <span>{{ item.education }}</span>
-            </p>
-          </li>
-        </ul>
-        <!-- <el-pagination
+        <el-button
+          round
+          @click="companyToList"
+        >返回</el-button>
+        <div class="listBar">
+          <ul class="list">
+            <li
+              v-for="(item, index) in company_employmentList"
+              :key="item.id"
+            >
+              <p class="authorMsg">
+                <span>发布者名字</span>
+                <span>她的职位</span>
+              </p>
+              <p class="station">{{ item.station }}</p>
+              <p class="msg">
+                <span class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></span>
+                <span>{{ item.location }}</span>
+                <span>{{ item.education }}</span>
+              </p>
+            </li>
+          </ul>
+          <!-- <el-pagination
           :page-size="9"
           :current-page="currentPage"
           :total="total"
@@ -238,74 +241,123 @@
           @current-change="handleCurrentChange"
         >
         </el-pagination> -->
-      </div>
-      <div class="companyBar">
-        <img
-          src="../assets/image/avatar.png"
-          alt="公司logo"
-        />
-        <p class="companyName">{{ companyDetails.name }}</p>
-        <div class="msg">
-          <span class="location">{{ companyDetails.location }}</span>
-          <span class="trade">{{ companyDetails.trade }}</span>
-          <span class="level">{{ companyDetails.level }}</span>
         </div>
-        <p class="introduction">{{ companyDetails.introduction }}</p>
+        <div class="companyBar">
+          <img
+            src="../assets/image/avatar.png"
+            alt="公司logo"
+          />
+          <p class="companyName">{{ companyDetails.name }}</p>
+          <div class="msg">
+            <span class="location">{{ companyDetails.location }}</span>
+            <span class="trade">{{ companyDetails.trade }}</span>
+            <span class="level">{{ companyDetails.level }}</span>
+          </div>
+          <p class="introduction">{{ companyDetails.introduction }}</p>
+        </div>
+      </div>
+      <div
+        id="schoolDetails"
+        v-if="isSchoolDetails"
+      >
+        <el-button
+          round
+          @click="schoolToList"
+        >返回</el-button>
+        <el-carousel
+          :interval="4000"
+          type="card"
+          height="200px"
+        >
+          <el-carousel-item
+            v-for="item in 6"
+            :key="item"
+          >
+            <h3 class="medium">{{ item }}</h3>
+          </el-carousel-item>
+        </el-carousel>
+        <div class="concat">
+          <ul>
+            <li>
+              <img
+                src="../assets/image/avatar.png"
+                alt="联系人头像"
+              />
+              <p class="name">李老师</p>
+              <p class="tel">13700000000</p>
+              <el-button
+                type="primary"
+                icon="el-icon-chat-line-round"
+                circle
+              ></el-button>
+            </li>
+            <li>
+              <img
+                src="../assets/image/avatar.png"
+                alt="联系人头像"
+              />
+              <p class="name">李老师</p>
+              <p class="tel">13700000000</p>
+              <el-button
+                type="primary"
+                icon="el-icon-chat-line-round"
+                circle
+              ></el-button>
+            </li>
+          </ul>
+        </div>
+        <div class="content">
+          ggggggggggggggggg
+        </div>
       </div>
     </div>
     <div
-      id="schoolDetails"
-      v-if="isSchoolDetails"
+      class="searchList"
+      v-if="isSearchList"
     >
-      <el-button
-        round
-        @click="schoolToList"
-      >返回</el-button>
-      <el-carousel
-        :interval="4000"
-        type="card"
-        height="200px"
+      <div class="topBar">
+        <span class="searchValue">“{{searchValue}}”的搜索结果</span>
+        <el-button
+          round
+          class="toList"
+          @click="isSearchList = false"
+        >返回</el-button>
+      </div>
+      <el-table
+        :data="searchList"
+        stripe
+        style="width: 100%"
+        @row-click="tableClick"
       >
-        <el-carousel-item
-          v-for="item in 6"
-          :key="item"
+        <el-table-column
+          prop="station"
+          label="岗位"
         >
-          <h3 class="medium">{{ item }}</h3>
-        </el-carousel-item>
-      </el-carousel>
-      <div class="concat">
-        <ul>
-          <li>
-            <img
-              src="../assets/image/avatar.png"
-              alt="联系人头像"
-            />
-            <p class="name">李老师</p>
-            <p class="tel">13700000000</p>
-            <el-button
-              type="primary"
-              icon="el-icon-chat-line-round"
-              circle
-            ></el-button>
-          </li>
-          <li>
-            <img
-              src="../assets/image/avatar.png"
-              alt="联系人头像"
-            />
-            <p class="name">李老师</p>
-            <p class="tel">13700000000</p>
-            <el-button
-              type="primary"
-              icon="el-icon-chat-line-round"
-              circle
-            ></el-button>
-          </li>
-        </ul>
-      </div>
-      <div class="content">
-        ggggggggggggggggg
-      </div>
+        </el-table-column>
+        <el-table-column
+          prop="companyName"
+          label="公司"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="salary"
+          label="薪水"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="location"
+          label="地点"
+          width="140"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="education"
+          label="学历"
+          width="140"
+        >
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -317,6 +369,7 @@ import {
   TextToCode,
 } from "element-china-area-data";
 import EmploymentDetails from "../components/employmentDetails.vue";
+import qs from "qs";
 
 export default {
   components: { EmploymentDetails },
@@ -325,10 +378,12 @@ export default {
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
       isCompanyDetails: false, //是否是公司详情页，默认为否
       isSchoolDetails: false, //是否是学校详情页，默认为否
+      isSearchList: false, //是否是搜索结果列表，默认为否
       currentPage: 1, // 当前页
       total: 0, // 数据总条数
       searchValue: "", //搜索内容
       searchSelect: "", //选择搜索的类别
+      searchList: [], //搜索结果列表
       educationFilter: "", //筛选学历
       salaryFilter: "", //筛选薪资
       locationOptions: provinceAndCityDataPlus,
@@ -336,7 +391,7 @@ export default {
       certification: false, //筛选学校认证
       employmentList: [], //首页招聘信息列表
       companyList: [], //公司列表
-      company_employmentList:[],//某个公司的招聘信息列表
+      company_employmentList: [], //某个公司的招聘信息列表
       schoolList: [
         {
           schoolid: 1,
@@ -393,9 +448,9 @@ export default {
       this.$ajax.get("/company/getCompanyById/" + id).then((res) => {
         that.companyDetails = res.data;
       });
-      this.$ajax.get("/company/getAllEmployment/" + id).then(res => {
+      this.$ajax.get("/company/getAllEmployment/" + id).then((res) => {
         that.company_employmentList = res.data;
-      })
+      });
     },
     //公司详情返回列表
     companyToList() {
@@ -438,6 +493,54 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val; // 保存当前页码
       this.getAccountListByPage(); // 调用分页函数
+    },
+    //根据关键字搜索
+    searchEmployment(isFullTime) {
+      let obj = {
+        keyword: this.searchValue,
+        isFullTime,
+      };
+      let that = this;
+      this.$ajax.get("/employment/getAllCompany").then((res) => {
+        let companys = res.data;
+        that.$ajax
+          .post("/employment/getEmploymentByKeyword", qs.stringify(obj), {
+            "content-type": "application/x-www-form-urlencoded",
+          })
+          .then((res) => {
+            that.isSearchList = true;
+            that.searchList = res.data;
+            for (let item in that.searchList) {
+              that.searchList[item].salary =
+                that.searchList[item].salaryStart +
+                " - " +
+                that.searchList[item].salaryEnd;
+            }
+            for (let i in that.searchList) {
+              for (let j in companys) {
+                if (that.searchList[i].companyId == companys[j].id) {
+                  that.searchList[i].companyName = companys[j].name;
+                }
+              }
+            }
+            console.log(that.searchList);
+          });
+      });
+    },
+    //点击搜索列表的行
+    tableClick(row, column, event) {
+      this.fromSearch = true;
+      this.isSearchList = false;
+      this.isEmploymentDetails = true;
+      let that = this;
+      this.$ajax.get("/employment/getEmploymentById/" + row.id).then((res) => {
+        that.employmentDetails = res.data;
+        that.$ajax
+          .get("/company/getCompanyById/" + that.employmentDetails.companyId)
+          .then((res) => {
+            that.companyDetails = res.data;
+          });
+      });
     },
   },
   mounted() {
@@ -732,5 +835,13 @@ export default {
   width: 66%;
   margin-left: 30%;
   padding: 2%;
+}
+/* 搜索结果页面 */
+#employment .searchList .toList {
+  float: right;
+}
+#employment .searchList .searchValue {
+  font-weight: 600;
+  font-size: 1.2rem;
 }
 </style>

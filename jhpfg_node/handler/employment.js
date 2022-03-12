@@ -48,6 +48,22 @@ exports.getEmploymentById = (req, res) => {
   })
 }
 
+//根据关键字进行搜索
+exports.getEmploymentByKeyword = (req, res) => {
+  let { keyword, isFullTime } = req.body;
+  let sql = 'select * from employment where isFullTime=' + isFullTime + ' order by id desc'
+  db.query(sql, (err, results) => {
+    if (err) throw err;
+    let arr = [];
+    for (let item in results) {
+      if (results[item].station.search(keyword) != -1) {
+        arr.push(results[item])
+      }
+    }
+    res.send(arr)
+  })
+}
+
 //删除招聘信息
 exports.deleteEmployment = (req, res) => {
   let id = req.params.id;
@@ -55,5 +71,14 @@ exports.deleteEmployment = (req, res) => {
   db.query(sql, (err, results) => {
     if (err) throw err;
     res.send('success')
+  })
+}
+
+//获取所有公司的数据
+exports.getAllCompany = (req, res) => {
+  let sql = 'select id,name from company';
+  db.query(sql,(err, results) => {
+    if (err) throw err;
+    res.send(results);
   })
 }

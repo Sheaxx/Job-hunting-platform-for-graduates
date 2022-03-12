@@ -276,7 +276,7 @@ export default {
       };
       let that = this;
       this.$ajax
-        .post("/forum/getPostByKeyword/", qs.stringify(obj), {
+        .post("/forum/getPostByKeyword", qs.stringify(obj), {
           "content-type": "application/x-www-form-urlencoded",
         })
         .then((res) => {
