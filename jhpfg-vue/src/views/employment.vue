@@ -55,14 +55,14 @@
             icon="el-icon-search"
             class="searchButton"
             v-if="searchSelect == 2"
-            @click="searchCompany"
+            @click="searchCompany()"
           >找公司</el-button>
           <el-button
             slot="append"
             icon="el-icon-search"
             class="searchButton"
             v-if="searchSelect == 3"
-            @click="searchSchool"
+            @click="searchSchool()"
           >找学校</el-button>
         </el-input>
         <div
@@ -452,6 +452,12 @@ export default {
       schoolDetails: {}, //学校详情
     };
   },
+  watch: {
+    searchSelect: function () {
+      this.currentPage = 1;
+      this.getAccountListByPage();
+    },
+  },
   methods: {
     //实习或全职转文字显示
     showIsFullTime(val) {
@@ -508,38 +514,61 @@ export default {
     toSchoolDetails(id) {
       this.isSchoolDetails = true;
       let that = this;
-      this.$ajax.get("/school/getSchoolById/" + id).then(res => {
+      this.$ajax.get("/school/getSchoolById/" + id).then((res) => {
         that.schoolDetails = res.data;
-      })
+      });
     },
     //学校详情返回列表
     schoolToList() {
       this.isSchoolDetails = false;
     },
+    // 分页显示处理结果
+    setAccountList(response) {
+      // 接收后端返回的数据总条数 total 和 对应页码的数据 data
+      let { total, results } = response.data;
+      // 赋值给对应的变量即可
+      this.total = total;
+      this.employmentList = results;
+      // 如果当前页没有数据 且 排除第一页
+      if (!data.length && this.currentPage !== 1) {
+        // 页码减去 1
+        this.currentPage -= 1;
+        // 再调用自己
+        this.getAccountListByPage();
+      }
+    },
     // 按照分页显示数据的函数
     getAccountListByPage() {
       // 收集当前页码 和 每页显示条数
       let currentPage = this.currentPage;
-      // 发送ajax请求 把分页数据发送给后端
-      this.$ajax
-        .get("/employment/getAccountListByPage/" + currentPage)
-        .then((response) => {
-          // 接收后端返回的数据总条数 total 和 对应页码的数据 data
-          let { total, results } = response.data;
-          // 赋值给对应的变量即可
-          this.total = total;
-          this.employmentList = results;
-          // 如果当前页没有数据 且 排除第一页
-          if (!data.length && this.currentPage !== 1) {
-            // 页码减去 1
-            this.currentPage -= 1;
-            // 再调用自己
-            this.getAccountListByPage();
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      let that = this;
+      switch (this.searchSelect) {
+        case 1: {
+          // 发送ajax请求 把分页数据发送给后端
+          this.$ajax
+            .get("/employment/getAccountListByPage/" + currentPage)
+            .then((response) => {
+              that.setAccountList(response);
+            });
+          break;
+        }
+        case 2: {
+          this.$ajax
+            .get("/company/getAccountListByPage/" + currentPage)
+            .then((response) => {
+              that.setAccountList(response);
+            });
+          break;
+        }
+        case 3: {
+          this.$ajax
+            .get("/school/getAccountListByPage/" + currentPage)
+            .then((response) => {
+              that.setAccountList(response);
+            });
+          break;
+        }
+      }
     },
     // 当前页码改变 就会触发这个函数
     handleCurrentChange(val) {
