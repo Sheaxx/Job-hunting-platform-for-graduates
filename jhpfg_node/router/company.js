@@ -9,7 +9,13 @@ router.get('/getAccountListByPage/:currentPage', handler.getAccountListByPage);
 //根据id搜索某一条公司信息
 router.get('/getCompanyById/:id', handler.getCompanyById)
 
+//根据关键字进行搜索
+router.get('/getCompanyByKeyword', handler.getCompanyByKeyword)
+
 //获取公司发布的所有招聘信息
 router.get('/getAllEmployment/:id', handler.getAllEmployment)
+
+//获取所有公司的数据，返回id和公司名
+router.get('/getAllCompany', handler.getAllCompany);
 
 module.exports = router

@@ -55,6 +55,7 @@
             icon="el-icon-search"
             class="searchButton"
             v-if="searchSelect == 2"
+            @click="searchCompany"
           >找公司</el-button>
           <el-button
             slot="append"
@@ -328,6 +329,7 @@
         stripe
         style="width: 100%"
         @row-click="tableClick"
+        v-if="searchSelect==1"
       >
         <el-table-column
           prop="station"
@@ -355,6 +357,37 @@
           prop="education"
           label="学历"
           width="140"
+        >
+        </el-table-column>
+      </el-table>
+      <el-table
+        :data="searchList"
+        stripe
+        style="width: 100%"
+        @row-click="tableClick"
+        v-if="searchSelect==2"
+      >
+        <el-table-column
+          prop="name"
+          label="公司"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="location"
+          label="地点"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="trade"
+          label="行业"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="level"
+          label="融资阶段"
+          width="200"
         >
         </el-table-column>
       </el-table>
@@ -392,14 +425,7 @@ export default {
       employmentList: [], //首页招聘信息列表
       companyList: [], //公司列表
       company_employmentList: [], //某个公司的招聘信息列表
-      schoolList: [
-        {
-          schoolid: 1,
-          logo: "",
-          name: "北京大学",
-          location: "北京",
-        },
-      ], //学校列表
+      schoolList: [], //学校列表
       employmentDetails: {}, //某个招聘信息的详情
       companyDetails: {}, //招聘信息详情页面的公司信息
     };
@@ -494,14 +520,14 @@ export default {
       this.currentPage = val; // 保存当前页码
       this.getAccountListByPage(); // 调用分页函数
     },
-    //根据关键字搜索
+    //根据关键字搜索职位
     searchEmployment(isFullTime) {
       let obj = {
         keyword: this.searchValue,
         isFullTime,
       };
       let that = this;
-      this.$ajax.get("/employment/getAllCompany").then((res) => {
+      this.$ajax.get("/company/getAllCompany").then((res) => {
         let companys = res.data;
         that.$ajax
           .post("/employment/getEmploymentByKeyword", qs.stringify(obj), {
@@ -523,9 +549,23 @@ export default {
                 }
               }
             }
-            console.log(that.searchList);
           });
       });
+    },
+    //根据关键字搜索公司
+    searchCompany() {
+      let obj = {
+        keyword: this.searchValue,
+      };
+      let that = this;
+      this.$ajax
+        .get("/company/getCompanyByKeyword", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then((res) => {
+          that.isSearchList = true;
+          that.searchList = res.data;
+        });
     },
     //点击搜索列表的行
     tableClick(row, column, event) {

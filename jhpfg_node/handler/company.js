@@ -34,12 +34,37 @@ exports.getCompanyById = (req, res) => {
   })
 }
 
+//根据关键字进行搜索
+exports.getCompanyByKeyword = (req, res) => {
+  let keyword = req.body.keyword;
+  let sql = 'select * from company order by id desc';
+  db.query(sql, (err, results) => {
+    if (err) throw err;
+    let arr = [];
+    for (let item in results) {
+      if (results[item].name.search(keyword) != -1) {
+        arr.push(results[item])
+      }
+    }
+    res.send(arr)
+  })
+}
+
 //获取公司发布的所有招聘信息
 exports.getAllEmployment = (req, res) => {
   let id = req.params.id;
   let sql = 'select * from employment where companyId=' + id;
   db.query(sql, (err, results) => {
     if(err) throw err;
+    res.send(results);
+  })
+}
+
+//获取所有公司的数据，返回id和公司名
+exports.getAllCompany = (req, res) => {
+  let sql = 'select id,name from company';
+  db.query(sql,(err, results) => {
+    if (err) throw err;
     res.send(results);
   })
 }

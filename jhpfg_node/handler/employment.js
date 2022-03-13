@@ -74,11 +74,4 @@ exports.deleteEmployment = (req, res) => {
   })
 }
 
-//获取所有公司的数据
-exports.getAllCompany = (req, res) => {
-  let sql = 'select id,name from company';
-  db.query(sql,(err, results) => {
-    if (err) throw err;
-    res.send(results);
-  })
-}
+//

@@ -15,8 +15,4 @@ router.post('/getEmploymentByKeyword', handler.getEmploymentByKeyword)
 //删除招聘信息
 router.post('/deleteEmployment/:id', handler.deleteEmployment);
 
-//获取所有公司的数据
-router.get('/getAllCompany', handler.getAllCompany);
-
-
 module.exports = router
