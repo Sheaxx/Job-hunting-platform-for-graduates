@@ -1,16 +1,16 @@
 <template>
-  <div id="user">
+  <div id="userStudent">
     <i class="el-icon-user index-icon" slot="icon"></i>
     <h4 class="index-boxTitle" slot="boxTitle">个人中心</h4>
-    <div id="userInfo">
+    <div class="userInfo">
       <el-tabs
         tab-position="left"
         style="height: 500px"
         v-if="!isEmploymentDetails && !isPostDetails"
         :value="tabValue"
       >
-        <el-tab-pane label="我的个人信息" class="user" name="1">
-          <h5 class="boxTitle">个人信息</h5>
+        <el-tab-pane label="我的账号信息" class="user" name="1">
+          <h5 class="boxTitle">账号信息</h5>
           <ul>
             <li>
               <span class="itemTitle">用户名：{{ userInfo.username }}</span>
@@ -179,7 +179,7 @@ export default {
       },
       companyDetails: {
         //详情页面的公司信息
-        companyid: 1,
+        id: 1,
         logo: "",
         name: "字节跳动",
         trade: "互联网",
@@ -199,22 +199,7 @@ export default {
           state: "error", //当前流程的状态
         },
       ], //已经投递的简历列表
-      postList: [
-        {
-          postid: 1,
-          title: "hhh",
-          author: "发布者",
-          createTime: "2021.06.07",
-          zone: "我要提问",
-        },
-        {
-          postid: 2,
-          title: "hhh",
-          author: "发布者",
-          createTime: "2021.06.07",
-          zone: "我要提问",
-        },
-      ], //发布的帖子列表
+      postList: [], //发布的帖子列表
       postDetails: {
         //某个帖子的详情
         postid: 1,
@@ -317,10 +302,10 @@ export default {
 </script>
 
 <style>
-#user {
+#userStudent {
   position: relative;
 }
-#userInfo {
+#userStudent .userInfo {
   clear: both;
   width: 100%;
   height: 500px;
@@ -328,13 +313,13 @@ export default {
   margin-top: 5vh;
   margin-left: 3vw;
 }
-#userInfo .el-tab-pane {
+#userStudent .userInfo .el-tab-pane {
   margin-left: 2vw;
 }
-#userInfo .el-tabs__content {
+#userStudent .userInfo .el-tabs__content {
   position: static;
 }
-#userInfo .boxTitle {
+#userStudent .userInfo .boxTitle {
   width: 100%;
   font-size: 1.1rem;
   height: 5vh;
@@ -342,7 +327,7 @@ export default {
   margin-bottom: 5vh;
 }
 /* 账号信息 */
-.user li {
+#userStudent .user li {
   margin-bottom: 3vh;
 }
 #updatePassword {
@@ -352,17 +337,17 @@ export default {
   margin-bottom: 2vh;
 }
 /* 我的收藏 */
-#user .collection {
+#userStudent .collection {
   width: 87%;
   padding: 1%;
   height: 500px;
   overflow: auto;
 }
-#user .collection .isFullTime {
+#userStudent .collection .isFullTime {
   float: left;
   margin-right: 20px;
 }
-#user .collection li {
+#userStudent .collection li {
   width: 95%;
   height: 18%;
   padding: 1.8%;
@@ -370,35 +355,35 @@ export default {
   border: #8e909421 1px solid;
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.05);
 }
-#user .collection .salary {
+#userStudent .collection .salary {
   float: right;
   color: #72b3f0;
   font-size: 1.2rem;
   width: 50%;
   text-align: right;
 }
-#user .collection .jobMsg,
-#user .collection .companyMsg {
+#userStudent .collection .jobMsg,
+#userStudent .collection .companyMsg {
   color: #8e9094;
   margin-top: 1%;
   font-size: 0.8rem;
 }
-#user .collection li:hover {
+#userStudent .collection li:hover {
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
 }
-#user .collection li:hover .station {
+#userStudent .collection li:hover .station {
   color: #72b3f0;
 }
-#user .collection span {
+#userStudent .collection span {
   margin-right: 0.5%;
 }
 /* 投递简历 */
-#user .resumeSent {
+#userStudent .resumeSent {
   width: 87%;
   overflow: auto;
   height: 500px;
 }
-#user .resumeSent li {
+#userStudent .resumeSent li {
   width: 95%;
   height: 18%;
   padding: 1.8%;
@@ -406,30 +391,30 @@ export default {
   border: #8e909421 1px solid;
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.05);
 }
-#user .resumeSent .company {
+#userStudent .resumeSent .company {
   float: left;
   font-weight: 600;
   margin-right: 2%;
 }
-#user .resumeSent .position {
+#userStudent .resumeSent .position {
   font-size: 0.9rem;
   font-weight: 600;
   height: 1.2rem;
   line-height: 1.2rem;
   vertical-align: bottom;
 }
-#user .resumeSent .el-steps {
+#userStudent .resumeSent .el-steps {
   margin-top: 2%;
 }
-#user .resumeSent .el-step__title {
+#userStudent .resumeSent .el-step__title {
   font-size: 0.9rem;
 }
 /* 我的发布 */
-#user #forumBox {
+#userStudent #forumBox {
   width: 87%;
   margin-top: -11vh;
 }
-#user #forumBox ul {
+#userStudent #forumBox ul {
   height: 440px;
 }
 </style>

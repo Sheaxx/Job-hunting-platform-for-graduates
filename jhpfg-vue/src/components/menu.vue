@@ -1,6 +1,6 @@
 <template>
   <div id="menu">
-    <el-menu
+    <!-- <el-menu
       background-color="#fff"
       text-color="#C0C1C5"
       active-text-color="#99BDDF"
@@ -29,7 +29,37 @@
         <i class="el-icon-bell"></i>
         <span>消息列表</span>
       </el-menu-item>
-      <el-menu-item index="/user">
+      <el-menu-item index="/userStudent">
+        <i class="el-icon-user"></i>
+        <span>个人信息</span>
+      </el-menu-item>
+    </el-menu> -->
+    <el-menu
+      background-color="#fff"
+      text-color="#C0C1C5"
+      active-text-color="#99BDDF"
+      class="el-menu-vertical-demo"
+      @open="handleOpen"
+      @close="handleClose"
+      :collapse="isCollapse"
+      default-active="/employment"
+      router
+    >
+      <el-button icon="el-icon-arrow-right" circle @click="changeCollapse" v-if="isCollapse"></el-button>
+      <el-button icon="el-icon-arrow-left" circle @click="changeCollapse" v-if="!isCollapse"></el-button>
+      <el-menu-item index="/employment">
+        <i class="el-icon-suitcase-1"></i>
+        <span>招聘信息</span>
+      </el-menu-item>
+      <el-menu-item index="/forum">
+        <i class="el-icon-chat-dot-square"></i>
+        <span>论坛</span>
+      </el-menu-item>
+      <el-menu-item index="/messages">
+        <i class="el-icon-bell"></i>
+        <span>消息列表</span>
+      </el-menu-item>
+      <el-menu-item index="/userCompany">
         <i class="el-icon-user"></i>
         <span>个人信息</span>
       </el-menu-item>

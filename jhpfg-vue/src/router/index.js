@@ -16,8 +16,12 @@ const routes = [
     component: Index,
     children: [
       {
-        path: '/user',
-        component: () => import('../views/user')
+        path: '/userStudent',
+        component: () => import('../views/userStudent')
+      },
+      {
+        path: '/userCompany',
+        component: () => import('../views/userCompany')
       },
       {
         path:'/employment',
