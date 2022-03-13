@@ -62,6 +62,7 @@
             icon="el-icon-search"
             class="searchButton"
             v-if="searchSelect == 3"
+            @click="searchSchool"
           >找学校</el-button>
         </el-input>
         <div
@@ -174,8 +175,8 @@
             <li
               class="schoolItem"
               v-for="(item,index) in schoolList"
-              :key="item.schoolid"
-              @click="toSchoolDetails(index)"
+              :key="item.id"
+              @click="toSchoolDetails(item.id)"
             >
               <img
                 src="../assets/image/avatar.png"
@@ -307,8 +308,9 @@
             </li>
           </ul>
         </div>
+        <h3>{{schoolDetails.name}}</h3>
         <div class="content">
-          ggggggggggggggggg
+          {{schoolDetails.introduction}}
         </div>
       </div>
     </div>
@@ -391,6 +393,25 @@
         >
         </el-table-column>
       </el-table>
+      <el-table
+        :data="searchList"
+        stripe
+        style="width: 100%"
+        @row-click="tableClick"
+        v-if="searchSelect==3"
+      >
+        <el-table-column
+          prop="name"
+          label="名字"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="location"
+          label="地点"
+          width="200"
+        >
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -428,6 +449,7 @@ export default {
       schoolList: [], //学校列表
       employmentDetails: {}, //某个招聘信息的详情
       companyDetails: {}, //招聘信息详情页面的公司信息
+      schoolDetails: {}, //学校详情
     };
   },
   methods: {
@@ -483,8 +505,12 @@ export default {
       this.isCompanyDetails = false;
     },
     //查看学校详情
-    toSchoolDetails(index) {
+    toSchoolDetails(id) {
       this.isSchoolDetails = true;
+      let that = this;
+      this.$ajax.get("/school/getSchoolById/" + id).then(res => {
+        that.schoolDetails = res.data;
+      })
     },
     //学校详情返回列表
     schoolToList() {
@@ -567,6 +593,21 @@ export default {
           that.searchList = res.data;
         });
     },
+    //根据关键字搜索学校
+    searchSchool() {
+      let obj = {
+        keyword: this.searchValue,
+      };
+      let that = this;
+      this.$ajax
+        .get("school/getSchoolByKeyword", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then((res) => {
+          that.isSearchList = true;
+          that.searchList = res.data;
+        });
+    },
     //点击搜索列表的行
     tableClick(row, column, event) {
       this.fromSearch = true;
@@ -591,6 +632,9 @@ export default {
     });
     this.$ajax.get("/company/getAccountListByPage/1").then((res) => {
       that.companyList = res.data.results;
+    });
+    this.$ajax.get("/school/getAccountListByPage/1").then((res) => {
+      that.schoolList = res.data.results;
     });
   },
 };
@@ -870,7 +914,17 @@ export default {
 #schoolDetails .concat .el-button {
   margin-top: 5px;
 }
-/* 学校详情-介绍内容 */
+/* 学校详情 */
+/* 学校名 */
+#schoolDetails h3 {
+  width: 66%;
+  position: relative;
+  top: 20px;
+  left: 35px;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+/* 介绍 */
 #schoolDetails .content {
   width: 66%;
   margin-left: 30%;
