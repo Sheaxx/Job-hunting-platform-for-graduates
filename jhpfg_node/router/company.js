@@ -16,6 +16,9 @@ router.get('/getCompanyByKeyword', handler.getCompanyByKeyword)
 router.get('/getAllEmployment/:id', handler.getAllEmployment)
 
 //获取所有公司的数据，返回id和公司名
-router.get('/getAllCompany', handler.getAllCompany);
+router.get('/getAllCompany', handler.getAllCompany)
+
+//更新公司信息
+router.post('/updateCompany', handler.updateCompany)
 
 module.exports = router

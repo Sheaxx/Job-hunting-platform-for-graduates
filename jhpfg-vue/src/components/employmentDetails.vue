@@ -273,8 +273,12 @@ export default {
   font-weight: 600;
 }
 #employmentDetails .msg {
+  width: 100%;
   top: 35%;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: center;
+
   color: #75777a;
 }
 #employmentDetails .msg span:not(.level) {

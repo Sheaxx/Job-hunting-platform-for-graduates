@@ -792,7 +792,7 @@ export default {
   position: absolute;
   top: 57px;
   left: 90px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #8e9094;
 }
 #companyList .msg span {

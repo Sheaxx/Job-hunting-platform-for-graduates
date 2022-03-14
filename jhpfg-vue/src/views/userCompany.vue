@@ -110,7 +110,10 @@
                 <el-input v-model="editCompany.name" />
               </el-form-item>
               <el-form-item label="行业">
-                <trade-select>
+                <trade-select
+                  :value="tradeValue"
+                  @setTradeValue="setTradeValue"
+                >
                 </trade-select>
               </el-form-item>
               <el-form-item label="融资">
@@ -128,7 +131,7 @@
                 <el-cascader
                   size="large"
                   :options="options"
-                  v-model="selectedOptions"
+                  v-model="locationValue"
                 >
                 </el-cascader>
               </el-form-item>
@@ -144,7 +147,10 @@
                 ></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="updateCompany">确认修改</el-button>
+                <el-button
+                  type="primary"
+                  @click="updateCompany"
+                >确认修改</el-button>
                 <el-button @click="cancelUpdateCompany">取消修改</el-button>
               </el-form-item>
             </el-form>
@@ -196,7 +202,12 @@
 </template>
 
 <script>
-import { provinceAndCityData } from "element-china-area-data";
+import {
+  provinceAndCityData,
+  CodeToText,
+  TextToCode,
+} from "element-china-area-data";
+import qs from "qs";
 import TradeSelect from "../components/tradeSelect.vue";
 import Resume from "../components/resume.vue";
 import EmploymentDetails from "../components/employmentDetails.vue";
@@ -213,6 +224,9 @@ export default {
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
       oldPassword: "", //旧密码
       newPassword: "", //新密码
+      tradeValue: [], //公司更新行业选择
+      options: provinceAndCityData,
+      locationValue: [], //地区选择
       userInfo: {
         //用户信息
         username: "zhalisu", //用户名
@@ -220,17 +234,7 @@ export default {
         role: "企业", //角色身份
         collections: [], //收藏的招聘信息列表
       },
-      companyDetails: {
-        id: 1,
-        logo: "",
-        name: "字节跳动",
-        trade: "互联网",
-        level: "已上市",
-        location: "北京",
-        address: "马路旁",
-        introduction:
-          "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-      }, //公司详情
+      companyDetails: {}, //公司详情
       editCompany: {
         id: "",
         logo: "",
@@ -242,8 +246,6 @@ export default {
         introduction: "",
       }, //公司编辑信息
       employmentList: [], //公司发布的招聘信息列表
-      options: provinceAndCityData,
-      selectedOptions: [], //地区选择
       level: [
         {
           value: "未融资",
@@ -300,16 +302,40 @@ export default {
     },
     //点击更新公司信息
     openUpdateCompany() {
+      Object.assign(this.editCompany, this.companyDetails);
+      this.tradeValue = [this.companyDetails.trade];
       this.isUpdateCompany = true;
+    },
+    //公司行业值设置
+    setTradeValue(value) {
+      this.editCompany.trade = value;
     },
     //确认修改公司信息
     updateCompany() {
-      this.isUpdateCompany = false;
+      let obj = Object.assign({}, this.editCompany);
+      obj.location = this.locationValue.join(",")
+      let that = this;
+      this.$ajax
+        .post("/company/updateCompany", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then((res) => {
+          Object.assign(that.companyDetails, that.editCompany);
+          that.isUpdateCompany = false;
+          that.$message.success("更新成功");
+        });
     },
     //取消修改公司信息
     cancelUpdateCompany() {
       this.isUpdateCompany = false;
-    }
+    },
+  },
+  mounted() {
+    let that = this;
+    this.$ajax.get("/company/getCompanyById/" + 1).then((res) => {
+      that.companyDetails = res.data;
+      that.locationValue = that.companyDetails.location.split(",");
+    });
   },
 };
 </script>

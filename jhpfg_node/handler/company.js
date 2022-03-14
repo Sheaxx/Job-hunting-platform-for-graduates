@@ -55,7 +55,7 @@ exports.getAllEmployment = (req, res) => {
   let id = req.params.id;
   let sql = 'select * from employment where companyId=' + id;
   db.query(sql, (err, results) => {
-    if(err) throw err;
+    if (err) throw err;
     res.send(results);
   })
 }
@@ -63,8 +63,32 @@ exports.getAllEmployment = (req, res) => {
 //获取所有公司的数据，返回id和公司名
 exports.getAllCompany = (req, res) => {
   let sql = 'select id,name from company';
-  db.query(sql,(err, results) => {
+  db.query(sql, (err, results) => {
     if (err) throw err;
     res.send(results);
   })
+}
+
+//更新公司信息
+exports.updateCompany = (req, res) => {
+  let company = req.body;
+  if (!company.id) {
+    let sql1 = 'select max(id) as maxid from company';
+    db.query(sql1, (err, results) => {
+      if (err) throw err;
+      company.id = results[0].maxid + 1;
+      let sql2 = 'insert into company set ?';
+      db.query(sql2, company, (err, result) => {
+        if (err) throw err;
+        res.send('success');
+      })
+    })
+  } else {
+    let sql3 = 'update company set ? where id=' + company.id;
+    db.query(sql3, company, (err, result) => {
+      if (err) throw err;
+      res.send('success');
+    })
+  }
+
 }

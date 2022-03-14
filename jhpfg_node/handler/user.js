@@ -116,7 +116,7 @@ exports.getNewTableId = (req, res) => {
 //更新用户的教育信息，实习经历，项目经历，校内经历
 exports.updateTable = (req, res) => {
   let table = req.params.table;
-  let data = req.body
+  let data = req.body;
   let sql1 = 'select * from ' + table + ' where id=' + data.id;
   db.query(sql1, (err, result) => {
     if (err) throw err;
@@ -134,30 +134,3 @@ exports.updateTable = (req, res) => {
     }
   })
 }
-
-//更新教育信息，实习经历，项目经历，校内经历
-// function updateInfo(list, table, tag) {
-//   //tag为true表示插入，tag为false表示更新
-//   if (tag) {
-//     let sql1 = 'select max(id) as maxid from ' + table
-//     db.query(sql1, (err, result) => {
-//       if (err) throw err;
-//       let sql2 = 'insert into ' + table + ' set ?'
-//       let maxid = result[0].id + 1;
-//       for (let item in list) {
-//         list[item].id = maxid;
-//         db.query(sql2, list[item], (err, result) => {
-//           if (err) throw err;
-//         })
-//         maxid++
-//       }
-//     })
-//   } else {
-//     let sql = 'update ' + table + ' set ? where id=?'
-//     for (let item in list) {
-//       db.query(sql, [list[item], list[item.id]], (err, result) => {
-//         if (err) throw err;
-//       })
-//     }
-//   }
-// }
