@@ -18,4 +18,10 @@ router.get('/getNewTableId/:table', handler.getNewTableId)
 //更新用户的教育信息，实习经历，项目经历，校内经历
 router.post('/updateTable/:table', handler.updateTable)
 
+//根据用户名返回学校用户信息
+router.get('/getPersonal/:username', handler.getPersonal)
+
+//更新学校用户信息
+router.post('/updatePersonal', handler.updatePersonal)
+
 module.exports = router

@@ -90,5 +90,4 @@ exports.updateCompany = (req, res) => {
       res.send('success');
     })
   }
-
 }

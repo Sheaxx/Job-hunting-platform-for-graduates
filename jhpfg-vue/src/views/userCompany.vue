@@ -15,63 +15,102 @@
         :value="tabValue"
       >
         <el-tab-pane
-          label="我的账号信息"
+          label="我的信息"
           class="user"
           name="1"
         >
-          <h5 class="boxTitle">账号信息</h5>
-          <ul>
-            <li>
-              <span class="itemTitle">用户名：{{ userInfo.username }}</span>
-            </li>
-            <li>
-              <span class="itemTitle">角色：{{ userInfo.role }}</span>
-            </li>
-            <li>
+          <div class="accountBox">
+            <h5 class="boxTitle">账号信息</h5>
+            <ul>
+              <li>
+                <span class="itemTitle">用户名：{{ userInfo.username }}</span>
+              </li>
+              <li>
+                <span class="itemTitle">角色：{{ userInfo.role }}</span>
+              </li>
+              <li>
+                <el-button
+                  round
+                  v-if="!isUpdatePassword"
+                  @click="openUpdatePassword"
+                >修改密码</el-button>
+                <el-button
+                  round
+                  v-else
+                  @click="cancelUpdatePassword"
+                >取消修改</el-button>
+              </li>
+            </ul>
+            <div
+              id="updatePassword"
+              v-if="isUpdatePassword"
+            >
+              <el-input
+                placeholder="请输入旧密码"
+                v-model="oldPassword"
+                show-password
+                class="password"
+              ></el-input>
+              <el-input
+                placeholder="请输入新密码"
+                v-model="newPassword"
+                show-password
+                class="password"
+              ></el-input>
               <el-button
+                type="primary"
                 round
-                v-if="!isUpdatePassword"
-                @click="openUpdatePassword"
-              >修改密码</el-button>
-              <el-button
-                round
+                @click="updatePassword"
+              >确认修改</el-button>
+            </div>
+          </div>
+          <div class="personalBox">
+            <div id="personalReadBox">
+              <h5 class="boxTitle">个人信息</h5>
+              <div
+                class="personalReadBox"
+                v-if="!isUpdatePersonal"
+              >
+                <el-button
+                  type="primary"
+                  round
+                  @click="openUpdatePersonal"
+                >更新信息</el-button>
+                <h6 class="name">{{personalInfo.realname}}</h6>
+                <p class="school"><i class="el-icon-s-home"></i>{{companyDetails.name}}</p>
+                <p class="position"><i class="el-icon-s-cooperation"></i>{{personalInfo.position}}</p>
+              </div>
+              <div
+                class="personalUpdateBox"
                 v-else
-                @click="cancelUpdatePassword"
-              >取消修改</el-button>
-            </li>
-          </ul>
-          <div
-            id="updatePassword"
-            v-if="isUpdatePassword"
-          >
-            <el-input
-              placeholder="请输入旧密码"
-              v-model="oldPassword"
-              show-password
-              class="password"
-            ></el-input>
-            <el-input
-              placeholder="请输入新密码"
-              v-model="newPassword"
-              show-password
-              class="password"
-            ></el-input>
-            <el-button
-              type="primary"
-              round
-              @click="updatePassword"
-            >确认修改</el-button>
+              >
+                <el-button
+                  type="primary"
+                  round
+                  @click="updatePersonal"
+                >确认更新</el-button>
+                <el-button
+                  round
+                  @click="cancelUpdatePersonal"
+                >取消更新</el-button>
+                <el-form label-width="100px">
+                  <el-form-item label="姓名">
+                    <el-input v-model="editPersonal.realname" />
+                  </el-form-item>
+                  <el-form-item label="公司">
+                    <el-input disabled v-model="companyDetails.name" />
+                  </el-form-item>
+                  <el-form-item label="职位">
+                    <el-input v-model="editPersonal.position" />
+                  </el-form-item>
+                </el-form>
+              </div>
+            </div>
           </div>
         </el-tab-pane>
         <el-tab-pane
-          label="我的个人信息"
+          label="我的公司"
           name="2"
-        >
-          <h5 class="boxTitle">个人信息</h5>
-        </el-tab-pane>
-        <el-tab-pane
-          label="我的公司信息"
-          name="3"
         >
           <div
             id="companyReadBox"
@@ -158,7 +197,7 @@
         </el-tab-pane>
         <el-tab-pane
           label="公司招聘"
-          name="4"
+          name="3"
         >
           <el-button
             type="primary"
@@ -187,7 +226,7 @@
         </el-tab-pane>
         <el-tab-pane
           label="我的发布"
-          name="5"
+          name="4"
         >
           <!-- <forum-box
             class="forumBox"
@@ -220,6 +259,7 @@ export default {
     return {
       tabValue: "1", //选项卡的值，默认为第一个
       isUpdatePassword: false, //修改密码界面，默认为否
+      isUpdatePersonal: false, //更新个人信息界面，默认为否
       isUpdateCompany: false, //更新公司信息页面，默认为否
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
       oldPassword: "", //旧密码
@@ -232,6 +272,12 @@ export default {
         username: "zhalisu", //用户名
         password: "", //密码
         role: "企业", //角色身份
+      },
+      personalInfo: {}, //个人信息
+      editPersonal: {
+        realname: "",
+        company: "",
+        position: "",
       },
       companyDetails: {}, //公司详情
       editCompany: {
@@ -299,6 +345,29 @@ export default {
       this.oldPassword = "";
       this.newPassword = "";
     },
+    //点击更新个人信息
+    openUpdatePersonal() {
+      Object.assign(this.editPersonal, this.personalInfo);
+      this.isUpdatePersonal = true;
+    },
+    //取消更新个人信息
+    cancelUpdatePersonal() {
+      this.isUpdatePersonal = false;
+    },
+    //确认更新个人信息
+    updatePersonal() {
+      let that = this;
+      let obj = Object.assign({}, this.editPersonal);
+      this.$ajax
+        .post("/user/updatePersonal", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then((res) => {
+          that.personalInfo = obj;
+          that.isUpdatePersonal = false;
+          that.$message.success("更新成功");
+        });
+    },
     //点击更新公司信息
     openUpdateCompany() {
       Object.assign(this.editCompany, this.companyDetails);
@@ -312,7 +381,7 @@ export default {
     //确认修改公司信息
     updateCompany() {
       let obj = Object.assign({}, this.editCompany);
-      obj.location = this.locationValue.join(",")
+      obj.location = this.locationValue.join(",");
       let that = this;
       this.$ajax
         .post("/company/updateCompany", qs.stringify(obj), {
@@ -331,9 +400,15 @@ export default {
   },
   mounted() {
     let that = this;
-    this.$ajax.get("/company/getCompanyById/" + 1).then((res) => {
-      that.companyDetails = res.data;
-      that.locationValue = that.companyDetails.location.split(",");
+    this.$ajax.get("/user/getPersonal/" + "aaa").then((res) => {
+      that.personalInfo = res.data;
+      that.$ajax
+        .get("/company/getCompanyById/" + res.data.company)
+        .then((res) => {
+          that.companyDetails = res.data;
+          that.locationValue = that.companyDetails.location.split(",");
+        });
+      console.log(that.personalInfo)
     });
   },
 };
@@ -364,6 +439,17 @@ export default {
   line-height: 5vh;
   margin-bottom: 5vh;
 }
+#userCompany .user {
+  display: flex;
+  width: 90%;
+  height: 500px;
+  align-items: center;
+}
+#userCompany .accountBox,
+#userCompany .personalBox {
+  height: 98%;
+  flex: 1;
+}
 /* 账号信息 */
 #userCompany .user li {
   margin-bottom: 3vh;
@@ -373,6 +459,38 @@ export default {
 }
 #updatePassword .el-input {
   margin-bottom: 2vh;
+}
+/* 个人信息 */
+/* 查看界面 */
+#userCompany .personalBox {
+  border-left: #8e90944d 1px solid;
+  padding-left: 50px;
+}
+#userCompany .personalBox .el-button {
+  float: right;
+  margin-left: 10px;
+}
+#userCompany .personalBox .name {
+  font-size: 1.4rem;
+  height: 4vh;
+  line-height: 4vh;
+  margin-bottom: 40px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+#userCompany .personalBox p {
+  margin-bottom: 15px;
+  letter-spacing: 1px;
+}
+#userCompany .personalBox i {
+  margin-right: 10px;
+}
+/* 修改界面 */
+#userCompany .personalUpdateBox .el-form {
+  clear: both;
+  position: relative;
+  top: 20px;
+  width: 90%;
 }
 /* 公司信息 */
 /* 查看 */

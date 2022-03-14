@@ -134,3 +134,24 @@ exports.updateTable = (req, res) => {
     }
   })
 }
+
+//根据用户名返回学校或企业用户信息
+exports.getPersonal = (req, res) => {
+  let username = req.params.username;
+  let sql = 'select * from resume where username="' + username + '"';
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    result[0].birth = moment(result[0].birth).format("YYYY-MM-DD")
+    res.send(result[0]);
+  })
+}
+
+//更新学校或企业用户信息
+exports.updatePersonal = (req, res) => {
+  let user = req.body;
+  let sql = 'update resume set ? where username="' + user.username + '"';
+  db.query(sql, user, (err, result) => {
+    if (err) throw err;
+    res.send('success');
+  })
+}
