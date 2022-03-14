@@ -1,6 +1,6 @@
 <template>
   <div id="menu">
-    <!-- <el-menu
+    <el-menu
       background-color="#fff"
       text-color="#C0C1C5"
       active-text-color="#99BDDF"
@@ -29,12 +29,16 @@
         <i class="el-icon-bell"></i>
         <span>消息列表</span>
       </el-menu-item>
-      <el-menu-item index="/userStudent">
+      <!-- <el-menu-item index="/userStudent">
+        <i class="el-icon-user"></i>
+        <span>个人信息</span>
+      </el-menu-item> -->
+      <el-menu-item index="/userSchool">
         <i class="el-icon-user"></i>
         <span>个人信息</span>
       </el-menu-item>
-    </el-menu> -->
-    <el-menu
+    </el-menu>
+    <!-- <el-menu
       background-color="#fff"
       text-color="#C0C1C5"
       active-text-color="#99BDDF"
@@ -63,7 +67,7 @@
         <i class="el-icon-user"></i>
         <span>个人信息</span>
       </el-menu-item>
-    </el-menu>
+    </el-menu> -->
   </div>
 </template>
 

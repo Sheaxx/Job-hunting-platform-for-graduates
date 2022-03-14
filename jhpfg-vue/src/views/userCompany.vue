@@ -232,7 +232,6 @@ export default {
         username: "zhalisu", //用户名
         password: "", //密码
         role: "企业", //角色身份
-        collections: [], //收藏的招聘信息列表
       },
       companyDetails: {}, //公司详情
       editCompany: {
