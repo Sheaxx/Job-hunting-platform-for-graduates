@@ -21,6 +21,19 @@
         >
           <div class="accountBox">
             <h5 class="boxTitle">账号信息</h5>
+            <el-upload
+              action="#"
+              list-type="picture-card"
+              :on-remove="handleRemove"
+              :on-change="handleChange"
+              :show-file-list="true"
+              :auto-upload="false"
+              :limit="1"
+              :class="{ hide: notShowUpload }"
+            >
+              <img v-if="avatarUrl" :src="avatarUrl" />
+              <i v-else class="el-icon-plus"></i>
+            </el-upload>
             <ul>
               <li>
                 <span class="itemTitle">用户名：{{ userInfo.username }}</span>
@@ -36,11 +49,16 @@
                 >修改密码</el-button>
                 <el-button
                   round
-                  v-else
+                  v-if="isUpdatePassword"
                   @click="cancelUpdatePassword"
                 >取消修改</el-button>
+                <el-button
+                  type="primary"
+                  round
+                  v-if="isUpdatePassword"
+                  @click="updatePassword"
+                >确认修改</el-button>
               </li>
-
             </ul>
             <div
               id="updatePassword"
@@ -58,11 +76,6 @@
                 show-password
                 class="password"
               ></el-input>
-              <el-button
-                type="primary"
-                round
-                @click="updatePassword"
-              >确认修改</el-button>
             </div>
           </div>
           <div class="personalBox">
@@ -152,11 +165,14 @@ export default {
       tabValue: "1", //选项卡的值，默认为第一个
       isUpdatePassword: false, //修改密码界面，默认为否
       isUpdatePersonal: false, //更新个人信息界面，默认为否
+      notShowUpload: false, //不显示上传图标，默认为否
+      avatarUrl: "", //编辑头像
       userInfo: {
         //用户信息
         username: "zhalisu", //用户名
         password: "", //密码
         role: "学校", //角色身份
+        avatar: "", //头像
       },
       personalInfo: {}, //个人信息
       editPersonal: {
@@ -167,6 +183,36 @@ export default {
     };
   },
   methods: {
+    //删除照片
+    handleRemove(file, fileList) {
+      if (fileList.length < 1) {
+        this.notShowUpload = false;
+      }
+      this.avatarUrl = "";
+    },
+    //照片上传按钮的动态显示
+    handleChange(file, fileList) {
+      if (fileList.length >= 1) {
+        this.notShowUpload = true;
+      } else {
+        this.notShowUpload = false;
+      }
+      let reader = new FileReader();
+      reader.readAsDataURL(file.raw);
+      let that = this;
+      reader.onload = function () {
+        that.avatarUrl = reader.result;
+        let obj = {
+          avatar: that.avatarUrl
+        }
+        that.$ajax.post("/user/updateAvatar/" + "aaa", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        }).then(res => {
+          that.userInfo.avatar = that.avatarUrl;
+          that.$message.success("更换头像成功")
+        })
+      };
+    },
     //点击修改密码
     openUpdatePassword() {
       this.oldPassword = "";
@@ -210,6 +256,10 @@ export default {
     let that = this;
     this.$ajax.get("/user/getPersonal/" + "aaa").then((res) => {
       that.personalInfo = res.data;
+    });
+    this.$ajax.get("/user/getUser/" + "aaa").then(res => {
+      that.userInfo = res.data;
+      that.avatarUrl = that.userInfo.avatar;
     });
   },
 };
@@ -260,6 +310,17 @@ export default {
 }
 #updatePassword .el-input {
   margin-bottom: 2vh;
+}
+/* 头像 */
+#userSchool .el-upload {
+  margin-bottom: 24px;
+}
+#userSchool .el-upload img {
+  width: 146px;
+  height: 146px;
+}
+#userSchool .hide .el-upload--picture-card {
+  display: none;
 }
 /* 个人信息 */
 /* 查看界面 */

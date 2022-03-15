@@ -1,5 +1,18 @@
 const db = require('../config/db')
 const moment = require('moment')
+const fs = require('fs')
+const path = require('path')
+const multiparty = require("multiparty");
+
+//根据用户名返回账号信息
+exports.getUser = (req, res) => {
+  let username = req.params.username;
+  let sql = 'select * from user where username="' + username + '"';
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result[0]);
+  })
+}
 
 //根据用户名返回简历信息
 exports.getResume = (req, res) => {
@@ -75,6 +88,17 @@ exports.getCollectList = (req, res) => {
   })
 }
 
+//更新用户的头像
+exports.updateAvatar = (req, res) => {
+  let avatar = req.body.avatar;
+  let { username} = req.params;
+  let sql = 'update user set avatar="' + avatar + '" where username="' + username + '"';
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send('success');
+  })
+}
+
 //更新用户的简历信息
 exports.updateResume = (req, res) => {
   let resume = req.body
@@ -129,7 +153,7 @@ exports.updateTable = (req, res) => {
       let sql3 = 'update ' + table + ' set ? where id=' + data.id
       db.query(sql3, data, (err, result) => {
         if (err) throw err;
-        res.send('success')
+        res.send('success');
       })
     }
   })

@@ -11,6 +11,19 @@
       >
         <el-tab-pane label="我的账号信息" class="user" name="1">
           <h5 class="boxTitle">账号信息</h5>
+          <el-upload
+              action="#"
+              list-type="picture-card"
+              :on-remove="handleRemove"
+              :on-change="handleChange"
+              :show-file-list="true"
+              :auto-upload="false"
+              :limit="1"
+              :class="{ hide: notShowUpload }"
+            >
+              <img v-if="avatarUrl" :src="avatarUrl" />
+              <i v-else class="el-icon-plus"></i>
+            </el-upload>
           <ul>
             <li>
               <span class="itemTitle">用户名：{{ userInfo.username }}</span>
@@ -25,9 +38,12 @@
                 @click="openUpdatePassword"
                 >修改密码</el-button
               >
-              <el-button round v-else @click="cancelUpdatePassword"
+              <el-button round v-if="isUpdatePassword" @click="cancelUpdatePassword"
                 >取消修改</el-button
               >
+              <el-button type="primary" round v-if="isUpdatePassword" @click="updatePassword"
+              >确认修改</el-button
+            >
             </li>
           </ul>
           <div id="updatePassword" v-if="isUpdatePassword">
@@ -43,9 +59,6 @@
               show-password
               class="password"
             ></el-input>
-            <el-button type="primary" round @click="updatePassword"
-              >确认修改</el-button
-            >
           </div>
         </el-tab-pane>
         <el-tab-pane label="我的简历" class="resume" name="2">
@@ -130,6 +143,7 @@
 </template>
 
 <script>
+import qs from "qs";
 import Resume from "../components/resume.vue";
 import EmploymentDetails from "../components/employmentDetails.vue";
 import ForumBox from "../components/forumBox.vue";
@@ -143,7 +157,8 @@ export default {
       isUpdatePassword: false, //修改密码界面，默认为否
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
       isPostDetails: false, //是否是帖子详情页，默认为否
-      oldPassword: "", //旧密码
+      notShowUpload: false, //不显示上传图标，默认为否
+      avatarUrl: "", //编辑头像
       newPassword: "", //新密码
       userInfo: {
         //用户信息
@@ -212,6 +227,36 @@ export default {
     };
   },
   methods: {
+    //删除照片
+    handleRemove(file, fileList) {
+      if (fileList.length < 1) {
+        this.notShowUpload = false;
+      }
+      this.avatarUrl = "";
+    },
+    //照片上传按钮的动态显示
+    handleChange(file, fileList) {
+      if (fileList.length >= 1) {
+        this.notShowUpload = true;
+      } else {
+        this.notShowUpload = false;
+      }
+      let reader = new FileReader();
+      reader.readAsDataURL(file.raw);
+      let that = this;
+      reader.onload = function () {
+        that.avatarUrl = reader.result;
+        let obj = {
+          avatar: that.avatarUrl
+        }
+        that.$ajax.post("/user/updateAvatar/" + "aaa", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        }).then(res => {
+          that.userInfo.avatar = that.avatarUrl;
+          that.$message.success("更换头像成功")
+        })
+      };
+    },
     //点击修改密码
     openUpdatePassword() {
       this.isUpdatePassword = true;
@@ -293,10 +338,14 @@ export default {
       for(let item in that.campusExperienceInfo) {
         that.campusExperienceInfo[item].duration = that.campusExperienceInfo[item].duration.split(',')
       }
-    })
+    });
     this.$ajax.get("/user/getCollectList/" + "aaa").then(res => {
       that.collectionList = res.data;
-    })
+    });
+        this.$ajax.get("/user/getUser/" + "aaa").then(res => {
+      that.userInfo = res.data;
+      that.avatarUrl = that.userInfo.avatar;
+    });
   }
 };
 </script>
@@ -335,6 +384,17 @@ export default {
 }
 #updatePassword .el-input {
   margin-bottom: 2vh;
+}
+/* 头像 */
+#userStudent .el-upload {
+  margin-bottom: 24px;
+}
+#userStudent .el-upload img {
+  width: 146px;
+  height: 146px;
+}
+#userStudent .hide .el-upload--picture-card {
+  display: none;
 }
 /* 我的收藏 */
 #userStudent .collection {

@@ -3,11 +3,17 @@ const router = express.Router();
 
 const handler = require('../handler/user');
 
+//根据用户名返回账号信息
+router.get('/getUser/:username', handler.getUser);
+
 //根据用户名返回简历信息
 router.get('/getResume/:username', handler.getResume)
 
 //获取用户的收藏列表
-router.get('/getCollectList/:username', handler.getCollectList)
+router.get('/getCollectList/:username', handler.getCollectList);
+
+//更新用户的头像
+router.post('/updateAvatar/:username', handler.updateAvatar);
 
 //更新用户的简历信息
 router.post('/updateResume', handler.updateResume)

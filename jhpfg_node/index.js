@@ -14,7 +14,7 @@ const cors = require('cors')
 // 将 cors 注册为全局中间件
 app.use(cors())
 
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ limit:"10mb",extended: false }))
 
 //路由
 const router = require('./router/index')
