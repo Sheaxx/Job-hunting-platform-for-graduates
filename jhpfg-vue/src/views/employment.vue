@@ -131,7 +131,7 @@
               <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
               <p class="station">{{ item.station }}</p>
               <p class="jobMsg">
-                <span>{{ item.location }}</span>
+                <span>{{ showLocation(item.location) }}</span>
                 <span>{{ item.education }}</span>
               </p>
               <p class="companyMsg">
@@ -154,13 +154,13 @@
               @click="toCompanyDetails(item.id)"
             >
               <img
-                src="../assets/image/avatar.png"
+                :src="item.logo"
                 alt="公司logo"
                 class="logo"
               />
               <p class="name">{{ item.name }}</p>
               <p class="msg">
-                <span>{{ item.location }}</span>
+                <span>{{ showLocation(item.location) }}</span>
                 <span>{{ item.trade }}</span>
                 <span>{{ item.level }}</span>
               </p>
@@ -243,12 +243,12 @@
         </div>
         <div class="companyBar">
           <img
-            src="../assets/image/avatar.png"
+            :src="companyDetails.logo"
             alt="公司logo"
           />
           <p class="companyName">{{ companyDetails.name }}</p>
           <div class="msg">
-            <span class="location">{{ companyDetails.location }}</span>
+            <span class="location">{{ showLocation(companyDetails.location) }}</span>
             <span class="trade">{{ companyDetails.trade }}</span>
             <span class="level">{{ companyDetails.level }}</span>
           </div>
@@ -465,6 +465,10 @@ export default {
           return "全职";
       }
     },
+    //地区码转中文
+    showLocation(location) {
+      return CodeToText[location[0]] + "" + CodeToText[location[1]];
+    },
     //查看招聘详情
     toEmploymentDetails(id) {
       this.isEmploymentDetails = true;
@@ -475,6 +479,8 @@ export default {
           .get("/company/getCompanyById/" + that.employmentDetails.companyId)
           .then((res) => {
             that.companyDetails = res.data;
+            that.companyDetails.location =
+              that.companyDetails.location.split(",");
           });
       });
     },
@@ -494,13 +500,14 @@ export default {
     sendResume() {},
     //查看公司详情
     toCompanyDetails(id) {
-      this.isCompanyDetails = true;
       let that = this;
       this.$ajax.get("/company/getCompanyById/" + id).then((res) => {
         that.companyDetails = res.data;
+        that.companyDetails.location = that.companyDetails.location.split(",");
       });
       this.$ajax.get("/company/getAllEmployment/" + id).then((res) => {
         that.company_employmentList = res.data;
+        that.isCompanyDetails = true;
       });
     },
     //公司详情返回列表
@@ -655,9 +662,17 @@ export default {
     this.$ajax.get("/employment/getAccountListByPage/1").then((res) => {
       that.employmentList = res.data.results;
       that.total = res.data.total;
+      for (let item in that.employmentList) {
+        that.employmentList[item].location =
+          that.employmentList[item].location.split(",");
+      }
     });
     this.$ajax.get("/company/getAccountListByPage/1").then((res) => {
       that.companyList = res.data.results;
+      for (let item in that.companyList) {
+        that.companyList[item].location =
+          that.companyList[item].location.split(",");
+      }
     });
     this.$ajax.get("/school/getAccountListByPage/1").then((res) => {
       that.schoolList = res.data.results;
@@ -881,8 +896,12 @@ export default {
   font-weight: 600;
 }
 #companyDetails .companyBar .msg {
+  width: 100%;
   top: 35%;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: center;
+
   color: #75777a;
 }
 #companyDetails .companyBar .msg span:not(.level) {

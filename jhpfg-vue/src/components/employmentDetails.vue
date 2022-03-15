@@ -56,12 +56,12 @@
     </div>
     <div class="companyBar">
       <img
-        src="../assets/image/avatar.png"
+        :src="companyDetails.logo"
         alt="公司logo"
       />
       <p class="companyName">{{ companyDetails.name }}</p>
       <div class="msg">
-        <span class="location">{{ companyDetails.location }}</span>
+        <span class="location">{{ showLocation(companyDetails.location) }}</span>
         <span class="trade">{{ companyDetails.trade }}</span>
         <span class="level">{{ companyDetails.level }}</span>
       </div>
@@ -107,6 +107,8 @@
 </template>
 
 <script>
+import { CodeToText } from "element-china-area-data";
+
 export default {
   data() {
     return {
@@ -127,6 +129,10 @@ export default {
         case 1:
           return "全职";
       }
+    },
+    //地区码转中文
+    showLocation(location) {
+      return CodeToText[location[0]] + "" + CodeToText[location[1]] 
     },
     //详情返回列表
     toList() {

@@ -13,6 +13,7 @@
         tab-position="left"
         style="height: 500px"
         :value="tabValue"
+        v-if="!isEmploymentDetails"
       >
         <el-tab-pane
           label="我的信息"
@@ -246,6 +247,7 @@
         <el-tab-pane
           label="公司招聘"
           name="3"
+          class="companyRecruitment"
         >
           <el-button
             type="primary"
@@ -254,8 +256,8 @@
           <ul v-if="!isEmploymentDetails">
             <li
               v-for="item in employmentList"
-              :key="item.employmentid"
-              @click="toEmploymentDetails"
+              :key="item.id"
+              @click="toEmploymentDetails(item.id)"
             >
               <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
               <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
@@ -285,6 +287,15 @@
         </el-tab-pane>
       </el-tabs>
     </div>
+    <employment-details
+        v-if="isEmploymentDetails"
+        :details="employmentDetails"
+        :companyDetails="companyDetails"
+        @toList="toEmploymentList"
+        @collect=""
+        @cancelCollect=""
+        @sendResume=""
+      ></employment-details>
   </div>
 </template>
 
@@ -302,7 +313,7 @@ import ForumBox from "../components/forumBox.vue";
 import ForumDetails from "../components/forumDetails.vue";
 
 export default {
-  components: { TradeSelect },
+  components: { TradeSelect, EmploymentDetails },
   data() {
     return {
       tabValue: "1", //选项卡的值，默认为第一个
@@ -333,6 +344,7 @@ export default {
         position: "",
       },
       companyDetails: {}, //公司详情
+      employmentDetails:{}, //招聘信息详情
       editCompany: {
         id: "",
         logo: "",
@@ -381,6 +393,15 @@ export default {
     };
   },
   methods: {
+    //实习或全职转文字显示
+    showIsFullTime(val) {
+      switch (val) {
+        case 0:
+          return "实习";
+        case 1:
+          return "全职";
+      }
+    },
     //删除头像
     handleRemoveAvatar(file, fileList) {
       if (fileList.length < 1) {
@@ -506,6 +527,19 @@ export default {
     cancelUpdateCompany() {
       this.isUpdateCompany = false;
     },
+    //查看招聘信息详情
+    toEmploymentDetails(id) {
+      let that = this;
+      this.$ajax.get("/employment/getEmploymentById/" + id).then((res) => {
+        that.employmentDetails = res.data;
+        that.isEmploymentDetails = true;
+      });
+      this.tabValue = 3;
+    },
+    //招聘信息详情返回列表
+    toEmploymentList() {
+      this.isEmploymentDetails = false;
+    },
   },
   mounted() {
     let that = this;
@@ -517,7 +551,9 @@ export default {
           that.companyDetails = res.data;
           that.locationValue = that.companyDetails.location.split(",");
         });
-      console.log(that.personalInfo);
+        that.$ajax.get("/company/getAllEmployment/" + res.data.company).then(res => {
+          that.employmentList = res.data;
+        })
     });
     this.$ajax.get("/user/getUser/" + "aaa").then((res) => {
       that.userInfo = res.data;
@@ -695,5 +731,55 @@ export default {
   height: 500px;
   overflow: auto;
   padding-right: 5%;
+}
+/* 公司发布招聘 */
+#userCompany .companyRecruitment {
+  width: 87%;
+  padding: 1%;
+  height: 500px;
+  overflow: auto;
+}
+#userCompany .companyRecruitment .isFullTime {
+  float: left;
+  margin-right: 20px;
+}
+#userCompany .companyRecruitment ul{
+  position: relative;
+  top: 10px;
+  padding-top: 10px;
+  height: 420px;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+}
+#userCompany .companyRecruitment li {
+  width: 94%;
+  height: 10%;
+  padding: 1.8%;
+  margin-bottom: 2%;
+  border: #8e909421 1px solid;
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.05);
+}
+#userCompany .companyRecruitment .salary {
+  float: right;
+  color: #72b3f0;
+  font-size: 1.2rem;
+  width: 50%;
+  text-align: right;
+}
+#userCompany .companyRecruitment .jobMsg,
+#userCompany .companyRecruitment .companyMsg {
+  color: #8e9094;
+  margin-top: 1%;
+  font-size: 0.8rem;
+}
+#userCompany .companyRecruitment li:hover {
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+}
+#userCompany .companyRecruitment li:hover .station {
+  color: #72b3f0;
+}
+#userCompany .companyRecruitment span {
+  margin-right: 0.5%;
 }
 </style>
