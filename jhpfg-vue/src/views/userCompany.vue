@@ -24,15 +24,21 @@
             <el-upload
               action="#"
               list-type="picture-card"
-              :on-remove="handleRemove"
-              :on-change="handleChange"
+              :on-remove="handleRemoveAvatar"
+              :on-change="handleChangeAvatar"
               :show-file-list="true"
               :auto-upload="false"
               :limit="1"
-              :class="{ hide: notShowUpload }"
+              :class="{ hide: notShowUploadAvatar }"
             >
-              <img v-if="avatarUrl" :src="avatarUrl" />
-              <i v-else class="el-icon-plus"></i>
+              <img
+                v-if="avatarUrl"
+                :src="avatarUrl"
+              />
+              <i
+                v-else
+                class="el-icon-plus"
+              ></i>
             </el-upload>
             <ul>
               <li>
@@ -53,11 +59,11 @@
                   @click="cancelUpdatePassword"
                 >取消修改</el-button>
                 <el-button
-                type="primary"
-                round
-                v-if="isUpdatePassword"
-                @click="updatePassword"
-              >确认修改</el-button>
+                  type="primary"
+                  round
+                  v-if="isUpdatePassword"
+                  @click="updatePassword"
+                >确认修改</el-button>
               </li>
             </ul>
             <div
@@ -112,7 +118,10 @@
                     <el-input v-model="editPersonal.realname" />
                   </el-form-item>
                   <el-form-item label="公司">
-                    <el-input disabled v-model="companyDetails.name" />
+                    <el-input
+                      disabled
+                      v-model="companyDetails.name"
+                    />
                   </el-form-item>
                   <el-form-item label="职位">
                     <el-input v-model="editPersonal.position" />
@@ -136,6 +145,10 @@
               @click="openUpdateCompany"
             >更新信息</el-button>
             <h6 class="companyName">{{companyDetails.name}}</h6>
+            <img
+              :src="companyDetails.logo"
+              alt="公司logo"
+            >
             <ul class="row1">
               <li>
                 <i class="el-icon-menu"></i>{{companyDetails.trade}}
@@ -159,6 +172,27 @@
             v-else
           >
             <el-form label-width="100px">
+              <el-form-item label="LOGO">
+                <el-upload
+                  action="#"
+                  list-type="picture-card"
+                  :on-remove="handleRemoveLogo"
+                  :on-change="handleChangeLogo"
+                  :show-file-list="true"
+                  :auto-upload="false"
+                  :limit="1"
+                  :class="{ hide: notShowUploadLogo }"
+                >
+                  <img
+                    v-if="logoUrl"
+                    :src="logoUrl"
+                  />
+                  <i
+                    v-else
+                    class="el-icon-plus"
+                  ></i>
+                </el-upload>
+              </el-form-item>
               <el-form-item label="公司名">
                 <el-input v-model="editCompany.name" />
               </el-form-item>
@@ -196,7 +230,7 @@
                   type="textarea"
                   v-model="editCompany.introduction"
                   resize="none"
-                  :rows="4"
+                  :rows="6"
                 ></el-input>
               </el-form-item>
               <el-form-item>
@@ -276,10 +310,12 @@ export default {
       isUpdatePersonal: false, //更新个人信息界面，默认为否
       isUpdateCompany: false, //更新公司信息页面，默认为否
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
-      notShowUpload: false, //不显示上传图标，默认为否
+      notShowUploadAvatar: false, //（用户头像）不显示上传图标，默认为否
+      notShowUploadLogo: false, //（公司LOGO）不显示上传图标，默认为否
+      avatarUrl: "", //编辑头像
+      logoUrl: "", //编辑logo
       oldPassword: "", //旧密码
       newPassword: "", //新密码
-      avatarUrl: "", //编辑头像
       tradeValue: [], // 公司更新行业选择
       options: provinceAndCityData,
       locationValue: [], //地区选择
@@ -288,7 +324,7 @@ export default {
         username: "zhalisu", //用户名
         password: "", //密码
         role: "企业", //角色身份
-        avatar:""
+        avatar: "",
       },
       personalInfo: {}, //个人信息
       editPersonal: {
@@ -345,19 +381,19 @@ export default {
     };
   },
   methods: {
-    //删除照片
-    handleRemove(file, fileList) {
+    //删除头像
+    handleRemoveAvatar(file, fileList) {
       if (fileList.length < 1) {
-        this.notShowUpload = false;
+        this.notShowUploadAvatar = false;
       }
       this.avatarUrl = "";
     },
-    //照片上传按钮的动态显示
-    handleChange(file, fileList) {
+    //头像上传按钮的动态显示
+    handleChangeAvatar(file, fileList) {
       if (fileList.length >= 1) {
-        this.notShowUpload = true;
+        this.notShowUploadAvatar = true;
       } else {
-        this.notShowUpload = false;
+        this.notShowUploadAvatar = false;
       }
       let reader = new FileReader();
       reader.readAsDataURL(file.raw);
@@ -365,14 +401,16 @@ export default {
       reader.onload = function () {
         that.avatarUrl = reader.result;
         let obj = {
-          avatar: that.avatarUrl
-        }
-        that.$ajax.post("/user/updateAvatar/" + "aaa", qs.stringify(obj), {
-          "content-type": "application/x-www-form-urlencoded",
-        }).then(res => {
-          that.userInfo.avatar = that.avatarUrl;
-          that.$message.success("更换头像成功")
-        })
+          avatar: that.avatarUrl,
+        };
+        that.$ajax
+          .post("/user/updateAvatar/" + "aaa", qs.stringify(obj), {
+            "content-type": "application/x-www-form-urlencoded",
+          })
+          .then((res) => {
+            that.userInfo.avatar = that.avatarUrl;
+            that.$message.success("更换头像成功");
+          });
       };
     },
     //点击修改密码
@@ -419,16 +457,39 @@ export default {
     openUpdateCompany() {
       Object.assign(this.editCompany, this.companyDetails);
       this.tradeValue = [this.companyDetails.trade];
+      this.logoUrl = this.companyDetails.logo;
       this.isUpdateCompany = true;
     },
     //公司行业值设置
     setTradeValue(value) {
       this.editCompany.trade = value;
     },
+    //删除logo
+    handleRemoveLogo(file, fileList) {
+      if (fileList.length < 1) {
+        this.notShowUploadLogo = false;
+      }
+      this.logoUrl = "";
+    },
+    //logo上传按钮的动态显示
+    handleChangeLogo(file, fileList) {
+      if (fileList.length >= 1) {
+        this.notShowUploadLogo = true;
+      } else {
+        this.notShowUploadLogo = false;
+      }
+      let reader = new FileReader();
+      reader.readAsDataURL(file.raw);
+      let that = this;
+      reader.onload = function () {
+        that.logoUrl = reader.result;
+      };
+    },
     //确认修改公司信息
     updateCompany() {
       let obj = Object.assign({}, this.editCompany);
       obj.location = this.locationValue.join(",");
+      obj.logo = this.logoUrl;
       let that = this;
       this.$ajax
         .post("/company/updateCompany", qs.stringify(obj), {
@@ -436,6 +497,7 @@ export default {
         })
         .then((res) => {
           Object.assign(that.companyDetails, that.editCompany);
+          that.companyDetails.logo = that.logoUrl;
           that.isUpdateCompany = false;
           that.$message.success("更新成功");
         });
@@ -455,12 +517,12 @@ export default {
           that.companyDetails = res.data;
           that.locationValue = that.companyDetails.location.split(",");
         });
-      console.log(that.personalInfo)
+      console.log(that.personalInfo);
     });
-    this.$ajax.get("/user/getUser/" + "aaa").then(res => {
+    this.$ajax.get("/user/getUser/" + "aaa").then((res) => {
       that.userInfo = res.data;
       that.avatarUrl = that.userInfo.avatar;
-    })
+    });
   },
 };
 </script>
@@ -573,8 +635,16 @@ export default {
   font-weight: 600;
   letter-spacing: 1px;
 }
+#userCompany #companyReadBox img {
+  height: 146px;
+  width: 146px;
+  float: left;
+  margin-right: 50px;
+}
 #userCompany #companyReadBox ul {
   width: 100%;
+  position: relative;
+  top: 40px;
 }
 #userCompany #companyReadBox li:not(:last-child) {
   float: left;
@@ -608,7 +678,7 @@ export default {
 #userCompany #companyReadBox .introduction h6 {
   font-size: 1.2rem;
   padding-bottom: 10px;
-  margin-top: 50px;
+  margin-top: 130px;
   margin-bottom: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.11);
 }
@@ -620,5 +690,10 @@ export default {
 #userCompany #companyUpdateBox .el-button {
   float: right;
   margin-left: 10px;
+}
+#userCompany #companyUpdateBox {
+  height: 500px;
+  overflow: auto;
+  padding-right: 5%;
 }
 </style>
