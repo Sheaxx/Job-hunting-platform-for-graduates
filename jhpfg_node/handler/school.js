@@ -34,6 +34,16 @@ exports.getSchoolById = (req, res) => {
   })
 }
 
+//根据名称搜索某一条学校信息
+exports.getSchoolByName = (req, res) => {
+  let name = req.params.name;
+  let sql = 'select * from school where name="' + name + '"';
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(result[0]);
+  })
+}
+
 //根据关键字进行搜索
 exports.getSchoolByKeyword = (req, res) => {
   let keyword = req.body.keyword;
@@ -48,4 +58,27 @@ exports.getSchoolByKeyword = (req, res) => {
     }
     res.send(arr)
   })
+}
+
+//更新学校信息
+exports.updateSchool = (req, res) => {
+  let school = req.body;
+  if (!school.id) {
+    let sql1 = 'select max(id) as maxid from school';
+    db.query(sql1, (err, results) => {
+      if (err) throw err;
+      school.id = results[0].maxid + 1;
+      let sql2 = 'insert into school set ?';
+      db.query(sql2, school, (err, result) => {
+        if (err) throw err;
+        res.send('success');
+      })
+    })
+  } else {
+    let sql3 = 'update school set ? where id=' + school.id;
+    db.query(sql3, school, (err, result) => {
+      if (err) throw err;
+      res.send('success');
+    })
+  }
 }

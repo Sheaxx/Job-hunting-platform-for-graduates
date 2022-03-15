@@ -184,9 +184,6 @@
                 class="logo"
               />
               <p class="name">{{ item.name }}</p>
-              <p class="msg">
-                <span>{{ item.location }}</span>
-              </p>
             </li>
           </ul>
         </div>

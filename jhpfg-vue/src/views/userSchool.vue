@@ -24,15 +24,21 @@
             <el-upload
               action="#"
               list-type="picture-card"
-              :on-remove="handleRemove"
-              :on-change="handleChange"
+              :on-remove="handleRemoveAvatar"
+              :on-change="handleChangeAvatar"
               :show-file-list="true"
               :auto-upload="false"
               :limit="1"
-              :class="{ hide: notShowUpload }"
+              :class="{ hide: notShowUploadAvatar }"
             >
-              <img v-if="avatarUrl" :src="avatarUrl" />
-              <i v-else class="el-icon-plus"></i>
+              <img
+                v-if="avatarUrl"
+                :src="avatarUrl"
+              />
+              <i
+                v-else
+                class="el-icon-plus"
+              ></i>
             </el-upload>
             <ul>
               <li>
@@ -126,6 +132,75 @@
           label="我的学校"
           name="2"
         >
+          <div
+            id="schoolReadBox"
+            v-if="!isUpdateSchool"
+          >
+            <el-button
+              type="primary"
+              round
+              @click="openUpdateSchool"
+            >更新信息</el-button>
+            <h6 class="name">{{schoolDetails.name}}</h6>
+            <img
+              :src="schoolDetails.logo"
+              alt="校徽"
+            >
+            <p><i class="el-icon-location"></i>{{schoolDetails.address}}</p>
+            <div class="introduction">
+              <h6>学校简介</h6>
+              <p>{{schoolDetails.introduction}}</p>
+            </div>
+          </div>
+          <div
+            id="schoolUpdateBox"
+            v-else
+          >
+            <el-form label-width="100px">
+              <el-form-item label="LOGO">
+                <el-upload
+                  action="#"
+                  list-type="picture-card"
+                  :on-remove="handleRemoveLogo"
+                  :on-change="handleChangeLogo"
+                  :show-file-list="true"
+                  :auto-upload="false"
+                  :limit="1"
+                  :class="{ hide: notShowUploadLogo }"
+                >
+                  <img
+                    v-if="logoUrl"
+                    :src="logoUrl"
+                  />
+                  <i
+                    v-else
+                    class="el-icon-plus"
+                  ></i>
+                </el-upload>
+              </el-form-item>
+              <el-form-item label="学校名">
+                <el-input v-model="editSchool.name" />
+              </el-form-item>
+              <el-form-item label="详细地址">
+                <el-input v-model="editSchool.address" />
+              </el-form-item>
+              <el-form-item label="内容">
+                <el-input
+                  type="textarea"
+                  v-model="editSchool.introduction"
+                  resize="none"
+                  :rows="6"
+                ></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button
+                  type="primary"
+                  @click="updateSchool"
+                >确认修改</el-button>
+                <el-button @click="cancelUpdateSchool">取消修改</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
         </el-tab-pane>
         <el-tab-pane
           label="认证招聘信息"
@@ -165,8 +240,11 @@ export default {
       tabValue: "1", //选项卡的值，默认为第一个
       isUpdatePassword: false, //修改密码界面，默认为否
       isUpdatePersonal: false, //更新个人信息界面，默认为否
-      notShowUpload: false, //不显示上传图标，默认为否
+      isUpdateSchool: false, //更新学校信息页面，默认为否
+      notShowUploadAvatar: false, //（用户头像）不显示上传图标，默认为否
+      notShowUploadLogo: false, //（学校LOGO）不显示上传图标，默认为否
       avatarUrl: "", //编辑头像
+      logoUrl: "", //编辑logo
       userInfo: {
         //用户信息
         username: "zhalisu", //用户名
@@ -180,18 +258,26 @@ export default {
         school: "",
         position: "",
       },
+      schoolDetails:{},//学校详情
+      editSchool:{
+        id:"",
+        name:"",
+        logo:"",
+        address:"",
+        introduction:""
+      }//学校编辑信息
     };
   },
   methods: {
-    //删除照片
-    handleRemove(file, fileList) {
+    //删除头像
+    handleRemoveAvatar(file, fileList) {
       if (fileList.length < 1) {
         this.notShowUpload = false;
       }
       this.avatarUrl = "";
     },
-    //照片上传按钮的动态显示
-    handleChange(file, fileList) {
+    //头像上传按钮的动态显示
+    handleChangeAvatar(file, fileList) {
       if (fileList.length >= 1) {
         this.notShowUpload = true;
       } else {
@@ -203,14 +289,16 @@ export default {
       reader.onload = function () {
         that.avatarUrl = reader.result;
         let obj = {
-          avatar: that.avatarUrl
-        }
-        that.$ajax.post("/user/updateAvatar/" + "aaa", qs.stringify(obj), {
-          "content-type": "application/x-www-form-urlencoded",
-        }).then(res => {
-          that.userInfo.avatar = that.avatarUrl;
-          that.$message.success("更换头像成功")
-        })
+          avatar: that.avatarUrl,
+        };
+        that.$ajax
+          .post("/user/updateAvatar/" + "aaa", qs.stringify(obj), {
+            "content-type": "application/x-www-form-urlencoded",
+          })
+          .then((res) => {
+            that.userInfo.avatar = that.avatarUrl;
+            that.$message.success("更换头像成功");
+          });
       };
     },
     //点击修改密码
@@ -251,13 +339,63 @@ export default {
           that.$message.success("更新成功");
         });
     },
+    //点击更新学校信息
+    openUpdateSchool() {
+      Object.assign(this.editSchool, this.schoolDetails);
+      this.logoUrl = this.schoolDetails.logo;
+      this.isUpdateSchool = true;
+    },
+    //删除logo
+    handleRemoveLogo(file, fileList) {
+      if (fileList.length < 1) {
+        this.notShowUploadLogo = false;
+      }
+      this.logoUrl = "";
+    },
+    //logo上传按钮的动态显示
+    handleChangeLogo(file, fileList) {
+      if (fileList.length >= 1) {
+        this.notShowUploadLogo = true;
+      } else {
+        this.notShowUploadLogo = false;
+      }
+      let reader = new FileReader();
+      reader.readAsDataURL(file.raw);
+      let that = this;
+      reader.onload = function () {
+        that.logoUrl = reader.result;
+      };
+    },
+    //确认修改学校信息
+    updateSchool() {
+      let obj = Object.assign({}, this.editSchool);
+      obj.logo = this.logoUrl;
+      let that = this;
+      this.$ajax
+        .post("/school/updateSchool", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then((res) => {
+          Object.assign(that.schoolDetails, that.editSchool);
+          that.schoolDetails.logo = that.logoUrl;
+          that.isUpdateSchool = false;
+          that.$message.success("更新成功");
+        });
+    },
+    //取消修改学校信息
+    cancelUpdateSchool() {
+      this.isUpdateSchool = false;
+    },
   },
   mounted() {
     let that = this;
     this.$ajax.get("/user/getPersonal/" + "aaa").then((res) => {
       that.personalInfo = res.data;
+      that.$ajax.get("/school/getSchoolByName/" + res.data.school).then(res=> {
+        that.schoolDetails = res.data;
+      })
     });
-    this.$ajax.get("/user/getUser/" + "aaa").then(res => {
+    this.$ajax.get("/user/getUser/" + "aaa").then((res) => {
       that.userInfo = res.data;
       that.avatarUrl = that.userInfo.avatar;
     });
@@ -353,5 +491,66 @@ export default {
   position: relative;
   top: 20px;
   width: 90%;
+}
+/* 学校信息 */
+/* 查看 */
+#userSchool #schoolReadBox,
+#userSchool #schoolUpdateBox {
+  width: 85%;
+  height: 500px;
+}
+#userSchool #schoolReadBox .el-button:first-of-type {
+  float: right;
+  margin-right: 3vw;
+}
+#userSchool #schoolReadBox .name {
+  font-size: 1.4rem;
+  height: 4vh;
+  line-height: 4vh;
+  margin-bottom: 60px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+#userSchool #schoolReadBox img {
+  height: 146px;
+  width: 146px;
+  float: left;
+  margin-right: 50px;
+}
+#userSchool #schoolReadBox p {
+  width: 100%;
+  position: relative;
+  top: 40px;
+  font-size: 14px;
+  height: 15px;
+  line-height: 15px;
+  vertical-align: middle;
+  letter-spacing: 1px;
+  color: #272736;
+}
+#userSchool #schoolReadBox i {
+  display: inline-block;
+  margin-right: 10px;
+  color: #99bddf;
+}
+#userSchool #schoolReadBox .introduction h6 {
+  font-size: 1.2rem;
+  padding-bottom: 10px;
+  margin-top: 160px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.11);
+}
+#userSchool #schoolReadBox .introduction p {
+  line-height: 1.5rem;
+  letter-spacing: 1px;
+}
+/* 更新 */
+#userSchool #schoolUpdateBox .el-button {
+  float: right;
+  margin-left: 10px;
+}
+#userSchool #schoolUpdateBox {
+  height: 500px;
+  overflow: auto;
+  padding-right: 5%;
 }
 </style>
