@@ -32,13 +32,18 @@
         class="delete"
         @click="openDelete"
       >删除</el-link>
+      <el-link
+        icon="el-icon-edit"
+        class="delete"
+        @click="openAddEmployment"
+      >修改</el-link>
     </div>
     <div class="topBar">
       <el-tag class="isFullTime">{{showIsFullTime(details.isFullTime)}}</el-tag>
       <h5>{{ details.station }}</h5>
       <h6><span>{{ details.salaryStart }}</span> - <span>{{ details.salaryEnd }}</span></h6>
       <p class="jobMsg">
-        <span>{{ details.location }}</span>
+        <span>{{ showLocation(details.location) }}</span>
         <span>{{ details.education }}</span>
       </p>
     </div>
@@ -103,17 +108,26 @@
         >取消</el-button>
       </div>
     </div>
+    <edit-employment
+      v-if="isEditEmployment"
+      :editEmployment="details"
+      @updateEmployment="updateEmployment"
+      @cancelUpdateEmployment="cancelUpdateEmployment"
+    ></edit-employment>
   </div>
 </template>
 
 <script>
 import { CodeToText } from "element-china-area-data";
+import EditEmployment from "../components/editEmployment.vue";
 
 export default {
+  components:{ EditEmployment },
   data() {
     return {
       isOpenSendResume: false, //是否打开投递简历窗口，默认为否
       isOpenDelete: false, //是否打开删除招聘信息窗口，默认为否
+      isEditEmployment: false, //是否打开编辑窗口，默认为否
     };
   },
   props: {
@@ -184,6 +198,18 @@ export default {
     cancelDelete() {
       this.isOpenDelete = false;
       document.documentElement.style.overflow = "auto";
+    },
+    //打开编辑招聘信息页面
+    openAddEmployment() {
+      this.isEditEmployment = true;
+    },
+    //确定更新招聘信息
+    updateEmployment(){
+      this.isEditEmployment = false;
+    },
+    //取消编辑招聘信息
+    cancelUpdateEmployment() {
+      this.isEditEmployment = false;
     },
   },
   mounted() {

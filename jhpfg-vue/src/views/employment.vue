@@ -179,7 +179,7 @@
               @click="toSchoolDetails(item.id)"
             >
               <img
-                src="../assets/image/avatar.png"
+                :src="item.logo"
                 alt="学校logo"
                 class="logo"
               />
@@ -475,6 +475,7 @@ export default {
       let that = this;
       this.$ajax.get("/employment/getEmploymentById/" + id).then((res) => {
         that.employmentDetails = res.data;
+        that.employmentDetails.location = that.employmentDetails.location.split(",");
         that.$ajax
           .get("/company/getCompanyById/" + that.employmentDetails.companyId)
           .then((res) => {

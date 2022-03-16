@@ -10,7 +10,10 @@ router.get('/getAccountListByPage/:currentPage', handler.getAccountListByPage)
 router.get('/getEmploymentById/:id', handler.getEmploymentById);
 
 //根据关键字进行搜索
-router.post('/getEmploymentByKeyword', handler.getEmploymentByKeyword)
+router.post('/getEmploymentByKeyword', handler.getEmploymentByKeyword);
+
+//更新招聘信息
+router.post('/updateEmployment', handler.updateEmployment);
 
 //删除招聘信息
 router.post('/deleteEmployment/:id', handler.deleteEmployment);

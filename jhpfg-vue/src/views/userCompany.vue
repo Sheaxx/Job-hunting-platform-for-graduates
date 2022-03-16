@@ -13,7 +13,7 @@
         tab-position="left"
         style="height: 500px"
         :value="tabValue"
-        v-if="!isEmploymentDetails"
+        v-if="!isEmploymentDetails && !isAddEmployment"
       >
         <el-tab-pane
           label="我的信息"
@@ -252,6 +252,7 @@
           <el-button
             type="primary"
             icon="el-icon-plus"
+            @click="openAddEmployment"
           >发布招聘</el-button>
           <ul v-if="!isEmploymentDetails">
             <li
@@ -263,7 +264,7 @@
               <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
               <p class="station">{{ item.station }}</p>
               <p class="jobMsg">
-                <span>{{ item.location }}</span>
+                <span>{{ showLocation(item.location) }}</span>
                 <span>{{ item.education }}</span>
               </p>
               <p class="companyMsg">
@@ -288,14 +289,20 @@
       </el-tabs>
     </div>
     <employment-details
-        v-if="isEmploymentDetails"
-        :details="employmentDetails"
-        :companyDetails="companyDetails"
-        @toList="toEmploymentList"
-        @collect=""
-        @cancelCollect=""
-        @sendResume=""
-      ></employment-details>
+      v-if="isEmploymentDetails"
+      :details="employmentDetails"
+      :companyDetails="companyDetails"
+      @toList="toEmploymentList"
+      @collect=""
+      @cancelCollect=""
+      @sendResume=""
+    ></employment-details>
+    <edit-employment
+      v-if="isAddEmployment"
+      :editEmployment="editEmployment"
+      @updateEmployment="updateEmployment"
+      @cancelUpdateEmployment="cancelUpdateEmployment"
+    ></edit-employment>
   </div>
 </template>
 
@@ -311,15 +318,17 @@ import Resume from "../components/resume.vue";
 import EmploymentDetails from "../components/employmentDetails.vue";
 import ForumBox from "../components/forumBox.vue";
 import ForumDetails from "../components/forumDetails.vue";
+import EditEmployment from "../components/editEmployment.vue";
 
 export default {
-  components: { TradeSelect, EmploymentDetails },
+  components: { TradeSelect, EmploymentDetails, EditEmployment },
   data() {
     return {
       tabValue: "1", //选项卡的值，默认为第一个
       isUpdatePassword: false, //修改密码界面，默认为否
       isUpdatePersonal: false, //更新个人信息界面，默认为否
       isUpdateCompany: false, //更新公司信息页面，默认为否
+      isAddEmployment: false, //发布招聘页面，默认为否
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
       notShowUploadAvatar: false, //（用户头像）不显示上传图标，默认为否
       notShowUploadLogo: false, //（公司LOGO）不显示上传图标，默认为否
@@ -344,7 +353,7 @@ export default {
         position: "",
       },
       companyDetails: {}, //公司详情
-      employmentDetails:{}, //招聘信息详情
+      employmentDetails: {}, //招聘信息详情
       editCompany: {
         id: "",
         logo: "",
@@ -355,6 +364,18 @@ export default {
         address: "",
         introduction: "",
       }, //公司编辑信息
+      editEmployment: {
+        id: "",
+        station: "",
+        isFullTime: "",
+        zone: [],
+        location: [],
+        salaryStart: "",
+        salaryEnd: "",
+        education: "",
+        introduction: "",
+        requirements: "",
+      }, //招聘信息编辑
       employmentList: [], //公司发布的招聘信息列表
       level: [
         {
@@ -401,6 +422,10 @@ export default {
         case 1:
           return "全职";
       }
+    },
+    //地区码转中文
+    showLocation(location) {
+      return CodeToText[location[0]] + "" + CodeToText[location[1]];
     },
     //删除头像
     handleRemoveAvatar(file, fileList) {
@@ -532,6 +557,8 @@ export default {
       let that = this;
       this.$ajax.get("/employment/getEmploymentById/" + id).then((res) => {
         that.employmentDetails = res.data;
+        that.employmentDetails.location =
+          that.employmentDetails.location.split(",");
         that.isEmploymentDetails = true;
       });
       this.tabValue = 3;
@@ -539,6 +566,18 @@ export default {
     //招聘信息详情返回列表
     toEmploymentList() {
       this.isEmploymentDetails = false;
+    },
+    //打开编辑招聘信息页面
+    openAddEmployment() {
+      this.isAddEmployment = true;
+    },
+    //确定更新招聘信息
+    updateEmployment(){
+      this.isAddEmployment = false;
+    },
+    //取消编辑招聘信息
+    cancelUpdateEmployment() {
+      this.isAddEmployment = false;
     },
   },
   mounted() {
@@ -549,11 +588,18 @@ export default {
         .get("/company/getCompanyById/" + res.data.company)
         .then((res) => {
           that.companyDetails = res.data;
-          that.locationValue = that.companyDetails.location.split(",");
+          that.companyDetails.location = that.locationValue =
+            that.companyDetails.location.split(",");
         });
-        that.$ajax.get("/company/getAllEmployment/" + res.data.company).then(res => {
+      that.$ajax
+        .get("/company/getAllEmployment/" + res.data.company)
+        .then((res) => {
           that.employmentList = res.data;
-        })
+          for (let item in that.employmentList) {
+            that.employmentList[item].location =
+              that.employmentList[item].location.split(",");
+          }
+        });
     });
     this.$ajax.get("/user/getUser/" + "aaa").then((res) => {
       that.userInfo = res.data;
@@ -743,7 +789,7 @@ export default {
   float: left;
   margin-right: 20px;
 }
-#userCompany .companyRecruitment ul{
+#userCompany .companyRecruitment ul {
   position: relative;
   top: 10px;
   padding-top: 10px;

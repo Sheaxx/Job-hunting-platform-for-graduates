@@ -10,9 +10,11 @@
 
 <script>
 export default {
+  props:{
+    value:Array
+  },
   data() {
     return {
-      value: [],
       options: [
         {
           value: "互联网技术",
@@ -729,7 +731,7 @@ export default {
   },
   methods: {
     handleChange(value) {
-      console.log(value);
+      this.$emit("setStationValue", this.value);
     },
   },
 };

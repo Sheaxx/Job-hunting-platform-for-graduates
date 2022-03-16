@@ -64,6 +64,29 @@ exports.getEmploymentByKeyword = (req, res) => {
   })
 }
 
+//更新招聘信息
+exports.updateEmployment = (req, res) => {
+  let employment = req.body;
+  if (!employment.id) { //新建
+    let sql1 = 'select max(id) as maxid from employment';
+    let sql2 = 'insert into employment set ?';
+    db.query(sql1, (err, result) => {
+      if (err) throw err;
+      employment.id = result[0].maxid + 1;
+      db.query(sql2, employment, (err, result) => {
+        if (err) throw err;
+        res.send('success');
+      })
+    })
+  } else { //修改
+    let sql3 = 'update employment set ? where id=' + employment.id;
+    db.query(sql3, employment, (err, result) => {
+      if (err) throw err;
+      res.send('success');
+    })
+  }
+}
+
 //删除招聘信息
 exports.deleteEmployment = (req, res) => {
   let id = req.params.id;

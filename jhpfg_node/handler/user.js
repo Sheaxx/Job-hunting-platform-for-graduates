@@ -108,20 +108,20 @@ exports.updateResume = (req, res) => {
     //未填写过简历，新建一个数据
     if (!result.length) {
       let sql2 = 'select max(id) as maxid from resume';
-      let sql3 = 'insert into resume set ?'
+      let sql3 = 'insert into resume set ?';
       db.query(sql2, (err, results) => {
         if (err) throw err;
         resume.id = results[0].maxid + 1
         db.query(sql3, resume, (err, result) => {
           if (err) throw err;
-          res.send('success')
+          res.send('success');
         })
       })
     } else {//否则，修改数据
       let sql4 = 'update resume set ? where username="' + resume.username + '"';
       db.query(sql4, resume, (err, result) => {
         if (err) throw err;
-        res.send('success')
+        res.send('success');
       })
     }
   })
