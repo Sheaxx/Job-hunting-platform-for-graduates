@@ -263,18 +263,9 @@
           round
           @click="schoolToList"
         >返回</el-button>
-        <el-carousel
-          :interval="4000"
-          type="card"
-          height="200px"
-        >
-          <el-carousel-item
-            v-for="item in 6"
-            :key="item"
-          >
-            <h3 class="medium">{{ item }}</h3>
-          </el-carousel-item>
-        </el-carousel>
+        <img :src="schoolDetails.logo" alt="学校logo" class="logo">
+        <h3>{{schoolDetails.name}}</h3>
+        <h6>{{schoolDetails.address}}</h6>
         <div class="concat">
           <ul>
             <li>
@@ -305,7 +296,6 @@
             </li>
           </ul>
         </div>
-        <h3>{{schoolDetails.name}}</h3>
         <div class="content">
           {{schoolDetails.introduction}}
         </div>
@@ -475,7 +465,8 @@ export default {
       let that = this;
       this.$ajax.get("/employment/getEmploymentById/" + id).then((res) => {
         that.employmentDetails = res.data;
-        that.employmentDetails.location = that.employmentDetails.location.split(",");
+        that.employmentDetails.location =
+          that.employmentDetails.location.split(",");
         that.$ajax
           .get("/company/getCompanyById/" + that.employmentDetails.companyId)
           .then((res) => {
@@ -915,23 +906,26 @@ export default {
   font-size: 0.9rem;
 }
 /* 学校详情 */
-/* 走马灯 */
-#schoolDetails .el-carousel {
-  clear: both;
+#schoolDetails .logo {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  top: 20px;
+  left: -70px;
 }
-#schoolDetails .el-carousel__item h3 {
-  color: #475669;
-  font-size: 14px;
-  opacity: 0.75;
-  line-height: 200px;
-  margin: 0;
+/* 学校名 */
+#schoolDetails h3 {
+  width: 66%;
+  position: relative;
+  top: -80px;
+  left: 175px;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
-#schoolDetails .el-carousel__item:nth-child(2n) {
-  background-color: #99a9bf;
-}
-
-#schoolDetails .el-carousel__item:nth-child(2n + 1) {
-  background-color: #d3dce6;
+#schoolDetails h6 {
+  position: relative;
+  top: -60px;
+  left: 175px;
 }
 /* 学校详情-联系人列表 */
 #schoolDetails .concat ul {
@@ -959,16 +953,6 @@ export default {
 }
 #schoolDetails .concat .el-button {
   margin-top: 5px;
-}
-/* 学校详情 */
-/* 学校名 */
-#schoolDetails h3 {
-  width: 66%;
-  position: relative;
-  top: 20px;
-  left: 35px;
-  font-size: 1.4rem;
-  font-weight: 600;
 }
 /* 介绍 */
 #schoolDetails .content {
