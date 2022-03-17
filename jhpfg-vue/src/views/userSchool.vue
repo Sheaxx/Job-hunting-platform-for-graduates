@@ -13,6 +13,7 @@
         tab-position="left"
         style="height: 500px"
         :value="tabValue"
+        v-show="!isPostDetails"
       >
         <el-tab-pane
           label="我的信息"
@@ -211,14 +212,27 @@
           label="我的发布"
           name="4"
         >
-          <!-- <forum-box
-            class="forumBox"
-            :tab="0"
-            :pageSize="6"
-            @itemClick="toPostDetails"
-          ></forum-box> -->
+          <ul class="list">
+            <li
+              v-for="(item) in postList"
+              :key="item.id"
+              @click="toPostDetails(item.id)"
+            >
+              <el-tag>{{showZone(item.zone)}}</el-tag>
+              <h6>{{item.title}}</h6>
+              <span>{{item.author}}</span>
+              <span>{{item.createTime}}</span>
+            </li>
+          </ul>
         </el-tab-pane>
       </el-tabs>
+      <forum-details
+        v-if="isPostDetails"
+        :details="postDetails"
+        :commentList="commentList"
+        @toList="toPostList"
+        @refresh="toPostDetails"
+      ></forum-details>
     </div>
   </div>
 </template>
@@ -231,16 +245,17 @@ import {
 } from "element-china-area-data";
 import qs from "qs";
 import EmploymentDetails from "../components/employmentDetails.vue";
-import ForumBox from "../components/forumBox.vue";
 import ForumDetails from "../components/forumDetails.vue";
 
 export default {
+  components: { ForumDetails },
   data() {
     return {
       tabValue: "1", //选项卡的值，默认为第一个
       isUpdatePassword: false, //修改密码界面，默认为否
       isUpdatePersonal: false, //更新个人信息界面，默认为否
       isUpdateSchool: false, //更新学校信息页面，默认为否
+      isPostDetails: false, //是否是帖子详情页，默认为否
       notShowUploadAvatar: false, //（用户头像）不显示上传图标，默认为否
       notShowUploadLogo: false, //（学校LOGO）不显示上传图标，默认为否
       avatarUrl: "", //编辑头像
@@ -258,14 +273,17 @@ export default {
         school: "",
         position: "",
       },
-      schoolDetails:{},//学校详情
-      editSchool:{
-        id:"",
-        name:"",
-        logo:"",
-        address:"",
-        introduction:""
-      }//学校编辑信息
+      schoolDetails: {}, //学校详情
+      editSchool: {
+        id: "",
+        name: "",
+        logo: "",
+        address: "",
+        introduction: "",
+      }, //学校编辑信息
+      postList: [], //帖子列表
+      postDetails: {}, //某个帖子的详情
+      commentList: [], //评论列表
     };
   },
   methods: {
@@ -300,6 +318,21 @@ export default {
             that.$message.success("更换头像成功");
           });
       };
+    },
+    //根据zone显示文字
+    showZone(zone) {
+      switch (zone) {
+        case 1:
+          return "我要提问";
+        case 2:
+          return "笔试经验";
+        case 3:
+          return "面试经验";
+        case 4:
+          return "工作分享";
+        case 5:
+          return "企业招聘";
+      }
     },
     //点击修改密码
     openUpdatePassword() {
@@ -386,18 +419,37 @@ export default {
     cancelUpdateSchool() {
       this.isUpdateSchool = false;
     },
+    //查看我发布的帖子详情
+    toPostDetails(id) {
+      let that = this;
+      this.$ajax.get("/forum/getPostById/" + id).then((res) => {
+        that.postDetails = res.data.post;
+        that.commentList = res.data.commentList;
+        that.isPostDetails = true;
+        that.tabValue = "4";
+      });
+    },
+    //帖子详情返回列表
+    toPostList() {
+      this.isPostDetails = false;
+    },
   },
   mounted() {
     let that = this;
     this.$ajax.get("/user/getPersonal/" + "aaa").then((res) => {
       that.personalInfo = res.data;
-      that.$ajax.get("/school/getSchoolByName/" + res.data.school).then(res=> {
-        that.schoolDetails = res.data;
-      })
+      that.$ajax
+        .get("/school/getSchoolByName/" + res.data.school)
+        .then((res) => {
+          that.schoolDetails = res.data;
+        });
     });
     this.$ajax.get("/user/getUser/" + "aaa").then((res) => {
       that.userInfo = res.data;
       that.avatarUrl = that.userInfo.avatar;
+    });
+    this.$ajax.get("/forum/getPostByUsername/" + "发布者").then((res) => {
+      that.postList = res.data;
     });
   },
 };
@@ -552,5 +604,37 @@ export default {
   height: 500px;
   overflow: auto;
   padding-right: 5%;
+}
+/* 我的发布 */
+#userSchool .list {
+  width: 90%;
+  padding: 1%;
+  height: 500px;
+  overflow: auto;
+}
+#userSchool .list li {
+  width: 96%;
+  padding: 2%;
+}
+#userSchool .list li:not(:last-of-type) {
+  border-bottom: #8e90943d 1px solid;
+}
+#userSchool .list li:last-of-type {
+  margin-bottom: 20px;
+}
+#userSchool .list h6 {
+  margin-bottom: 0.5%;
+}
+#userSchool .list .el-tag {
+  float: right;
+}
+#userSchool .list span:not(.el-tag) {
+  font-size: 0.8rem;
+  color: #8e9094;
+  margin-right: 1%;
+}
+#userSchool .list li:hover {
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+  z-index: 999;
 }
 </style>

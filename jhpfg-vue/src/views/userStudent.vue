@@ -1,7 +1,13 @@
 <template>
   <div id="userStudent">
-    <i class="el-icon-user index-icon" slot="icon"></i>
-    <h4 class="index-boxTitle" slot="boxTitle">个人中心</h4>
+    <i
+      class="el-icon-user index-icon"
+      slot="icon"
+    ></i>
+    <h4
+      class="index-boxTitle"
+      slot="boxTitle"
+    >个人中心</h4>
     <div class="userInfo">
       <el-tabs
         tab-position="left"
@@ -9,21 +15,31 @@
         v-if="!isEmploymentDetails && !isPostDetails"
         :value="tabValue"
       >
-        <el-tab-pane label="我的账号信息" class="user" name="1">
+        <el-tab-pane
+          label="我的账号信息"
+          class="user"
+          name="1"
+        >
           <h5 class="boxTitle">账号信息</h5>
           <el-upload
-              action="#"
-              list-type="picture-card"
-              :on-remove="handleRemove"
-              :on-change="handleChange"
-              :show-file-list="true"
-              :auto-upload="false"
-              :limit="1"
-              :class="{ hide: notShowUpload }"
-            >
-              <img v-if="avatarUrl" :src="avatarUrl" />
-              <i v-else class="el-icon-plus"></i>
-            </el-upload>
+            action="#"
+            list-type="picture-card"
+            :on-remove="handleRemove"
+            :on-change="handleChange"
+            :show-file-list="true"
+            :auto-upload="false"
+            :limit="1"
+            :class="{ hide: notShowUpload }"
+          >
+            <img
+              v-if="avatarUrl"
+              :src="avatarUrl"
+            />
+            <i
+              v-else
+              class="el-icon-plus"
+            ></i>
+          </el-upload>
           <ul>
             <li>
               <span class="itemTitle">用户名：{{ userInfo.username }}</span>
@@ -36,17 +52,24 @@
                 round
                 v-if="!isUpdatePassword"
                 @click="openUpdatePassword"
-                >修改密码</el-button
-              >
-              <el-button round v-if="isUpdatePassword" @click="cancelUpdatePassword"
-                >取消修改</el-button
-              >
-              <el-button type="primary" round v-if="isUpdatePassword" @click="updatePassword"
-              >确认修改</el-button
-            >
+              >修改密码</el-button>
+              <el-button
+                round
+                v-if="isUpdatePassword"
+                @click="cancelUpdatePassword"
+              >取消修改</el-button>
+              <el-button
+                type="primary"
+                round
+                v-if="isUpdatePassword"
+                @click="updatePassword"
+              >确认修改</el-button>
             </li>
           </ul>
-          <div id="updatePassword" v-if="isUpdatePassword">
+          <div
+            id="updatePassword"
+            v-if="isUpdatePassword"
+          >
             <el-input
               placeholder="请输入旧密码"
               v-model="oldPassword"
@@ -61,7 +84,11 @@
             ></el-input>
           </div>
         </el-tab-pane>
-        <el-tab-pane label="我的简历" class="resume" name="2">
+        <el-tab-pane
+          label="我的简历"
+          class="resume"
+          name="2"
+        >
           <resume
             :resumeInfo="resumeInfo"
             :educationInfo="educationInfo"
@@ -72,18 +99,22 @@
             :certificateInfo="certificateInfo"
           ></resume>
         </el-tab-pane>
-        <el-tab-pane label="我的收藏" class="collection" name="3">
+        <el-tab-pane
+          label="我的收藏"
+          class="collection"
+          name="3"
+        >
           <ul v-if="!isEmploymentDetails">
             <li
               v-for="item in collectionList"
               :key="item.employmentid"
-              @click="toEmploymentDetails"
+              @click="toEmploymentDetails(item.id)"
             >
               <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
               <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
               <p class="station">{{ item.station }}</p>
               <p class="jobMsg">
-                <span>{{ item.location }}</span>
+                <span>{{ showLocation(item.location) }}</span>
                 <span>{{ item.education }}</span>
               </p>
               <p class="companyMsg">
@@ -94,9 +125,16 @@
             </li>
           </ul>
         </el-tab-pane>
-        <el-tab-pane label="我的投递" class="resumeSent" name="4">
+        <el-tab-pane
+          label="我的投递"
+          class="resumeSent"
+          name="4"
+        >
           <ul>
-            <li v-for="item in resumeSentList" :key="item.sentid">
+            <li
+              v-for="item in resumeSentList"
+              :key="item.sentid"
+            >
               <p class="company">{{ item.company }}</p>
               <p class="position">{{ item.position }}</p>
               <el-steps
@@ -113,13 +151,22 @@
             </li>
           </ul>
         </el-tab-pane>
-        <el-tab-pane label="我的发布" name="5">
-          <forum-box
-            class="forumBox"
-            :tab="0"
-            :pageSize="6"
-            @itemClick="toPostDetails"
-          ></forum-box>
+        <el-tab-pane
+          label="我的发布"
+          name="5"
+        >
+          <ul class="list">
+            <li
+              v-for="(item) in postList"
+              :key="item.id"
+              @click="toPostDetails(item.id)"
+            >
+              <el-tag>{{showZone(item.zone)}}</el-tag>
+              <h6>{{item.title}}</h6>
+              <span>{{item.author}}</span>
+              <span>{{item.createTime}}</span>
+            </li>
+          </ul>
         </el-tab-pane>
       </el-tabs>
       <employment-details
@@ -136,24 +183,24 @@
         :details="postDetails"
         :commentList="commentList"
         @toList="toPostList"
-        @addComment="addComment"
+        @refresh="toPostDetails"
       ></forum-details>
     </div>
   </div>
 </template>
 
 <script>
+import { CodeToText } from "element-china-area-data";
 import qs from "qs";
 import Resume from "../components/resume.vue";
 import EmploymentDetails from "../components/employmentDetails.vue";
-import ForumBox from "../components/forumBox.vue";
 import ForumDetails from "../components/forumDetails.vue";
 
 export default {
-  components: { Resume, EmploymentDetails, ForumBox, ForumDetails },
+  components: { Resume, EmploymentDetails, ForumDetails },
   data() {
     return {
-      tabValue:"1",//选项卡的值，默认为第一个
+      tabValue: "1", //选项卡的值，默认为第一个
       isUpdatePassword: false, //修改密码界面，默认为否
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
       isPostDetails: false, //是否是帖子详情页，默认为否
@@ -167,31 +214,15 @@ export default {
         role: "学生", //角色身份
         collections: [], //收藏的招聘信息列表
       },
-      resumeInfo: {},//简历信息
-      educationInfo: [],//教育信息
-      internshipInfo: [],//实习经历
-      projectInfo: [],//项目经历
+      resumeInfo: {}, //简历信息
+      educationInfo: [], //教育信息
+      internshipInfo: [], //实习经历
+      projectInfo: [], //项目经历
       skillInfo: [], //技能
       certificateInfo: [], //证书
-      campusExperienceInfo: [],//校内经历
+      campusExperienceInfo: [], //校内经历
       collectionList: [], //收藏招聘信息列表
-      employmentDetails: {
-        //某个招聘信息的详情
-        employmentid: 1,
-        isCollect: true, //是否收藏该招聘信息
-        isFullTime: true,
-        station: "高级产品经理",
-        salary: "10-20k",
-        location: "北京",
-        education: "本科",
-        company: "字节跳动",
-        trade: "互联网",
-        level: "已上市",
-        introduction:
-          "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-        requirements:
-          "1、具备良好的沟通表达能力和组织协调能力，懂政府语言，团队意识强，抗压能力强，有激情，勇于接受挑战，善于开拓创新。2、至少精通生物医药、新一代信息技术等战新产业体系中的一个，熟悉行业领域格局。可独立宇客户进行业务交流。具备需求调研、服务解决方案设计能力。3、5年以上车联网、人工智能、生物医药、文旅行业领域从业经验，过往工作经历中有产业研究，信息化咨询、解决方案售前等相关工作经验，获得相关证书者优先。",
-      },
+      employmentDetails: {}, //某个招聘信息的详情
       companyDetails: {
         //详情页面的公司信息
         id: 1,
@@ -215,15 +246,8 @@ export default {
         },
       ], //已经投递的简历列表
       postList: [], //发布的帖子列表
-      postDetails: {
-        //某个帖子的详情
-        postid: 1,
-        title: "hhh",
-        content: "hahaha",
-        author: "发布者",
-        createTime: "2021.04.07",
-        zone: "我要提问",
-      },
+      postDetails: {}, //某个帖子的详情
+      commentList: [], //评论列表
     };
   },
   methods: {
@@ -247,14 +271,16 @@ export default {
       reader.onload = function () {
         that.avatarUrl = reader.result;
         let obj = {
-          avatar: that.avatarUrl
-        }
-        that.$ajax.post("/user/updateAvatar/" + "aaa", qs.stringify(obj), {
-          "content-type": "application/x-www-form-urlencoded",
-        }).then(res => {
-          that.userInfo.avatar = that.avatarUrl;
-          that.$message.success("更换头像成功")
-        })
+          avatar: that.avatarUrl,
+        };
+        that.$ajax
+          .post("/user/updateAvatar/" + "aaa", qs.stringify(obj), {
+            "content-type": "application/x-www-form-urlencoded",
+          })
+          .then((res) => {
+            that.userInfo.avatar = that.avatarUrl;
+            that.$message.success("更换头像成功");
+          });
       };
     },
     //点击修改密码
@@ -283,10 +309,42 @@ export default {
           return "全职";
       }
     },
+    //根据zone显示文字
+    showZone(zone) {
+      switch (zone) {
+        case 1:
+          return "我要提问";
+        case 2:
+          return "笔试经验";
+        case 3:
+          return "面试经验";
+        case 4:
+          return "工作分享";
+        case 5:
+          return "企业招聘";
+      }
+    },
+    //地区码转中文
+    showLocation(location) {
+      return CodeToText[location[0]] + "" + CodeToText[location[1]];
+    },
     //查看招聘信息详情
-    toEmploymentDetails() {
-      this.isEmploymentDetails = true;
-      this.tabValue = 3;
+    toEmploymentDetails(id) {
+      let that = this;
+      this.$ajax.get("/employment/getEmploymentById/" + id).then((res) => {
+        that.employmentDetails = res.data;
+        that.employmentDetails.location =
+          that.employmentDetails.location.split(",");
+        that.$ajax
+          .get("/company/getCompanyById/" + that.employmentDetails.companyId)
+          .then((res) => {
+            that.companyDetails = res.data;
+            that.companyDetails.location =
+              that.companyDetails.location.split(",");
+            that.isEmploymentDetails = true;
+            that.tabValue = "3";
+          });
+      });
     },
     //招聘信息详情返回列表
     toEmploymentList() {
@@ -303,22 +361,23 @@ export default {
     //投递简历
     sendResume() {},
     //查看我发布的帖子详情
-    toPostDetails() {
+    toPostDetails(id) {
       this.isPostDetails = true;
-      this.tabValue = 5;
+      this.tabValue = "5";
+      let that = this;
+      this.$ajax.get("/forum/getPostById/" + id).then((res) => {
+        that.postDetails = res.data.post;
+        that.commentList = res.data.commentList;
+      });
     },
     //帖子详情返回列表
     toPostList() {
       this.isPostDetails = false;
     },
-    //发布评论
-    addComment() {
-      
-    },
   },
   mounted() {
     let that = this;
-    this.$ajax.get("/user/getResume/" + "aaa").then(res => {
+    this.$ajax.get("/user/getResume/" + "aaa").then((res) => {
       that.resumeInfo = res.data.resume;
       that.educationInfo = res.data.education;
       that.internshipInfo = res.data.internship;
@@ -326,27 +385,38 @@ export default {
       that.campusExperienceInfo = res.data.campusExperience;
       that.skillInfo = res.data.skill;
       that.certificateInfo = res.data.certificate;
-      for(let item in that.educationInfo) {
-        that.educationInfo[item].duration = that.educationInfo[item].duration.split(',')
+      for (let item in that.educationInfo) {
+        that.educationInfo[item].duration =
+          that.educationInfo[item].duration.split(",");
       }
-      for(let item in that.internshipInfo) {
-        that.internshipInfo[item].duration = that.internshipInfo[item].duration.split(',')
+      for (let item in that.internshipInfo) {
+        that.internshipInfo[item].duration =
+          that.internshipInfo[item].duration.split(",");
       }
-      for(let item in that.projectInfo) {
-        that.projectInfo[item].duration = that.projectInfo[item].duration.split(',')
+      for (let item in that.projectInfo) {
+        that.projectInfo[item].duration =
+          that.projectInfo[item].duration.split(",");
       }
-      for(let item in that.campusExperienceInfo) {
-        that.campusExperienceInfo[item].duration = that.campusExperienceInfo[item].duration.split(',')
+      for (let item in that.campusExperienceInfo) {
+        that.campusExperienceInfo[item].duration =
+          that.campusExperienceInfo[item].duration.split(",");
       }
     });
-    this.$ajax.get("/user/getCollectList/" + "aaa").then(res => {
+    this.$ajax.get("/user/getCollectList/" + "aaa").then((res) => {
       that.collectionList = res.data;
+      for (let item in that.collectionList) {
+        that.collectionList[item].location =
+          that.collectionList[item].location.split(",");
+      }
     });
-        this.$ajax.get("/user/getUser/" + "aaa").then(res => {
+    this.$ajax.get("/user/getUser/" + "aaa").then((res) => {
       that.userInfo = res.data;
       that.avatarUrl = that.userInfo.avatar;
     });
-  }
+    this.$ajax.get("/forum/getPostByUsername/" + "发布者").then((res) => {
+      that.postList = res.data;
+    });
+  },
 };
 </script>
 
@@ -470,11 +540,35 @@ export default {
   font-size: 0.9rem;
 }
 /* 我的发布 */
-#userStudent #forumBox {
-  width: 87%;
-  margin-top: -11vh;
+#userStudent .list {
+  width: 90%;
+  padding: 1%;
+  height: 500px;
+  overflow: auto;
 }
-#userStudent #forumBox ul {
-  height: 440px;
+#userStudent .list li {
+  width: 96%;
+  padding: 2%;
+}
+#userStudent .list li:not(:last-of-type) {
+  border-bottom: #8e90943d 1px solid;
+}
+#userStudent .list li:last-of-type {
+  margin-bottom: 20px;
+}
+#userStudent .list h6 {
+  margin-bottom: 0.5%;
+}
+#userStudent .list .el-tag {
+  float: right;
+}
+#userStudent .list span:not(.el-tag) {
+  font-size: 0.8rem;
+  color: #8e9094;
+  margin-right: 1%;
+}
+#userStudent .list li:hover {
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+  z-index: 999;
 }
 </style>

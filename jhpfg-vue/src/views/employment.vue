@@ -263,7 +263,11 @@
           round
           @click="schoolToList"
         >返回</el-button>
-        <img :src="schoolDetails.logo" alt="学校logo" class="logo">
+        <img
+          :src="schoolDetails.logo"
+          alt="学校logo"
+          class="logo"
+        >
         <h3>{{schoolDetails.name}}</h3>
         <h6>{{schoolDetails.address}}</h6>
         <div class="concat">
@@ -461,7 +465,6 @@ export default {
     },
     //查看招聘详情
     toEmploymentDetails(id) {
-      this.isEmploymentDetails = true;
       let that = this;
       this.$ajax.get("/employment/getEmploymentById/" + id).then((res) => {
         that.employmentDetails = res.data;
@@ -473,6 +476,7 @@ export default {
             that.companyDetails = res.data;
             that.companyDetails.location =
               that.companyDetails.location.split(",");
+            that.isEmploymentDetails = true;
           });
       });
     },

@@ -13,7 +13,7 @@
         tab-position="left"
         style="height: 500px"
         :value="tabValue"
-        v-if="!isEmploymentDetails && !isAddEmployment"
+        v-if="!isEmploymentDetails && !isAddEmployment && !isPostDetails"
       >
         <el-tab-pane
           label="我的信息"
@@ -279,12 +279,18 @@
           label="我的发布"
           name="4"
         >
-          <!-- <forum-box
-            class="forumBox"
-            :tab="0"
-            :pageSize="6"
-            @itemClick="toPostDetails"
-          ></forum-box> -->
+          <ul class="list">
+            <li
+              v-for="(item) in postList"
+              :key="item.id"
+              @click="toPostDetails(item.id)"
+            >
+              <el-tag>{{showZone(item.zone)}}</el-tag>
+              <h6>{{item.title}}</h6>
+              <span>{{item.author}}</span>
+              <span>{{item.createTime}}</span>
+            </li>
+          </ul>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -303,6 +309,13 @@
       @updateEmployment="updateEmployment"
       @cancelUpdateEmployment="cancelUpdateEmployment"
     ></edit-employment>
+    <forum-details
+        v-if="isPostDetails"
+        :details="postDetails"
+        :commentList="commentList"
+        @toList="toPostList"
+        @refresh="toPostDetails"
+      ></forum-details>
   </div>
 </template>
 
@@ -316,12 +329,11 @@ import qs from "qs";
 import TradeSelect from "../components/tradeSelect.vue";
 import Resume from "../components/resume.vue";
 import EmploymentDetails from "../components/employmentDetails.vue";
-import ForumBox from "../components/forumBox.vue";
 import ForumDetails from "../components/forumDetails.vue";
 import EditEmployment from "../components/editEmployment.vue";
 
 export default {
-  components: { TradeSelect, EmploymentDetails, EditEmployment },
+  components: { TradeSelect, EmploymentDetails, ForumDetails, EditEmployment },
   data() {
     return {
       tabValue: "1", //选项卡的值，默认为第一个
@@ -330,6 +342,7 @@ export default {
       isUpdateCompany: false, //更新公司信息页面，默认为否
       isAddEmployment: false, //发布招聘页面，默认为否
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
+      isPostDetails: false, //是否是帖子详情页，默认为否
       notShowUploadAvatar: false, //（用户头像）不显示上传图标，默认为否
       notShowUploadLogo: false, //（公司LOGO）不显示上传图标，默认为否
       avatarUrl: "", //编辑头像
@@ -377,6 +390,9 @@ export default {
         requirements: "",
       }, //招聘信息编辑
       employmentList: [], //公司发布的招聘信息列表
+      postList: [], //发布的帖子列表
+      postDetails: {}, //某个帖子的详情
+      commentList: [], //评论列表
       level: [
         {
           value: "未融资",
@@ -421,6 +437,21 @@ export default {
           return "实习";
         case 1:
           return "全职";
+      }
+    },
+    //根据zone显示文字
+    showZone(zone) {
+      switch (zone) {
+        case 1:
+          return "我要提问";
+        case 2:
+          return "笔试经验";
+        case 3:
+          return "面试经验";
+        case 4:
+          return "工作分享";
+        case 5:
+          return "企业招聘";
       }
     },
     //地区码转中文
@@ -572,12 +603,26 @@ export default {
       this.isAddEmployment = true;
     },
     //确定更新招聘信息
-    updateEmployment(){
+    updateEmployment() {
       this.isAddEmployment = false;
     },
     //取消编辑招聘信息
     cancelUpdateEmployment() {
       this.isAddEmployment = false;
+    },
+    //查看我发布的帖子详情
+    toPostDetails(id) {
+      this.isPostDetails = true;
+      this.tabValue = "4";
+      let that = this;
+      this.$ajax.get("/forum/getPostById/" + id).then((res) => {
+        that.postDetails = res.data.post;
+        that.commentList = res.data.commentList;
+      });
+    },
+    //帖子详情返回列表
+    toPostList() {
+      this.isPostDetails = false;
     },
   },
   mounted() {
@@ -604,6 +649,9 @@ export default {
     this.$ajax.get("/user/getUser/" + "aaa").then((res) => {
       that.userInfo = res.data;
       that.avatarUrl = that.userInfo.avatar;
+    });
+    this.$ajax.get("/forum/getPostByUsername/" + "发布者").then((res) => {
+      that.postList = res.data;
     });
   },
 };
@@ -827,5 +875,37 @@ export default {
 }
 #userCompany .companyRecruitment span {
   margin-right: 0.5%;
+}
+/* 我的发布 */
+#userCompany .list {
+  width: 90%;
+  padding: 1%;
+  height: 500px;
+  overflow: auto;
+}
+#userCompany .list li {
+  width: 96%;
+  padding: 2%;
+}
+#userCompany .list li:not(:last-of-type) {
+  border-bottom: #8e90943d 1px solid;
+}
+#userCompany .list li:last-of-type {
+  margin-bottom: 20px;
+}
+#userCompany .list h6 {
+  margin-bottom: 0.5%;
+}
+#userCompany .list .el-tag {
+  float: right;
+}
+#userCompany .list span:not(.el-tag) {
+  font-size: 0.8rem;
+  color: #8e9094;
+  margin-right: 1%;
+}
+#userCompany .list li:hover {
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+  z-index: 999;
 }
 </style>

@@ -138,7 +138,7 @@ export default {
 #forumBox .list .el-tag {
   float: right;
 }
-#forumBox .list span {
+#forumBox .list span:not(.el-tag) {
   font-size: 0.8rem;
   color: #8e9094;
   margin-right: 1%;

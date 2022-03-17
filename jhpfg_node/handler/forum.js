@@ -94,7 +94,14 @@ exports.getPostByKeyword = (req, res) => {
 //根据用户名搜索所发布的帖子
 exports.getPostByUsername = (req, res) => {
   let username = req.params.username;
-  
+  let sql = 'select * from forum where author="' + username + '"';
+  db.query(sql,(err, list) => {
+    if (err) throw err;
+    for (let item in list) {
+      list[item].createTime = moment(list[item].createTime).format('YYYY-MM-DD HH:mm:ss');
+    }
+    res.send(list);
+  })
 }
 
 //发布帖子

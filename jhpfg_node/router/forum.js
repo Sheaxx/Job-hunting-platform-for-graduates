@@ -18,6 +18,9 @@ router.get('/getPostById/:id', handler.getPostById);
 //根据关键字进行搜索
 router.post('/getPostByKeyword', handler.getPostByKeyword);
 
+//根据用户名搜索所发布的帖子
+router.get('/getPostByUsername/:username', handler.getPostByUsername);
+
 //发布帖子
 router.post('/addPost', handler.addPost);
 
