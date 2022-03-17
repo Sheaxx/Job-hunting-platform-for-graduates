@@ -119,7 +119,7 @@ exports.deletePost = (req, res) => {
   let sql = 'delete from forum where id=' + id;
   db.query(sql, (err, results) => {
     if (err) throw err;
-    res.send('success')
+    res.send('success');
   })
 }
 

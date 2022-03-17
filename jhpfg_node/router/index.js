@@ -12,3 +12,6 @@ exports.schoolRouter = require('./school')
 
 //用户
 exports.userRouter = require('./user')
+
+//日历
+exports.calendarRouter = require('./calendar')

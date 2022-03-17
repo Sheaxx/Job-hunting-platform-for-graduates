@@ -23,6 +23,7 @@ app.use('/employment', router.employmentRouter)
 app.use('/company', router.companyRouter)
 app.use('/school', router.schoolRouter)
 app.use('/user', router.userRouter)
+app.use('/calendar', router.calendarRouter)
 
 io.sockets.on('connection', function (socket) {
   console.log('a user connected');

@@ -13,7 +13,10 @@
         slot="dateCell"
         slot-scope="{ date, data }"
       >
-        <p :class="data.isSelected ? 'is-selected' : ''">
+        <p
+          :class="data.isSelected ? 'is-selected' : ''"
+          @click="changeDay(data.day)"
+        >
           {{ data.day.split("-").slice(2).join() }}
           <br>
           {{ data.day in jobFair ? jobFair[data.day].join("，") : "" }}
@@ -26,9 +29,14 @@
             class="el-icon-edit edit"
             @click="openEditJobFair(data.day)"
           ></i>
+          <div
+            v-for="(item,index) in dayMap"
+            :key="index"
+            style="display:none"
+          ></div>
           <ul>
             <li
-              v-for="(item,index) in dayMap"
+              v-for="(item,index) in contentList"
               :key="index"
             >
               <i class="el-icon-s-flag" />
@@ -36,7 +44,7 @@
               <i class="el-icon-location" />
               <span>{{item.location}}</span>
               <i class="el-icon-time" />
-              <span>{{item.time}}</span>
+              <span>{{item.clock}}</span>
             </li>
           </ul>
         </div>
@@ -72,6 +80,7 @@
               v-model="editContent.time"
               type="datetime"
               placeholder="请选择日期时间"
+              value-format="yyyy-MM-dd HH:mm:ss"
             >
             </el-date-picker>
           </el-form-item>
@@ -110,7 +119,7 @@
       <ul>
         <li
           v-for="(item,index) in editList"
-          :key="index"
+          :key="item.id"
         >
           <el-form
             :model="item"
@@ -130,6 +139,7 @@
                 v-model="item.time"
                 type="datetime"
                 placeholder="请选择日期时间"
+                value-format="yyyy-MM-dd HH:mm:ss"
               >
               </el-date-picker>
             </el-form-item>
@@ -142,7 +152,7 @@
             <el-form-item>
               <el-link
                 type="danger"
-                @click="openDeleteJobFair(index)"
+                @click="openDeleteJobFair(item.id, index)"
                 class="delete"
                 icon="el-icon-delete"
               >删除</el-link>
@@ -150,7 +160,10 @@
           </el-form>
         </li>
       </ul>
-      <div id="deleteJobFair" v-if="isDelete">
+      <div
+        id="deleteJobFair"
+        v-if="isDelete"
+      >
         <div class="deleteBox">
           <i class="el-icon-s-promotion"></i>
           <p>是否删除该项招聘会或宣讲会活动？</p>
@@ -172,6 +185,8 @@
 </template>
 
 <script>
+import qs from "qs";
+
 export default {
   data() {
     return {
@@ -180,16 +195,27 @@ export default {
       isDelete: false, //是否打开删除窗口，默认为否
       dayMap: [], //{招聘会名字，地点，时间}
       jobFair: {}, //日期：[招聘会名字]
+      contentList: [], //当天的{招聘会名字，地点，时间}
       editContent: {
         name: "",
         time: "",
         location: "",
       }, //添加招聘会
-      editDay: "2022-02-09", //要修改内容的日期
+      editDay: "", //要修改内容的日期
       editList: [], //修改某天招聘会列表
+      currentId: "", //当前要删除的id
+      currentIndex: "", //当前要删除的索引
     };
   },
   methods: {
+    changeDay(day) {
+      this.contentList = [];
+      for (let item in this.dayMap) {
+        if (String(this.dayMap[item].time).search(day) != -1) {
+          this.contentList.push(this.dayMap[item]);
+        }
+      }
+    },
     //关闭日历详情
     closeDetails(data) {
       let theClass = document.getElementsByClassName("is-selected")[0];
@@ -197,14 +223,34 @@ export default {
     },
     //点击添加信息按钮
     openAddJobFair() {
+      for (let item in this.editContent) {
+        this.editContent[item] = "";
+      }
       this.isAdd = true;
       document.body.scrollTop = document.documentElement.scrollTop = 0;
       document.documentElement.style.overflow = "hidden";
     },
     //确定添加
     addJobFair() {
-      this.isAdd = false;
-      document.documentElement.style.overflow = "auto";
+      let that = this;
+      let obj = Object.assign({}, this.editContent);
+      this.$ajax
+        .post("/calendar/add", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then((res) => {
+          that.dayMap.splice(that.dayMap.length, 1, obj);
+          console.log(obj);
+          let date = obj.time.split(" ");
+          if (String(date[0]) in that.jobFair) {
+            that.jobFair[date[0]].push(obj.name);
+          } else {
+            that.jobFair[date[0]] = [obj.name];
+          }
+          that.isAdd = false;
+          that.$message.success("添加成功");
+          document.documentElement.style.overflow = "auto";
+        });
     },
     //取消添加
     cancelAddJobFair() {
@@ -215,28 +261,61 @@ export default {
     openEditJobFair(day) {
       this.isEdit = true;
       this.editDay = day;
-      this.editList = JSON.parse(JSON.stringify(this.dayMap));
-      for (let item in this.editList) {
-        this.editList[item].time = day + " " + this.editList[item].time;
-      }
+      this.editList = JSON.parse(JSON.stringify(this.contentList));
     },
     //确认修改
     editJobFair() {
-      this.isEdit = false;
+      let that = this;
+      new Promise((resolve, reject) => {
+        for (let item in this.editList) {
+          let obj = Object.assign({}, this.editList[item]);
+          delete obj.clock;
+          this.$ajax.post("/calendar/update", qs.stringify(obj), {
+            "content-type": "application/x-www-form-urlencoded",
+          });
+        }
+        resolve();
+      }).then(() => {
+        that.isEdit = false;
+        that.$message.success("更新成功");
+      });
     },
     //取消修改
     cancelEditJobFair() {
       this.isEdit = false;
+      let that = this;
+      this.$ajax.get("/calendar/getAll").then((res) => {
+        that.dayMap = res.data;
+        that.jobFair = {};
+        for (let item in that.dayMap) {
+          let date = that.dayMap[item].time.split(" ");
+          //抽取时间
+          that.dayMap[item].clock = date[1];
+          //整理每一天有的宣讲会
+          if (String(date[0]) in that.jobFair) {
+            that.jobFair[date[0]].push(that.dayMap[item].name);
+          } else {
+            that.jobFair[date[0]] = [that.dayMap[item].name];
+          }
+        }
+      });
     },
     //点击删除
-    openDeleteJobFair(index) {
+    openDeleteJobFair(id, index) {
       this.isDelete = true;
-      document.documentElement.style.overflow='hidden';
+      document.documentElement.style.overflow = "hidden";
+      this.currentId = id;
+      this.currentIndex = index;
     },
     //确认删除
     deleteJobFair() {
-      this.isDelete = false;
-      document.documentElement.style.overflow = "auto";
+      let that = this;
+      this.$ajax.post("/calendar/delete/" + this.currentId).then((res) => {
+        that.editList.splice(that.currentIndex, 1);
+        that.$message.success("删除成功");
+        that.isDelete = false;
+        document.documentElement.style.overflow = "auto";
+      });
     },
     //取消删除
     cancelDeleteJobFair() {
@@ -244,22 +323,25 @@ export default {
       document.documentElement.style.overflow = "auto";
     },
   },
-  computed: {
-    // getValues(da) {
-    //   let array = [];
-    //   console.log(data);
-    //   console.log(this.dayMap[day]);
-    //   this.dayMap[day].forEach(function (value, key) {
-    //     array.push(key);
-    //   });
-    //   console.log(array);
-    //   return array.join("，");
-    // },
-  },
   created() {
-    this.dayMap[0] = { name: "hhh", location: "教六", time: "7:00" };
-    this.dayMap[1] = { name: "ggg", location: "教六", time: "6:00" };
-    this.jobFair["2022-02-09"] = ["hhh"];
+    let that = this;
+    this.$ajax.get("/calendar/getAll").then((res) => {
+      that.dayMap = res.data;
+      for (let item in that.dayMap) {
+        let date = that.dayMap[item].time.split(" ");
+        //抽取时间
+        that.dayMap[item].clock = date[1];
+        //整理每一天有的宣讲会
+        if (!(String(date[0]) in that.jobFair)) {
+          that.jobFair[date[0]] = [];
+        }
+        that.jobFair[date[0]].splice(
+          that.jobFair[date[0]].length,
+          1,
+          that.dayMap[item].name
+        );
+      }
+    });
   },
 };
 </script>
@@ -269,11 +351,15 @@ export default {
   margin: 0 auto;
   width: 80%;
 }
+.el-calendar p {
+  width: 100%;
+  height: 100%;
+}
 /* 选中的详情 */
 .is-selected .content {
   position: relative;
   z-index: 9;
-  min-width: 260px;
+  width: 460px;
   background: #fff;
   padding: 20px;
   margin-top: 5px;

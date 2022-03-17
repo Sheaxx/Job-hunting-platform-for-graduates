@@ -6,7 +6,7 @@ exports.getAccountListByPage = (req, res) => {
   let { currentPage } = req.params;
   let sql1 = 'select * from employment order by id desc';
   db.query(sql1, (err, results) => {
-    if (err) return res.send("error")
+    if (err) throw err;
     let total = results.length;
     // 分页条件 (跳过多少条)
     let n = (currentPage - 1) * pageSize;
