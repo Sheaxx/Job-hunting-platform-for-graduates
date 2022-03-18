@@ -128,6 +128,7 @@ export default {
       isOpenSendResume: false, //是否打开投递简历窗口，默认为否
       isOpenDelete: false, //是否打开删除招聘信息窗口，默认为否
       isEditEmployment: false, //是否打开编辑窗口，默认为否
+      detailsForm:{}, //备份
     };
   },
   props: {
@@ -210,10 +211,11 @@ export default {
     //取消编辑招聘信息
     cancelUpdateEmployment() {
       this.isEditEmployment = false;
+      Object.assign(this.details, this.detailsForm);
     },
   },
   mounted() {
-    
+    Object.assign(this.detailsForm, this.details);
   },
 };
 </script>

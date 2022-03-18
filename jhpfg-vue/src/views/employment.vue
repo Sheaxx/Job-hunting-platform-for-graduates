@@ -213,21 +213,23 @@
         <el-button
           round
           @click="companyToList"
+          v-if="!isEmploymentDetails "
         >返回</el-button>
         <div class="listBar">
           <ul class="list">
             <li
               v-for="(item, index) in company_employmentList"
               :key="item.id"
+              @click="toEmploymentDetails(item.id)"
             >
               <p class="authorMsg">
-                <span>发布者名字</span>
+                <span>{{item.author}}</span>
                 <span>她的职位</span>
               </p>
               <p class="station">{{ item.station }}</p>
               <p class="msg">
                 <span class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></span>
-                <span>{{ item.location }}</span>
+                <span>{{ showLocation(item.location) }}</span>
                 <span>{{ item.education }}</span>
               </p>
             </li>
@@ -241,7 +243,7 @@
         >
         </el-pagination> -->
         </div>
-        <div class="companyBar">
+        <div class="companyBar" v-if="!isEmploymentDetails ">
           <img
             :src="companyDetails.logo"
             alt="公司logo"
@@ -504,6 +506,9 @@ export default {
       });
       this.$ajax.get("/company/getAllEmployment/" + id).then((res) => {
         that.company_employmentList = res.data;
+        for(let item in that.company_employmentList) {
+          that.company_employmentList[item].location = that.company_employmentList[item].location.split(",");
+        }
         that.isCompanyDetails = true;
       });
     },
@@ -832,12 +837,15 @@ export default {
   width: 100%;
 }
 #companyDetails .list li {
-  width: 97%;
+  width: 96%;
   margin-bottom: 5px;
-  padding: 1.5%;
+  padding: 2%;
 }
 #companyDetails .list li:not(:last-of-type) {
   border-bottom: #8e909444 1px solid;
+}
+#companyDetails .list li:hover {
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
 }
 #companyDetails .station {
   margin-bottom: 1%;

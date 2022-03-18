@@ -149,8 +149,8 @@ export default {
             window.localStorage.setItem("username", obj.username);
             window.localStorage.setItem("password", obj.password);
             window.localStorage.setItem("role", obj.role);
-            window.localStorage.setItem("avatar", "");
-            window.localStorage.setItem("collectList", "");
+            window.localStorage.setItem("avatar", res.data.avatar);
+            window.localStorage.setItem("collectList", res.data.collectList);
             that.$router.replace("/employment");
           }
         });

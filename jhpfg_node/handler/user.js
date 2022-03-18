@@ -207,7 +207,7 @@ exports.login = (req, res) => {
   db.query(sql, (err, result) => {
     if (err) throw err;
     if (user.password == result[0].password) {
-      res.send("success");
+      res.send(result[0]);
     } else {
       res.send("error");
     }

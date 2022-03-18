@@ -12,7 +12,7 @@
         label="职位"
         class="station"
       >
-        <el-input v-model="editForm.station" />
+        <el-input v-model="editEmployment.station" />
       </el-form-item>
       <div class="row1">
         <el-form-item
@@ -20,7 +20,7 @@
           class="zone"
         >
           <station-select
-            :value="editForm.zone"
+            :value="zoneValue"
             @setStationValue="setStationValue"
           ></station-select>
         </el-form-item>
@@ -28,14 +28,14 @@
           label="岗位类型"
           class="isFullTime"
         >
-          <el-select v-model="editForm.isFullTime">
+          <el-select v-model="editEmployment.isFullTime">
             <el-option
               label="实习"
-              value="0"
+              :value="0"
             ></el-option>
             <el-option
               label="全职"
-              value="1"
+              :value="1"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -55,14 +55,14 @@
           label="薪资"
           class="salary"
         >
-          <el-input v-model="editForm.salaryStart" /><span>至</span>
-          <el-input v-model="editForm.salaryEnd" />
+          <el-input v-model="editEmployment.salaryStart" /><span>至</span>
+          <el-input v-model="editEmployment.salaryEnd" />
         </el-form-item>
         <el-form-item
           label="学历要求"
           class="education"
         >
-          <el-select v-model="editForm.education">
+          <el-select v-model="editEmployment.education">
             <el-option value="大专"></el-option>
             <el-option value="本科"></el-option>
             <el-option value="硕士"></el-option>
@@ -75,7 +75,7 @@
         class="introduction"
       >
         <el-input
-          v-model="editForm.introduction"
+          v-model="editEmployment.introduction"
           type="textarea"
           resize="none"
           :rows="8"
@@ -86,7 +86,7 @@
         class="requirements"
       >
         <el-input
-          v-model="editForm.requirements"
+          v-model="editEmployment.requirements"
           type="textarea"
           resize="none"
           :rows="8"
@@ -110,19 +110,21 @@ export default {
     return {
       options: provinceAndCityData,
       locationValue: [], //地区选择
+      zoneValue:[], //职位选择
       editForm:{},//备份编辑
     };
   },
   methods: {
     //设置职业领域值
     setStationValue(value) {
-      this.editForm.zone = value;
+      this.zoneValue = value;
     },
     //编辑完成
     updateEmployment() {
-      let obj = Object.assign({}, this.editForm);
-      obj.zone = obj.zone.join(",");
+      let obj = Object.assign({}, this.editEmployment);
+      obj.zone = this.zoneValue.join(",");
       obj.location = this.locationValue.join(",")
+      console.log(obj)
       let that = this;
       this.$ajax
         .post("/employment/updateEmployment", qs.stringify(obj), {
@@ -139,9 +141,9 @@ export default {
     },
   },
   created() {
-    Object.assign(this.editForm, this.editEmployment);
-    this.locationValue = this.editForm.location
-    this.editForm.zone = this.editForm.zone.split(",")
+    this.locationValue = this.editEmployment.location;
+    this.zoneValue = this.editEmployment.zone;
+    if (this.zoneValue.length) this.zoneValue = this.zoneValue.split(",");
   }
 };
 </script>

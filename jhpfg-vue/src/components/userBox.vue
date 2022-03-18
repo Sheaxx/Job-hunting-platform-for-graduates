@@ -1,7 +1,7 @@
 <template>
   <div id="userBox">
     <span class="userInfo">欢迎你，{{ nowUser }}！</span>
-    <img src="../assets/image/avatar.png" alt="头像" @click="showExit = true" />
+    <img :src="nowAvatar" alt="头像" @click="showExit = true" />
 
     <div class="coverBox" v-show="showExit">
       <div class="exitBox">
@@ -25,6 +25,7 @@ export default {
   data() {
     return {
       nowUser:"",
+      nowAvatar:"",
       showExit: false,
     };
   },
@@ -37,6 +38,7 @@ export default {
   },
   created() {
     this.nowUser = window.localStorage.getItem("username");
+    this.nowAvatar = window.localStorage.getItem("avatar");
   }
 };
 </script>

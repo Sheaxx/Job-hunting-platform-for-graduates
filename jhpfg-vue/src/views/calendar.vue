@@ -28,6 +28,7 @@
           <i
             class="el-icon-edit edit"
             @click="openEditJobFair(data.day)"
+            v-if="isAuthor"
           ></i>
           <div
             v-for="(item,index) in dayMap"
@@ -57,7 +58,7 @@
       icon="el-icon-plus"
       class="add"
       @click="openAddJobFair"
-      v-if="!isEdit"
+      v-if="!isEdit && isAuthor"
     >添加信息</el-button>
     <div
       id="addJobFair"
@@ -193,6 +194,7 @@ export default {
       isAdd: false, //是否打开添加窗口，默认为否
       isEdit: false, //是否打开修改窗口，默认为否
       isDelete: false, //是否打开删除窗口，默认为否
+      isAuthor:false,//是否有更新的权力
       dayMap: [], //{招聘会名字，地点，时间}
       jobFair: {}, //日期：[招聘会名字]
       contentList: [], //当天的{招聘会名字，地点，时间}
@@ -205,6 +207,7 @@ export default {
       editList: [], //修改某天招聘会列表
       currentId: "", //当前要删除的id
       currentIndex: "", //当前要删除的索引
+      school:"",//用户所在学校
     };
   },
   methods: {
@@ -342,6 +345,12 @@ export default {
         );
       }
     });
+    this.$ajax.get("/user/getResume/" + window.localStorage.getItem("username")).then(res => {
+      that.school = res.data.school;
+      if (window.localStorage.getItem("role") == 3 ) {
+        that.isAuthor = true;
+      }
+    })
   },
 };
 </script>

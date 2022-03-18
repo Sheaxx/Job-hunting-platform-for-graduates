@@ -352,13 +352,7 @@ export default {
       tradeValue: [], // 公司更新行业选择
       options: provinceAndCityData,
       locationValue: [], //地区选择
-      userInfo: {
-        //用户信息
-        username: "zhalisu", //用户名
-        password: "", //密码
-        role: "企业", //角色身份
-        avatar: "",
-      },
+      userInfo: {},//用户信息
       personalInfo: {}, //个人信息
       editPersonal: {
         realname: "",
@@ -388,6 +382,7 @@ export default {
         education: "",
         introduction: "",
         requirements: "",
+        author: "",
       }, //招聘信息编辑
       employmentList: [], //公司发布的招聘信息列表
       postList: [], //发布的帖子列表
@@ -612,11 +607,13 @@ export default {
           that.companyDetails.logo = that.logoUrl;
           that.isUpdateCompany = false;
           that.$message.success("更新成功");
+          that.tabValue = "2";
         });
     },
     //取消修改公司信息
     cancelUpdateCompany() {
       this.isUpdateCompany = false;
+      this.tabValue = "2";
     },
     //查看招聘信息详情
     toEmploymentDetails(id) {
@@ -636,14 +633,22 @@ export default {
     //打开编辑招聘信息页面
     openAddEmployment() {
       this.isAddEmployment = true;
+      for(let item in this.editEmployment) {
+        this.editEmployment[item] = ""
+      }
+      this.editEmployment.zone = [];
+      this.editEmployment.location = [];
+      this.editEmployment.author = window.localStorage.getItem("username");
     },
     //确定更新招聘信息
     updateEmployment() {
       this.isAddEmployment = false;
+      this.tabValue = "3";
     },
     //取消编辑招聘信息
     cancelUpdateEmployment() {
       this.isAddEmployment = false;
+      this.tabValue = "3";
     },
     //查看我发布的帖子详情
     toPostDetails(id) {
