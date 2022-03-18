@@ -7,30 +7,42 @@
           <input
             type="text"
             placeholder="用户名"
+            v-model="editRegister.username"
           >
           <input
             type="password"
             placeholder="密码"
+            v-model="editRegister.password"
           >
-          <select name="role">
-            <option value='' disabled selected style='display:none;'>身份</option>
+          <select
+            name="role"
+            v-model="editRegister.role"
+          >
+            <option
+              value=''
+              disabled
+              selected
+              style='display:none;'
+            >身份</option>
             <option value="0">学生</option>
             <option value="1">企业</option>
             <option value="2">学校</option>
           </select>
-          <button>注册</button>
+          <button @click="register">注册</button>
         </div>
         <div class="login-box">
           <h1>LOGIN</h1>
           <input
             type="text"
             placeholder="用户名"
+            v-model="editLogin.username"
           >
           <input
             type="password"
             placeholder="密码"
+            v-model="editLogin.password"
           >
-          <button>登录</button>
+          <button @click="login">登录</button>
         </div>
       </div>
       <div class="con-box left">
@@ -58,26 +70,92 @@
 </template>
 
 <script>
+import qs from "qs";
+
 export default {
-  methods:{
+  data() {
+    return {
+      editRegister: {
+        username: "",
+        password: "",
+        role: "",
+      }, //注册
+      editLogin: {
+        username: "",
+        password: "",
+      }, //登录
+    };
+  },
+  methods: {
+    //切换到注册
     toRegister() {
       let register = document.getElementsByClassName("register-box")[0];
       let login = document.getElementsByClassName("login-box")[0];
       let form_box = document.getElementsByClassName("form-box")[0];
       register.classList.remove("hidden");
       login.classList.add("hidden");
-      form_box.style.transform='translateX(80%)';
+      form_box.style.transform = "translateX(80%)";
     },
+    //切换到登录
     toLogin() {
       let register = document.getElementsByClassName("register-box")[0];
       let login = document.getElementsByClassName("login-box")[0];
       let form_box = document.getElementsByClassName("form-box")[0];
       register.classList.add("hidden");
       login.classList.remove("hidden");
-      form_box.style.transform='translateX(0%)';
-
-    }
-  }
+      form_box.style.transform = "translateX(0%)";
+    },
+    //注册
+    register() {
+      for (let item in this.editRegister) {
+        if (this.editRegister[item] == "") {
+          this.$message.warning("请填写完毕信息");
+          return;
+        }
+      }
+      let obj = Object.assign({}, this.editRegister);
+      let that = this;
+      this.$ajax
+        .post("/user/register", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then((res) => {
+          if (res.data == "error") {
+            that.$message.error("该用户名已存在");
+          } else {
+            that.$message.success("注册成功，请登录");
+          }
+        });
+    },
+    //登录
+    login() {
+      for (let item in this.editLogin) {
+        if (this.editLogin[item] == "") {
+          this.$message.warning("请填写完毕信息");
+          return;
+        }
+      }
+      let obj = Object.assign({}, this.editLogin);
+      let that = this;
+      this.$ajax
+        .post("/user/login", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then((res) => {
+          if (res.data == "error") {
+            that.$message.error("用户名或密码错误");
+          } else {
+            that.$message.success("登录成功");
+            window.localStorage.setItem("username", obj.username);
+            window.localStorage.setItem("password", obj.password);
+            window.localStorage.setItem("role", obj.role);
+            window.localStorage.setItem("avatar", "");
+            window.localStorage.setItem("collectList", "");
+            that.$router.replace("/employment");
+          }
+        });
+    },
+  },
 };
 </script>
 
@@ -101,7 +179,7 @@ export default {
   position: absolute;
   top: -10%;
   left: 5%;
-  background: #99BDDF;
+  background: #99bddf;
   width: 320px;
   height: 500px;
   border-radius: 5px;
@@ -142,7 +220,7 @@ export default {
   text-indent: 10px;
   margin: 8px 0;
   font-size: 14px;
-  letter-spacing: 2px
+  letter-spacing: 2px;
 }
 #login input::placeholder {
   color: #fff;
@@ -193,7 +271,7 @@ export default {
   right: -2%;
 }
 #login .con-box h2 {
-  color: #99BDDF;
+  color: #99bddf;
   font-size: 19px;
   font-weight: 600;
   letter-spacing: 2px;
@@ -209,7 +287,7 @@ export default {
   color: #6d9dca;
   font-weight: 600;
 }
-#login .con-box img{
+#login .con-box img {
   width: 200px;
   height: 200px;
   margin: 15px 0;
@@ -218,7 +296,7 @@ export default {
   margin-top: 3%;
   background: #fff;
   color: #6d9dca;
-  border: 1px solid #99BDDF;
+  border: 1px solid #99bddf;
   padding: 6px 10px;
   border-radius: 5px;
   letter-spacing: 1px;

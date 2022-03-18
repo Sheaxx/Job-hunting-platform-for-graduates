@@ -30,4 +30,10 @@ router.get('/getPersonal/:username', handler.getPersonal)
 //更新学校用户信息
 router.post('/updatePersonal', handler.updatePersonal)
 
+//注册
+router.post('/register', handler.register)
+
+//登录
+router.post('/login', handler.login)
+
 module.exports = router

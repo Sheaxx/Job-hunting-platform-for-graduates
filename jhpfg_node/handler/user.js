@@ -91,7 +91,7 @@ exports.getCollectList = (req, res) => {
 //更新用户的头像
 exports.updateAvatar = (req, res) => {
   let avatar = req.body.avatar;
-  let { username} = req.params;
+  let { username } = req.params;
   let sql = 'update user set avatar="' + avatar + '" where username="' + username + '"';
   db.query(sql, (err, result) => {
     if (err) throw err;
@@ -177,5 +177,39 @@ exports.updatePersonal = (req, res) => {
   db.query(sql, user, (err, result) => {
     if (err) throw err;
     res.send('success');
+  })
+}
+
+//注册
+exports.register = (req, res) => {
+  let user = req.body;
+  let sql1 = 'select * from user where username="' + user.username + '"';
+  db.query(sql1, (err, result) => {
+    if (err) throw err;
+    if (result.length) {
+      res.send("error");
+    } else {
+      let sql2 = 'insert into user set ?';
+      user.avatar = "";
+      user.collectList = "";
+      db.query(sql2, user, (err, result) => {
+        if (err) throw err;
+        res.send(user);
+      })
+    }
+  })
+}
+
+//登录
+exports.login = (req, res) => {
+  let user = req.body;
+  let sql = 'select * from user where username="' + user.username + '"';
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    if (user.password == result[0].password) {
+      res.send("success");
+    } else {
+      res.send("error");
+    }
   })
 }
