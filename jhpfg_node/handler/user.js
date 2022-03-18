@@ -213,3 +213,22 @@ exports.login = (req, res) => {
     }
   })
 }
+
+//修改密码
+exports.updatePassword = (req, res) => {
+  let { oldPassword, newPassword } = req.body;
+  let username = req.params.username;
+  let sql1 = 'select * from user where username="' + username + '"';
+  db.query(sql1, (err, result) => {
+    if (err) throw err;
+    if (oldPassword != result[0].password) {
+      res.send("error");
+    } else {
+      let sql2 = 'update user set password="' + newPassword + '" where username="' + username + '"';
+      db.query(sql2, (err, result) => {
+        if (err) throw err;
+        res.send("success");
+      })
+    }
+  })
+}

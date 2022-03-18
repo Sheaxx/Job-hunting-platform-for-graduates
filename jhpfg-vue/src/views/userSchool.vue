@@ -46,7 +46,7 @@
                 <span class="itemTitle">用户名：{{ userInfo.username }}</span>
               </li>
               <li>
-                <span class="itemTitle">角色：{{ userInfo.role }}</span>
+                <span class="itemTitle">角色：{{ showRole(userInfo.role) }}</span>
               </li>
               <li>
                 <el-button
@@ -260,6 +260,8 @@ export default {
       notShowUploadLogo: false, //（学校LOGO）不显示上传图标，默认为否
       avatarUrl: "", //编辑头像
       logoUrl: "", //编辑logo
+      oldPassword: "", //旧密码
+      newPassword: "", //新密码
       userInfo: {
         //用户信息
         username: "zhalisu", //用户名
@@ -319,6 +321,17 @@ export default {
           });
       };
     },
+    //身份显示
+    showRole(role) {
+      switch (role) {
+        case 0:
+          return "学生";
+        case 1:
+          return "企业";
+        case 2:
+          return "学校";
+      }
+    },
     //根据zone显示文字
     showZone(zone) {
       switch (zone) {
@@ -346,8 +359,34 @@ export default {
     },
     //确认修改密码
     updatePassword() {
-      this.isUpdatePassword = false;
-      this.$message.success("密码修改成功。");
+      if (this.oldPassword == "" || this.newPassword == "") {
+        this.$message.warning("新密码或旧密码不能为空");
+      } else if (this.oldPassword == this.newPassword) {
+        this.$message.warning("新密码和旧密码不能相同");
+      } else {
+        let that = this;
+        let obj = {
+          oldPassword: this.oldPassword,
+          newPassword: this.newPassword,
+        };
+        this.$ajax
+          .post(
+            "/user/updatePassword/" + window.localStorage.getItem("username"),
+            qs.stringify(obj),
+            {
+              "content-type": "application/x-www-form-urlencoded",
+            }
+          )
+          .then((res) => {
+            if (res.data == "error") {
+              that.$message.error("旧密码错误");
+            } else {
+              window.localStorage.setItem("password", that.newPassword);
+              that.$message.success("修改密码成功");
+              that.isUpdatePassword = false;
+            }
+          });
+      }
     },
     //点击更新个人信息
     openUpdatePersonal() {
@@ -436,21 +475,29 @@ export default {
   },
   mounted() {
     let that = this;
-    this.$ajax.get("/user/getPersonal/" + "aaa").then((res) => {
-      that.personalInfo = res.data;
-      that.$ajax
-        .get("/school/getSchoolByName/" + res.data.school)
-        .then((res) => {
-          that.schoolDetails = res.data;
-        });
-    });
-    this.$ajax.get("/user/getUser/" + "aaa").then((res) => {
-      that.userInfo = res.data;
-      that.avatarUrl = that.userInfo.avatar;
-    });
-    this.$ajax.get("/forum/getPostByUsername/" + "发布者").then((res) => {
-      that.postList = res.data;
-    });
+    this.$ajax
+      .get("/user/getPersonal/" + window.localStorage.getItem("username"))
+      .then((res) => {
+        that.personalInfo = res.data;
+        that.$ajax
+          .get("/school/getSchoolByName/" + res.data.school)
+          .then((res) => {
+            that.schoolDetails = res.data;
+          });
+      });
+    this.$ajax
+      .get("/user/getUser/" + window.localStorage.getItem("username"))
+      .then((res) => {
+        that.userInfo = res.data;
+        that.avatarUrl = that.userInfo.avatar;
+      });
+    this.$ajax
+      .get(
+        "/forum/getPostByUsername/" + window.localStorage.getItem("username")
+      )
+      .then((res) => {
+        that.postList = res.data;
+      });
   },
 };
 </script>

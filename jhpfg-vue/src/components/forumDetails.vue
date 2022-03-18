@@ -9,6 +9,7 @@
       icon="el-icon-delete"
       class="delete"
       @click="openDelete"
+      v-if="showDelete"
     >删除</el-link>
     <div id="postContent">
       <div class="topBar">
@@ -81,6 +82,7 @@ export default {
   props: {
     details: Object,
     commentList: Array,
+    showDelete: Boolean, //是否展示删除选项
   },
   methods: {
     //根据zone显示文字
@@ -130,6 +132,7 @@ export default {
       let obj = {
         content: this.commentValue,
         postid: this.details.id,
+        author: window.localStorage.getItem("username"),
       };
       let that = this;
       this.$ajax

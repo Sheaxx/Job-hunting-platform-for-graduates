@@ -424,6 +424,7 @@ export default {
       isCompanyDetails: false, //是否是公司详情页，默认为否
       isSchoolDetails: false, //是否是学校详情页，默认为否
       isSearchList: false, //是否是搜索结果列表，默认为否
+      showDeleteUpdate: false, //详情是否展示删除修改按钮
       currentPage: 1, // 当前页
       total: 0, // 数据总条数
       searchValue: "", //搜索内容

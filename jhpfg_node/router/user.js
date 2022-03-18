@@ -36,4 +36,7 @@ router.post('/register', handler.register)
 //登录
 router.post('/login', handler.login)
 
+//修改密码
+router.post('/updatePassword/:username', handler.updatePassword)
+
 module.exports = router

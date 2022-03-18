@@ -79,6 +79,7 @@
         v-if="isDetails"
         :details="details"
         :commentList="commentList"
+        :showDelete="showDelete"
         @toList="toList"
         @refresh="toDetails"
       ></forum-details>
@@ -190,6 +191,7 @@ export default {
       isDetails: false, //是否是详情页，默认为否
       isAddPost: false, //是否打开发布帖子窗口，默认为否
       isSearchList: false, //是否是搜索结果列表，默认为否
+      showDelete: false, //详情是否展示删除选项
       fromSearch: false, //是否是从搜索列表打开详情，默认为否
       tab: 0, //当前选中的tab
       searchValue: "", //搜索内容
@@ -220,6 +222,11 @@ export default {
       this.$ajax.get("/forum/getPostById/" + id).then((res) => {
         that.details = res.data.post;
         that.commentList = res.data.commentList;
+        if (that.details.author == window.localStorage.getItem("username")) {
+          that.showDelete = true;
+        } else {
+          that.showDelete = false;
+        }
       });
     },
     //帖子详情页返回列表
@@ -232,6 +239,7 @@ export default {
       for (let item in this.editPost) {
         this.editPost[item] = null;
       }
+      this.editPost.author = window.localStorage.getItem("username");
       document.documentElement.style.overflow = "hidden";
     },
     //确定发布帖子
