@@ -203,7 +203,6 @@
         @toList="employmentToList"
         @collect="collect"
         @cancelCollect="cancelCollect"
-        @sendResume="sendResume"
         @refresh="getAccountListByPage"
       ></employment-details>
       <div
@@ -495,8 +494,6 @@ export default {
     cancelCollect() {
       this.employmentDetails.isCollect = false;
     },
-    //投递简历
-    sendResume() {},
     //查看公司详情
     toCompanyDetails(id) {
       let that = this;

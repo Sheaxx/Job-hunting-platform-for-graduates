@@ -124,7 +124,6 @@ export default {
       let obj = Object.assign({}, this.editEmployment);
       obj.zone = this.zoneValue.join(",");
       obj.location = this.locationValue.join(",")
-      console.log(obj)
       let that = this;
       this.$ajax
         .post("/employment/updateEmployment", qs.stringify(obj), {

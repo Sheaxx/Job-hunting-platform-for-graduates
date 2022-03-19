@@ -383,6 +383,7 @@ export default {
         introduction: "",
         requirements: "",
         author: "",
+        sentUsers:""
       }, //招聘信息编辑
       employmentList: [], //公司发布的招聘信息列表
       postList: [], //发布的帖子列表

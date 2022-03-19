@@ -8,7 +8,15 @@
       type="primary"
       round
       @click="openSendResume"
+      v-if="showSendResume"
     >投递简历</el-button>
+    <el-button
+      type="primary"
+      round
+      disabled
+      @click="openSendResume"
+      v-if="!showSendResume"
+    >已投递简历</el-button>
     <div
       class="collectBox"
       v-if="false"
@@ -37,6 +45,11 @@
         class="delete"
         @click="openAddEmployment"
       >修改</el-link>
+      <el-link
+        icon="el-icon-tickets"
+        class="delete"
+        @click="toSentResume"
+      >查看投递</el-link>
     </div>
     <div class="topBar">
       <el-tag class="isFullTime">{{showIsFullTime(details.isFullTime)}}</el-tag>
@@ -63,6 +76,7 @@
       <img
         :src="companyDetails.logo"
         alt="公司logo"
+        class="logo"
       />
       <p class="companyName">{{ companyDetails.name }}</p>
       <div class="msg">
@@ -114,21 +128,29 @@
       @updateEmployment="updateEmployment"
       @cancelUpdateEmployment="cancelUpdateEmployment"
     ></edit-employment>
+    <sent-resume
+      v-if="isSentResume"
+      :employment="details"
+      @sentResumeBack="sentResumeBack"
+    ></sent-resume>
   </div>
 </template>
 
 <script>
 import { CodeToText } from "element-china-area-data";
 import EditEmployment from "../components/editEmployment.vue";
+import SentResume from "../components/sentResume.vue";
 
 export default {
-  components:{ EditEmployment },
+  components: { EditEmployment, SentResume },
   data() {
     return {
       isOpenSendResume: false, //是否打开投递简历窗口，默认为否
       isOpenDelete: false, //是否打开删除招聘信息窗口，默认为否
       isEditEmployment: false, //是否打开编辑窗口，默认为否
-      detailsForm:{}, //备份
+      isSentResume: false, //是否打开查看投递者页面，默认为否
+      showSendResume: false, //是否展示投递简历按钮
+      detailsForm: {}, //备份
     };
   },
   props: {
@@ -147,7 +169,7 @@ export default {
     },
     //地区码转中文
     showLocation(location) {
-      return CodeToText[location[0]] + "" + CodeToText[location[1]] 
+      return CodeToText[location[0]] + "" + CodeToText[location[1]];
     },
     //详情返回列表
     toList() {
@@ -168,14 +190,38 @@ export default {
     },
     //确定投递简历
     sendResume() {
-      this.$emit("sendResume");
-      this.isOpenSendResume = false;
-      document.documentElement.style.overflow = "auto";
+      let that = this;
+      this.$ajax
+        .post(
+          "/user/sendResume/" +
+            this.details.id +
+            "/" +
+            window.localStorage.getItem("username")
+        )
+        .then((res) => {
+          that.$message.success("投递成功");
+          let list = window.localStorage.getItem("sentList").split(",");
+          list[list.length] = this.details.id;
+          list.join(",");
+          window.localStorage.setItem("sentList", list);
+          console.log(list);
+          that.showSendResume = false;
+          that.isOpenSendResume = false;
+          document.documentElement.style.overflow = "auto";
+        });
     },
     //取消投递简历
     cancelSendResume() {
       this.isOpenSendResume = false;
       document.documentElement.style.overflow = "auto";
+    },
+    //查看投递者
+    toSentResume() {
+      this.isSentResume = true;
+    },
+    //投递者返回详情页面
+    sentResumeBack() {
+      this.isSentResume = false;
     },
     //点击删除按钮
     openDelete() {
@@ -205,7 +251,7 @@ export default {
       this.isEditEmployment = true;
     },
     //确定更新招聘信息
-    updateEmployment(){
+    updateEmployment() {
       this.isEditEmployment = false;
     },
     //取消编辑招聘信息
@@ -214,8 +260,14 @@ export default {
       Object.assign(this.details, this.detailsForm);
     },
   },
-  mounted() {
+  created() {
     Object.assign(this.detailsForm, this.details);
+    let list = window.localStorage.getItem("sentList").split(",");
+    if (list.indexOf(String(this.details.id)) != -1) {
+      this.showSendResume = false;
+    } else {
+      this.showSendResume = true;
+    }
   },
 };
 </script>
@@ -288,7 +340,7 @@ export default {
   border-left: #8e909444 1px solid;
 }
 /* 全部居中 */
-#employmentDetails img,
+#employmentDetails .logo,
 #employmentDetails .companyName,
 #employmentDetails .msg,
 #employmentDetails .companyBar .introduction {
@@ -296,7 +348,7 @@ export default {
   transform: translate(-50%, -50%);
   left: 50%;
 }
-#employmentDetails img {
+#employmentDetails .logo {
   width: 50px;
   height: 50px;
   top: 15%;

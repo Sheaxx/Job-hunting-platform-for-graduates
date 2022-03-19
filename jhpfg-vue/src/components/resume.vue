@@ -3,7 +3,7 @@
     <el-button
       type="primary"
       round
-      v-if="!isUpdateResume"
+      v-if="!isUpdateResume && showUpdate"
       @click="openUpdateResume"
     >更新简历</el-button>
     <div
@@ -171,7 +171,7 @@
     </div>
     <div
       id="updateResume"
-      v-if="isUpdateResume"
+      v-if="isUpdateResume && showUpdate"
     >
       <el-button
         type="primary"
@@ -527,6 +527,7 @@ export default {
   data() {
     return {
       isUpdateResume: false, //是否打开更新简历窗口，默认为否
+      showUpdate:false, //是否展示修改简历选项
       editResume: {
         resumeInfo: {},
         educationInfo: [],
@@ -738,10 +739,18 @@ export default {
       this.editResume.certificateInfo.splice(index, 1);
     },
   },
+  mounted() {
+    if(window.localStorage.getItem("role") != 1) {
+      this.showUpdate = false;
+    }
+  }
 };
 </script>
 
 <style>
+#resume {
+  position: relative;
+}
 #resume .el-button:first-of-type {
   float: right;
   margin-right: 3vw;
@@ -793,7 +802,7 @@ export default {
   vertical-align: middle;
   margin: 0 20px;
 }
-#resumeRead img {
+#resume #resumeRead img {
   width: 15px;
   height: 15px;
   vertical-align: middle;

@@ -27,8 +27,14 @@ router.post('/updateTable/:table', handler.updateTable)
 //根据用户名返回学校用户信息
 router.get('/getPersonal/:username', handler.getPersonal)
 
+//根据投递者用户名列表获取他的真名和学校
+router.get('/getRealnameSchool/:sentUsers', handler.getRealnameSchool)
+
 //更新学校用户信息
 router.post('/updatePersonal', handler.updatePersonal)
+
+//投递简历
+router.post('/sendResume/:id/:username', handler.sendResume)
 
 //注册
 router.post('/register', handler.register)

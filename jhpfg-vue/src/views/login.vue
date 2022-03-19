@@ -151,6 +151,7 @@ export default {
             window.localStorage.setItem("role", obj.role);
             window.localStorage.setItem("avatar", res.data.avatar);
             window.localStorage.setItem("collectList", res.data.collectList);
+            window.localStorage.setItem("sentList", res.data.sentList);
             that.$router.replace("/employment");
           }
         });

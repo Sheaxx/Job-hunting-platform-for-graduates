@@ -16,7 +16,7 @@
         :value="tabValue"
       >
         <el-tab-pane
-          label="我的账号信息"
+          label="我的信息"
           class="user"
           name="1"
         >

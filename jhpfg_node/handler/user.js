@@ -170,6 +170,24 @@ exports.getPersonal = (req, res) => {
   })
 }
 
+//根据投递者用户名列表获取他的真名和学校
+exports.getRealnameSchool = (req, res) => {
+  let sentUsers = req.params.sentUsers.split(",");
+  let sql = 'select username,realname,school from resume';
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    let list = [];
+    for (let i in sentUsers) {
+      for (let j in result) {
+        if (result[j].username == sentUsers[i]) {
+          list.push(result[j])
+        }
+      }
+    }
+    res.send(list)
+  })
+}
+
 //更新学校或企业用户信息
 exports.updatePersonal = (req, res) => {
   let user = req.body;
@@ -177,6 +195,48 @@ exports.updatePersonal = (req, res) => {
   db.query(sql, user, (err, result) => {
     if (err) throw err;
     res.send('success');
+  })
+}
+
+//投递简历
+exports.sendResume = (req, res) => {
+  let { id, username } = req.params;
+  //找到这个用户
+  let sql1 = 'select * from user where username="' + username + '"';
+  db.query(sql1, (err, result) => {
+    if (err) throw err;
+    let list = result[0].sentList;
+    if (list.length) {
+      list = list.split(",");
+      list[list.length] = id;
+      list.join(",");
+    } else {
+      list = id;
+    }
+    //更新他的投递列表
+    let sql2 = 'update user set sentList="' + list + '" where username="' + username + '"';
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+      //找到这条招聘信息
+      let sql3 = 'select * from employment where id=' + id;
+      db.query(sql3, (err, result) => {
+        if (err) throw err;
+        let users = result[0].sentUsers;
+        if (users.length) {
+          users = users.split(",");
+          users[users.length] = username;
+          users.join(",");
+        } else {
+          users = username;
+        }
+        //更新岗位候选者
+        let sql4 = 'update employment set sentUsers="' + users + '" where id=' + id;
+        db.query(sql4, (err, result) => {
+          if (err) throw err;
+          res.send("success");
+        })
+      })
+    })
   })
 }
 
@@ -192,6 +252,7 @@ exports.register = (req, res) => {
       let sql2 = 'insert into user set ?';
       user.avatar = "";
       user.collectList = "";
+      user.sentList = "";
       db.query(sql2, user, (err, result) => {
         if (err) throw err;
         res.send(user);

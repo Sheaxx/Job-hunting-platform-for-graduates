@@ -96,5 +96,3 @@ exports.deleteEmployment = (req, res) => {
     res.send('success')
   })
 }
-
-//
