@@ -88,7 +88,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.employment)
     let that = this;
     this.$ajax
       .get("/user/getRealnameSchool/" + this.employment.sentUsers)

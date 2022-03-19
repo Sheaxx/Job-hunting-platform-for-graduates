@@ -19,12 +19,12 @@
             @click="openChat(index)"
           >
             <img
-              src="../assets/image/avatar.png"
+              :src="item.avatar"
               alt="联系人头像"
             >
             <h5 class="username">{{item.username}}</h5>
-            <p class="msgOmitted">{{item.newest}}</p>
-            <b>1</b>
+            <!-- <p class="msgOmitted">{{item.newest}}</p> -->
+            <!-- <b>1</b> -->
           </li>
         </ul>
       </div>
@@ -56,41 +56,15 @@
 </template>
 
 <script>
+import getNowTime from "../utils/date";
+
 export default {
   data() {
     return {
-      list: [
-        {
-          username: "哈哈",
-          avatar: "",
-          newest: "我说嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻gggggggggggggg嘻嘻嘻",
-        },
-        {
-          username: "呜呜",
-          avatar: "",
-          newest: "我说嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻嘻gggggggggggggg嘻嘻嘻",
-        },
-      ], //用户列表显示最新消息内容
+      list: [], //用户列表显示最新消息内容
       currentUser: "", //当前打开的聊天框对方用户名
       currentMessages: [], //当前聊天记录
-      total: [
-        {
-          id: 1,
-          sender: "wo",
-          receiver: "哈哈",
-          content: "Hi",
-          time: "18:51",
-          status: 1,
-        },
-        {
-          id: 2,
-          sender: "哈哈",
-          receiver: "wo",
-          content: "Hello",
-          time: "18:51",
-          status: 1,
-        },
-      ], //与我有关的所有聊天记录
+      total: [], //与我有关的所有聊天记录
       value: "", //输入框的内容
     };
   },
@@ -117,12 +91,13 @@ export default {
     },
     //发送消息
     send() {
+      let that = this;
       new Promise((resolve, reject) => {
         let obj = {
-          sender: "wo",
+          sender: window.localStorage.getItem("username"),
           receiver: this.currentUser,
           content: this.value,
-          time: "13:41",
+          time: getNowTime(),
         };
         this.currentMessages.push(obj);
         this.value = "";
@@ -131,7 +106,13 @@ export default {
         let newMsgList = document.getElementsByClassName("message");
         let newLi = newMsgList[newMsgList.length - 1];
         newLi.classList.add("my_message");
-        this.$socket.emit('send',obj)
+        this.$socket.emit("send", obj);
+        let users = window.localStorage.getItem("chatList");
+        users = users.split(",");
+        if (users.indexOf(this.currentUser) == -1) {
+          users.push(this.currentUser);
+          window.localStorage.setItem("chatList", users.join(","));
+        }
       });
     },
   },
@@ -147,19 +128,61 @@ export default {
       }
     }
   },
-  mounted() {
-    let li = document.getElementsByClassName("chatItem")[0];
-    li.classList.add("active");
-    this.currentUser = this.list[0].username;
-    //区分自己发送和接收的消息
-    let messages = document.getElementsByClassName("message");
-    for (let i = 0; i < this.currentMessages.length; i++) {
-      if (this.currentMessages[i].sender == "wo") {
-        messages[i].classList.add("my_message");
-      } else {
-        messages[i].classList.add("other_message");
+  created() {
+    let that = this;
+    new Promise((resolve, reject) => {
+      let users = window.localStorage.getItem("chatList");
+      users = users.split(",");
+      for (let item in users) {
+        that.$ajax.get("/message/getAvatar/" + users[item]).then((res) => {
+          that.list.push({ username: users[item], avatar: res.data });
+        });
       }
-    }
+      resolve();
+    }).then(() => {
+      that.$ajax
+        .get("/message/getRecords/" + window.localStorage.getItem("username"))
+        .then((res) => {
+          console.log(that.list);
+          for (let item in res.data) {
+            if (
+              res.data[item].sender == that.list[0].username ||
+              res.data[item].receiver == that.list[0].username
+            ) {
+              that.currentMessages.push(res.data[item]);
+            }
+          }
+          new Promise((resolve, reject) => {
+            let li = document.getElementsByClassName("chatItem")[0];
+            li.classList.add("active");
+            that.currentUser = that.list[0].username;
+            resolve();
+          }).then((res) => {
+            //区分自己发送和接收的消息
+            let messages = document.getElementsByClassName("message");
+            for (let i = 0; i < that.currentMessages.length; i++) {
+              if (that.currentMessages[i].sender == window.localStorage.getItem("username")) {
+                messages[i].classList.add("my_message");
+              } else {
+                messages[i].classList.add("other_message");
+              }
+            }
+          });
+        });
+    });
+  },
+  sockets: {
+    /* 监听私聊事件 */
+    receive: function (data) {
+      new Promise((resolve, reject) => {
+        this.currentMessages.push(data);
+        resolve();
+      }).then(() => {
+        let newMsgList = document.getElementsByClassName("message");
+        let newLi = newMsgList[newMsgList.length - 1];
+        newLi.classList.add("other_message");
+      });
+    },
   },
 };
 </script>

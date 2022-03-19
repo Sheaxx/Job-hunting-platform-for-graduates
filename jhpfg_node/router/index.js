@@ -15,3 +15,6 @@ exports.userRouter = require('./user')
 
 //日历
 exports.calendarRouter = require('./calendar')
+
+//私聊
+exports.messageRouter = require('./message')

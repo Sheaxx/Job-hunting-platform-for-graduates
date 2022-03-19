@@ -253,6 +253,7 @@ exports.register = (req, res) => {
       user.avatar = "";
       user.collectList = "";
       user.sentList = "";
+      user.chatList = "";
       db.query(sql2, user, (err, result) => {
         if (err) throw err;
         res.send(user);
