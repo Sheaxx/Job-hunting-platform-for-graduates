@@ -36,6 +36,12 @@ router.post('/updatePersonal', handler.updatePersonal)
 //投递简历
 router.post('/sendResume/:id/:username', handler.sendResume)
 
+//收藏招聘信息
+router.post('/collect/:username/:id', handler.collect)
+
+//取消收藏
+router.post('/cancelCollect/:username/:id', handler.cancelCollect)
+
 //注册
 router.post('/register', handler.register)
 

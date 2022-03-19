@@ -19,12 +19,12 @@
     >已投递简历</el-button>
     <div
       class="collectBox"
-      v-if="false"
+      v-if="true"
     >
       <el-link
         icon="el-icon-star-off"
         class="collect"
-        v-if="!details.isCollect"
+        v-if="!isCollect"
         @click="collect"
       >收藏</el-link>
       <el-link
@@ -34,7 +34,7 @@
         @click="cancelCollect"
       >已收藏</el-link>
     </div>
-    <div class="deleteLink">
+    <div class="deleteLink" v-else>
       <el-link
         icon="el-icon-delete"
         class="delete"
@@ -149,6 +149,7 @@ export default {
       isOpenDelete: false, //是否打开删除招聘信息窗口，默认为否
       isEditEmployment: false, //是否打开编辑窗口，默认为否
       isSentResume: false, //是否打开查看投递者页面，默认为否
+      isCollect: false, //该详情是否已被收藏
       showSendResume: false, //是否展示投递简历按钮
       detailsForm: {}, //备份
     };
@@ -177,11 +178,21 @@ export default {
     },
     //收藏招聘信息
     collect() {
-      this.$emit("collect");
+      let that = this;
+      this.$ajax.post("/user/collect/"  + window.localStorage.getItem("username") + "/" + this.details.id).then(res => {
+        window.localStorage.setItem("collectList", res.data.join(","));
+        that.isCollect = true;
+        that.$message.success("收藏成功");
+      })
     },
     //取消收藏招聘信息
     cancelCollect() {
-      this.$emit("cancelCollect");
+      let that = this;
+      this.$ajax.post("/user/cancelCollect/" + window.localStorage.getItem("username") + "/" + this.details.id).then(res => {
+        window.localStorage.setItem("collectList", res.data.join(","));
+        that.isCollect = false;
+        that.$message.success("取消收藏");
+      })
     },
     //点击投递简历按钮
     openSendResume() {
@@ -267,6 +278,14 @@ export default {
       this.showSendResume = false;
     } else {
       this.showSendResume = true;
+    }
+    let collectList = window.localStorage.getItem("collectList");
+    collectList = collectList.split(",");
+    for (let item in collectList) {
+      if (collectList[item] == this.details.id) {
+        this.isCollect = true;
+        break;
+      }
     }
   },
 };

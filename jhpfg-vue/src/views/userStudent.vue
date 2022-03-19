@@ -174,8 +174,6 @@
         :details="employmentDetails"
         :companyDetails="companyDetails"
         @toList="toEmploymentList"
-        @collect="collect"
-        @cancelCollect="cancelCollect"
         @sendResume="sendResume"
       ></employment-details>
       <forum-details
@@ -382,18 +380,18 @@ export default {
     },
     //招聘信息详情返回列表
     toEmploymentList() {
-      this.isEmploymentDetails = false;
+      let that = this;
+      this.$ajax
+        .get("/user/getCollectList/" + window.localStorage.getItem("username"))
+        .then((res) => {
+          that.collectionList = res.data;
+          for (let item in that.collectionList) {
+            that.collectionList[item].location =
+              that.collectionList[item].location.split(",");
+          }
+          that.isEmploymentDetails = false;
+        });
     },
-    //收藏招聘信息
-    collect() {
-      this.employmentDetails.isCollect = true;
-    },
-    //取消收藏招聘信息
-    cancelCollect() {
-      this.employmentDetails.isCollect = false;
-    },
-    //投递简历
-    sendResume() {},
     //查看我发布的帖子详情
     toPostDetails(id) {
       this.isPostDetails = true;

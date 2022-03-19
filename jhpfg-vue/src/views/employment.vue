@@ -201,8 +201,6 @@
         :details="employmentDetails"
         :companyDetails="companyDetails"
         @toList="employmentToList"
-        @collect="collect"
-        @cancelCollect="cancelCollect"
         @refresh="getAccountListByPage"
       ></employment-details>
       <div
@@ -485,14 +483,6 @@ export default {
     //招聘详情返回列表
     employmentToList() {
       this.isEmploymentDetails = false;
-    },
-    //收藏招聘信息
-    collect() {
-      this.employmentDetails.isCollect = true;
-    },
-    //取消收藏招聘信息
-    cancelCollect() {
-      this.employmentDetails.isCollect = false;
     },
     //查看公司详情
     toCompanyDetails(id) {

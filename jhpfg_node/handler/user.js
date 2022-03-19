@@ -240,6 +240,49 @@ exports.sendResume = (req, res) => {
   })
 }
 
+//收藏招聘信息
+exports.collect = (req, res) => {
+  let { username, id } = req.params;
+  //找到这个用户
+  let sql1 = 'select * from user where username="' + username + '"';
+  db.query(sql1, (err, result) => {
+    if (err) throw err;
+    let list = result[0].collectList;
+    if (list.length) {
+      list = list.split(",");
+      list[list.length] = id;
+    } else {
+      list = [id];
+    }
+    //更新他的投递列表
+    let sql2 = 'update user set collectList="' + list + '" where username="' + username + '"';
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+      res.send(list);
+    })
+  })
+}
+
+//取消收藏
+exports.cancelCollect = (req, res) => {
+  let { username, id } = req.params;
+  //找到这个用户
+  let sql1 = 'select * from user where username="' + username + '"';
+  db.query(sql1, (err, result) => {
+    if (err) throw err;
+    let list = result[0].collectList;
+    list = list.split(",");
+    let index = list.indexOf(String(id));
+    list.splice(index, 1).join(",");
+    //更新他的投递列表
+    let sql2 = 'update user set collectList="' + list + '" where username="' + username + '"';
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+      res.send(list);
+    })
+  })
+}
+
 //注册
 exports.register = (req, res) => {
   let user = req.body;
