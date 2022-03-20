@@ -197,7 +197,10 @@
             <el-input v-model="editResume.resumeInfo.realname" />
           </el-form-item>
           <el-form-item label="期待职位">
-            <el-input v-model="editResume.resumeInfo.expectedPosition" />
+            <station-select
+            :value="zoneValue"
+            @setStationValue="setStationValue"
+          ></station-select>
           </el-form-item>
           <el-form-item label="出生日期">
             <el-date-picker
@@ -522,12 +525,15 @@
 
 <script>
 import qs from "qs";
+import StationSelect from "../components/stationSelect.vue";
 
 export default {
+  components:{ StationSelect },
   data() {
     return {
       isUpdateResume: false, //是否打开更新简历窗口，默认为否
-      showUpdate:false, //是否展示修改简历选项
+      showUpdate:true, //是否展示修改简历选项
+      zoneValue:[], //职位选择
       editResume: {
         resumeInfo: {},
         educationInfo: [],
@@ -549,6 +555,10 @@ export default {
     campusExperienceInfo: Array,
   },
   methods: {
+    //设置职业领域值
+    setStationValue(value) {
+      this.zoneValue = value;
+    },
     //点击更新简历按钮
     openUpdateResume() {
       this.isUpdateResume = true;
@@ -559,12 +569,14 @@ export default {
       this.editResume.skillInfo = Array.from(this.skillInfo);
       this.editResume.certificateInfo = Array.from(this.certificateInfo);
       this.editResume.campusExperienceInfo = Array.from(this.campusExperienceInfo);
+      this.zoneValue = Array.from(this.editResume.resumeInfo.expectedPosition.split(" / "));
     },
     //确定更新简历
     updateResume() {
       let skill = this.editResume.skillInfo.join(",");
       let certificate = this.editResume.certificateInfo.join(",");
       let obj = Object.assign({}, this.editResume.resumeInfo);
+      obj.expectedPosition = this.zoneValue.join(" / ");
       obj.skill = skill;
       obj.certificate = certificate;
       let that = this;
@@ -574,6 +586,7 @@ export default {
           "content-type": "application/x-www-form-urlencoded",
         })
         .then(() => {
+          that.resumeInfo.expectedPosition = that.zoneValue.join(" / ");
           // 上传教育经历
           that.$ajax.get("/user/getNewTableId/education").then((res) => {
             let maxid = res.data.maxid + 1;
@@ -740,7 +753,7 @@ export default {
     },
   },
   mounted() {
-    if(window.localStorage.getItem("role") != 1) {
+    if(window.localStorage.getItem("role") != "0") {
       this.showUpdate = false;
     }
   }
@@ -751,7 +764,7 @@ export default {
 #resume {
   position: relative;
 }
-#resume .el-button:first-of-type {
+#resume .el-button {
   float: right;
   margin-right: 3vw;
 }
@@ -952,11 +965,11 @@ export default {
 /* 更新简历-右侧两个按钮 */
 #updateResume .updateButton {
   position: absolute;
-  right: -3vw;
+  right: 0vw;
 }
 #updateResume .cancelButton {
   position: absolute;
   right: 0vw;
-  top: 15vh;
+  top: 7vh;
 }
 </style>

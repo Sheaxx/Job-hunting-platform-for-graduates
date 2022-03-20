@@ -148,7 +148,7 @@ export default {
             that.$message.success("登录成功");
             window.localStorage.setItem("username", obj.username);
             window.localStorage.setItem("password", obj.password);
-            window.localStorage.setItem("role", obj.role);
+            window.localStorage.setItem("role", res.data.role);
             window.localStorage.setItem("avatar", res.data.avatar);
             window.localStorage.setItem("collectList", res.data.collectList);
             window.localStorage.setItem("sentList", res.data.sentList);

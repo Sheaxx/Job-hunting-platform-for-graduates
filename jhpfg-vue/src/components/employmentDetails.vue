@@ -8,18 +8,18 @@
       type="primary"
       round
       @click="openSendResume"
-      v-if="showSendResume"
+      v-if="showSendResume && isStudent"
     >投递简历</el-button>
     <el-button
       type="primary"
       round
       disabled
       @click="openSendResume"
-      v-if="!showSendResume"
+      v-if="!showSendResume && isStudent"
     >已投递简历</el-button>
     <div
       class="collectBox"
-      v-if="true"
+      v-if="isStudent"
     >
       <el-link
         icon="el-icon-star-off"
@@ -34,7 +34,10 @@
         @click="cancelCollect"
       >已收藏</el-link>
     </div>
-    <div class="deleteLink" v-else>
+    <div
+      class="deleteLink"
+      v-if="isCompany"
+    >
       <el-link
         icon="el-icon-delete"
         class="delete"
@@ -50,6 +53,11 @@
         class="delete"
         @click="toSentResume"
       >查看投递</el-link>
+      <el-link
+        icon="el-icon-collection"
+        class="delete"
+        @click="toSentResume"
+      >推荐列表</el-link>
     </div>
     <div class="topBar">
       <el-tag class="isFullTime">{{showIsFullTime(details.isFullTime)}}</el-tag>
@@ -145,6 +153,8 @@ export default {
   components: { EditEmployment, SentResume },
   data() {
     return {
+      isStudent: false, //用户身份是否是学生
+      isCompany: false, //用户身份是否是企业
       isOpenSendResume: false, //是否打开投递简历窗口，默认为否
       isOpenDelete: false, //是否打开删除招聘信息窗口，默认为否
       isEditEmployment: false, //是否打开编辑窗口，默认为否
@@ -179,20 +189,34 @@ export default {
     //收藏招聘信息
     collect() {
       let that = this;
-      this.$ajax.post("/user/collect/"  + window.localStorage.getItem("username") + "/" + this.details.id).then(res => {
-        window.localStorage.setItem("collectList", res.data.join(","));
-        that.isCollect = true;
-        that.$message.success("收藏成功");
-      })
+      this.$ajax
+        .post(
+          "/user/collect/" +
+            window.localStorage.getItem("username") +
+            "/" +
+            this.details.id
+        )
+        .then((res) => {
+          window.localStorage.setItem("collectList", res.data.join(","));
+          that.isCollect = true;
+          that.$message.success("收藏成功");
+        });
     },
     //取消收藏招聘信息
     cancelCollect() {
       let that = this;
-      this.$ajax.post("/user/cancelCollect/" + window.localStorage.getItem("username") + "/" + this.details.id).then(res => {
-        window.localStorage.setItem("collectList", res.data.join(","));
-        that.isCollect = false;
-        that.$message.success("取消收藏");
-      })
+      this.$ajax
+        .post(
+          "/user/cancelCollect/" +
+            window.localStorage.getItem("username") +
+            "/" +
+            this.details.id
+        )
+        .then((res) => {
+          window.localStorage.setItem("collectList", res.data.join(","));
+          that.isCollect = false;
+          that.$message.success("取消收藏");
+        });
     },
     //点击投递简历按钮
     openSendResume() {
@@ -286,6 +310,14 @@ export default {
         this.isCollect = true;
         break;
       }
+    }
+    switch (window.localStorage.getItem("role")) {
+      case "0":
+        this.isStudent = true;
+        break;
+      case "1":
+        this.isCompany = true;
+        break;
     }
   },
 };
