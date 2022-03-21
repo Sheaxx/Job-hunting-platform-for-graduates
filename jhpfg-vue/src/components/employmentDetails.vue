@@ -156,7 +156,7 @@
             :key="item.username"
           >
             <h6>{{item.username}}</h6>
-            <i class="el-icon-s-comment chat"></i>
+            <i class="el-icon-s-comment chat" @click="chatRecommendation"></i>
           </li>
           <div class="close">
             <i
@@ -291,6 +291,10 @@ export default {
     toRecommendation() {
       this.isRecommendation = true;
       document.documentElement.style.overflow = "hidden";
+    },
+    //推荐人选点击聊天
+    chatRecommendation() {
+      this.$router.replace("/messages");
     },
     //推荐人选返回详情页面
     recommendationBack() {

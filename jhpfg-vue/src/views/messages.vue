@@ -16,7 +16,7 @@
             class="chatItem"
             v-for="(item,index) in list"
             :key="item.username"
-            @click="openChat(index)"
+            @click="openChat(item.username, index)"
           >
             <img
               :src="item.avatar"
@@ -70,8 +70,8 @@ export default {
   },
   methods: {
     //打开私聊窗口
-    openChat(index) {
-      this.currentUser = this.list[index].username;
+    openChat(username, index) {
+      this.currentUser = username;
       this.currentMessages = [];
       //切换左侧用户列表样式
       let lis = document.getElementsByClassName("chatItem");
@@ -79,15 +79,35 @@ export default {
       lis[index].classList.add("active");
       currentActive.classList.remove("active");
       //从total中挑聊天记录
-      for (let i = 0; i < this.total.length; i++) {
-        if (
-          this.total[i].sender == "哈哈" ||
-          this.total[i].receiver == "哈哈"
-        ) {
-          let obj = Object.assign({}, this.total[i]);
-          this.currentMessages.push(obj);
-        }
-      }
+      let that = this;
+      this.$ajax
+        .get("/message/getRecords/" + window.localStorage.getItem("username"))
+        .then((res) => {
+          for (let item in res.data) {
+            if (
+              res.data[item].sender == that.list[0].username ||
+              res.data[item].receiver == that.list[0].username
+            ) {
+              that.currentMessages.push(res.data[item]);
+            }
+          }
+          new Promise((resolve, reject) => {
+            let li = document.getElementsByClassName("chatItem")[0];
+            li.classList.add("active");
+            that.currentUser = that.list[0].username;
+            resolve();
+          }).then((res) => {
+            //区分自己发送和接收的消息
+            let messages = document.getElementsByClassName("message");
+            for (let i = 0; i < that.currentMessages.length; i++) {
+              if (that.currentMessages[i].sender == window.localStorage.getItem("username")) {
+                messages[i].classList.add("my_message");
+              } else {
+                messages[i].classList.add("other_message");
+              }
+            }
+          });
+        });
     },
     //发送消息
     send() {
@@ -143,7 +163,6 @@ export default {
       that.$ajax
         .get("/message/getRecords/" + window.localStorage.getItem("username"))
         .then((res) => {
-          console.log(that.list);
           for (let item in res.data) {
             if (
               res.data[item].sender == that.list[0].username ||
