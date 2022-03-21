@@ -100,7 +100,10 @@ export default {
             //区分自己发送和接收的消息
             let messages = document.getElementsByClassName("message");
             for (let i = 0; i < that.currentMessages.length; i++) {
-              if (that.currentMessages[i].sender == window.localStorage.getItem("username")) {
+              if (
+                that.currentMessages[i].sender ==
+                window.localStorage.getItem("username")
+              ) {
                 messages[i].classList.add("my_message");
               } else {
                 messages[i].classList.add("other_message");
@@ -150,45 +153,51 @@ export default {
   },
   created() {
     let that = this;
-    new Promise((resolve, reject) => {
-      let users = window.localStorage.getItem("chatList");
-      users = users.split(",");
-      for (let item in users) {
-        that.$ajax.get("/message/getAvatar/" + users[item]).then((res) => {
-          that.list.push({ username: users[item], avatar: res.data });
-        });
-      }
-      resolve();
-    }).then(() => {
-      that.$ajax
-        .get("/message/getRecords/" + window.localStorage.getItem("username"))
-        .then((res) => {
-          for (let item in res.data) {
+    let users = window.localStorage.getItem("chatList");
+    users = users.split(",");
+    for (let item in users) {
+      that.$ajax.get("/message/getAvatar/" + users[item]).then((res) => {
+        that.list.push({ username: users[item], avatar: res.data });
+      });
+    }
+  },
+  mounted() {
+    let that = this;
+    this.$ajax
+      .get("/message/getRecords/" + window.localStorage.getItem("username"))
+      .then((res) => {
+        for (let item in res.data) {
+          if (
+            res.data[item].sender == that.list[0].username ||
+            res.data[item].receiver == that.list[0].username
+          ) {
+            that.currentMessages.splice(
+              that.currentMessages.length,
+              1,
+              res.data[item]
+            );
+          }
+        }
+        new Promise((resolve, reject) => {
+          let li = document.getElementsByClassName("chatItem")[0];
+          li.classList.add("active");
+          that.currentUser = that.list[0].username;
+          resolve();
+        }).then((res) => {
+          //区分自己发送和接收的消息
+          let messages = document.getElementsByClassName("message");
+          for (let i = 0; i < that.currentMessages.length; i++) {
             if (
-              res.data[item].sender == that.list[0].username ||
-              res.data[item].receiver == that.list[0].username
+              that.currentMessages[i].sender ==
+              window.localStorage.getItem("username")
             ) {
-              that.currentMessages.push(res.data[item]);
+              messages[i].classList.add("my_message");
+            } else {
+              messages[i].classList.add("other_message");
             }
           }
-          new Promise((resolve, reject) => {
-            let li = document.getElementsByClassName("chatItem")[0];
-            li.classList.add("active");
-            that.currentUser = that.list[0].username;
-            resolve();
-          }).then((res) => {
-            //区分自己发送和接收的消息
-            let messages = document.getElementsByClassName("message");
-            for (let i = 0; i < that.currentMessages.length; i++) {
-              if (that.currentMessages[i].sender == window.localStorage.getItem("username")) {
-                messages[i].classList.add("my_message");
-              } else {
-                messages[i].classList.add("other_message");
-              }
-            }
-          });
         });
-    });
+      });
   },
   sockets: {
     /* 监听私聊事件 */

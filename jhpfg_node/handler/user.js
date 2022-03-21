@@ -88,6 +88,43 @@ exports.getCollectList = (req, res) => {
   })
 }
 
+//获取用户的投递列表
+exports.getSentList = (req, res) => {
+  let username = req.params.username;
+  let sql1 = 'select * from user where username="' + username + '"';
+  db.query(sql1, (err,sents) => {
+    if (err) throw err;
+    let sql2 = 'select * from employment'
+    db.query(sql2, (err, employments) => {
+      let results = [];
+      let list = sents[0].sentList.split(",")
+      for (let i in list) {
+        for (let j in employments) {
+          if (list[i] == employments[j].id) {
+            results.push(employments[j])
+            break;
+          }
+        }
+      }
+      let sql3 = 'select * from company'
+      db.query(sql3, (err, companys) => {
+        if (err) throw err;
+        for (let i in results) {
+          for (let j in companys) {
+            if (results[i].companyId === companys[j].id) {
+              results[i].companyName = companys[j].name;
+              results[i].trade = companys[j].trade;
+              results[i].level = companys[j].level;
+              break;
+            }
+          }
+        }
+        res.send(results);
+      })
+    })
+  })
+}
+
 //更新用户的头像
 exports.updateAvatar = (req, res) => {
   let avatar = req.body.avatar;

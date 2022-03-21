@@ -12,6 +12,9 @@ router.get('/getResume/:username', handler.getResume)
 //获取用户的收藏列表
 router.get('/getCollectList/:username', handler.getCollectList);
 
+//获取用户的投递列表
+router.get('/getSentList/:username', handler.getSentList);
+
 //更新用户的头像
 router.post('/updateAvatar/:username', handler.updateAvatar);
 

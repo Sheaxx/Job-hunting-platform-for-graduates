@@ -101,13 +101,13 @@
         </el-tab-pane>
         <el-tab-pane
           label="我的收藏"
-          class="collection"
+          class="collection employmentList"
           name="3"
         >
           <ul v-if="!isEmploymentDetails">
             <li
               v-for="item in collectionList"
-              :key="item.employmentid"
+              :key="item.id"
               @click="toEmploymentDetails(item.id)"
             >
               <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
@@ -127,27 +127,27 @@
         </el-tab-pane>
         <el-tab-pane
           label="我的投递"
-          class="resumeSent"
+          class="resumeSent employmentList"
           name="4"
         >
-          <ul>
+          <ul v-if="!isEmploymentDetails">
             <li
               v-for="item in resumeSentList"
-              :key="item.sentid"
+              :key="item.id"
+              @click="toEmploymentDetails(item.id)"
             >
-              <p class="company">{{ item.company }}</p>
-              <p class="position">{{ item.position }}</p>
-              <el-steps
-                :active="item.now"
-                finish-status="success"
-                :process-status="item.state"
-              >
-                <el-step
-                  v-for="(item2, index) in item.total"
-                  :key="index"
-                  :title="item2"
-                ></el-step>
-              </el-steps>
+              <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
+              <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
+              <p class="station">{{ item.station }}</p>
+              <p class="jobMsg">
+                <span>{{ showLocation(item.location) }}</span>
+                <span>{{ item.education }}</span>
+              </p>
+              <p class="companyMsg">
+                <span>{{ item.companyName }}</span>
+                <span>{{ item.trade }}</span>
+                <span>{{ item.level }}</span>
+              </p>
             </li>
           </ul>
         </el-tab-pane>
@@ -216,17 +216,7 @@ export default {
       campusExperienceInfo: [], //校内经历
       collectionList: [], //收藏招聘信息列表
       employmentDetails: {}, //某个招聘信息的详情
-      companyDetails: {
-        //详情页面的公司信息
-        id: 1,
-        logo: "",
-        name: "字节跳动",
-        trade: "互联网",
-        level: "已上市",
-        location: "北京",
-        introduction:
-          "1、对国家政策、产业环境、市场规模等进行洞察，结合客户需求进行痛点分析，聚焦功能需求，适配相关解决方案。2、根据市场洞察，结合客户需求，孵化数字政府相关解决方案，协同合作伙伴进行落地支撑；3、进行产业环境分析，对服务区域的主导产业进行分析研究，结合方案进行信息化平台的售前工作，4、根据项目需求进行实地调研，可独立输出PPT以及WORD等相关报告，能够适应中短期出差。",
-      },
+      companyDetails: {}, //详情页面的公司信息
       resumeSentList: [
         {
           sentid: 1,
@@ -445,6 +435,16 @@ export default {
             that.collectionList[item].location.split(",");
         }
       });
+    //投递列表
+    this.$ajax
+      .get("/user/getSentList/" + window.localStorage.getItem("username"))
+      .then((res) => {
+        that.resumeSentList = res.data;
+        for (let item in that.resumeSentList) {
+          that.resumeSentList[item].location =
+            that.resumeSentList[item].location.split(",");
+        }
+      });
     this.$ajax
       .get("/user/getUser/" + window.localStorage.getItem("username"))
       .then((res) => {
@@ -509,17 +509,17 @@ export default {
   display: none;
 }
 /* 我的收藏 */
-#userStudent .collection {
+#userStudent .employmentList {
   width: 87%;
   padding: 1%;
   height: 500px;
   overflow: auto;
 }
-#userStudent .collection .isFullTime {
+#userStudent .employmentList .isFullTime {
   float: left;
   margin-right: 20px;
 }
-#userStudent .collection li {
+#userStudent .employmentList li {
   width: 95%;
   height: 18%;
   padding: 1.8%;
@@ -527,30 +527,30 @@ export default {
   border: #8e909421 1px solid;
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.05);
 }
-#userStudent .collection .salary {
+#userStudent .employmentList .salary {
   float: right;
   color: #72b3f0;
   font-size: 1.2rem;
   width: 50%;
   text-align: right;
 }
-#userStudent .collection .jobMsg,
-#userStudent .collection .companyMsg {
+#userStudent .employmentList .jobMsg,
+#userStudent .employmentList .companyMsg {
   color: #8e9094;
   margin-top: 1%;
   font-size: 0.8rem;
 }
-#userStudent .collection li:hover {
+#userStudent .employmentList li:hover {
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
 }
-#userStudent .collection li:hover .station {
+#userStudent .employmentList li:hover .station {
   color: #72b3f0;
 }
-#userStudent .collection span {
+#userStudent .employmentList span {
   margin-right: 0.5%;
 }
 /* 投递简历 */
-#userStudent .resumeSent {
+/* #userStudent .resumeSent {
   width: 87%;
   overflow: auto;
   height: 500px;
@@ -580,7 +580,7 @@ export default {
 }
 #userStudent .resumeSent .el-step__title {
   font-size: 0.9rem;
-}
+} */
 /* 我的发布 */
 #userStudent .list {
   width: 90%;
