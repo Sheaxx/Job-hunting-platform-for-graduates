@@ -64,6 +64,37 @@ exports.getEmploymentByKeyword = (req, res) => {
   })
 }
 
+//根据求职意向获取推荐人选
+exports.getUsersByStation = (req, res) => {
+  let id = req.params.id;
+  let sql1 = 'select * from employment where id=' + id;
+  db.query(sql1, (err, result) => {
+    if (err) throw err;
+    let station = result[0].zone;
+    let sentUsers = result[0].sentUsers;
+    sentUsers = sentUsers.split(",");
+    let sql2 = 'select username from resume where expectedPosition="' + station + '"';
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+      let arr = [];
+      for (let i in result) {
+        let tag = true;
+        for (let j in sentUsers) {
+          if (result[i] == sentUsers[j]) {
+            tag = false;
+            break;
+          }
+          if (tag == true) {
+            arr.push(result[i]);
+          }
+        }
+      }
+      res.send(arr);
+    })
+  })
+
+}
+
 //更新招聘信息
 exports.updateEmployment = (req, res) => {
   let employment = req.body;

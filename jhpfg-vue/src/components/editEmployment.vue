@@ -122,7 +122,7 @@ export default {
     //编辑完成
     updateEmployment() {
       let obj = Object.assign({}, this.editEmployment);
-      obj.zone = this.zoneValue.join(",");
+      obj.zone = this.zoneValue.join(" / ");
       obj.location = this.locationValue.join(",")
       let that = this;
       this.$ajax
@@ -142,7 +142,7 @@ export default {
   created() {
     this.locationValue = this.editEmployment.location;
     this.zoneValue = this.editEmployment.zone;
-    if (this.zoneValue.length) this.zoneValue = this.zoneValue.split(",");
+    if (this.zoneValue.length) this.zoneValue = this.zoneValue.split(" / ");
   }
 };
 </script>

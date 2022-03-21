@@ -321,7 +321,7 @@
         stripe
         style="width: 100%"
         @row-click="tableClick"
-        v-if="searchSelect==1"
+        v-if="searchSelect==1 || searchSelect == ''"
       >
         <el-table-column
           prop="station"

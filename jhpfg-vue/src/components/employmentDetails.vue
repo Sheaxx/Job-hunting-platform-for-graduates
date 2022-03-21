@@ -56,7 +56,7 @@
       <el-link
         icon="el-icon-collection"
         class="delete"
-        @click="toSentResume"
+        @click="toRecommendation"
       >推荐列表</el-link>
     </div>
     <div class="topBar">
@@ -130,21 +130,48 @@
         >取消</el-button>
       </div>
     </div>
+    <!-- 编辑详情 -->
     <edit-employment
       v-if="isEditEmployment"
       :editEmployment="details"
       @updateEmployment="updateEmployment"
       @cancelUpdateEmployment="cancelUpdateEmployment"
     ></edit-employment>
+    <!-- 查看简历投递者 -->
     <sent-resume
       v-if="isSentResume"
       :employment="details"
       @sentResumeBack="sentResumeBack"
     ></sent-resume>
+    <!-- 查看推荐人选 -->
+    <div
+      id="recommendation"
+      v-if="isRecommendation"
+    >
+      <div class="container">
+        <ul>
+          <h5>以下同学求职意向为<span>{{details.zone}}</span></h5>
+          <li
+            v-for="item in recommendationList"
+            :key="item.username"
+          >
+            <h6>{{item.username}}</h6>
+            <i class="el-icon-s-comment chat"></i>
+          </li>
+          <div class="close">
+            <i
+              class="el-icon-circle-close"
+              @click="recommendationBack"
+            ></i>
+          </div>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import qs from "qs";
 import { CodeToText } from "element-china-area-data";
 import EditEmployment from "../components/editEmployment.vue";
 import SentResume from "../components/sentResume.vue";
@@ -160,8 +187,10 @@ export default {
       isEditEmployment: false, //是否打开编辑窗口，默认为否
       isSentResume: false, //是否打开查看投递者页面，默认为否
       isCollect: false, //该详情是否已被收藏
+      isRecommendation: false, //是否打开推荐人选页面，默认为否
       showSendResume: false, //是否展示投递简历按钮
       detailsForm: {}, //备份
+      recommendationList: [], //推荐人选列表
     };
   },
   props: {
@@ -258,6 +287,16 @@ export default {
     sentResumeBack() {
       this.isSentResume = false;
     },
+    //查看推荐人选
+    toRecommendation() {
+      this.isRecommendation = true;
+      document.documentElement.style.overflow = "hidden";
+    },
+    //推荐人选返回详情页面
+    recommendationBack() {
+      this.isRecommendation = false;
+      document.documentElement.style.overflow = "auto";
+    },
     //点击删除按钮
     openDelete() {
       this.isOpenDelete = true;
@@ -296,6 +335,7 @@ export default {
     },
   },
   created() {
+    let that = this;
     Object.assign(this.detailsForm, this.details);
     let list = window.localStorage.getItem("sentList").split(",");
     if (list.indexOf(String(this.details.id)) != -1) {
@@ -319,6 +359,11 @@ export default {
         this.isCompany = true;
         break;
     }
+    this.$ajax
+      .get("/employment/getUsersByStation/" + this.details.id)
+      .then((res) => {
+        that.recommendationList = res.data;
+      });
   },
 };
 </script>
@@ -480,5 +525,61 @@ export default {
 }
 #employmentDetails .deleteBox p {
   margin: 8% auto 4% 18%;
+}
+/* 推荐列表 */
+#employmentDetails #recommendation {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  top: -16.8vh;
+  left: -10vw;
+  z-index: 9;
+}
+#employmentDetails #recommendation .container {
+  height: 100vh;
+  width: 25vw;
+  margin: 0 auto;
+}
+#employmentDetails #recommendation h5 {
+  margin-bottom: 20px;
+}
+#employmentDetails #recommendation span {
+  font-weight: 600;
+}
+#employmentDetails #recommendation ul {
+  background: #fff;
+  padding: 2%;
+  width: 24vw;
+  min-height: 12%;
+  max-height: 85%;
+  position: absolute;
+  flex: 0 1 auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+}
+#employmentDetails #recommendation li {
+  height: 40px;
+  line-height: 40px;
+  margin: 10px 0;
+  padding: 0 20px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+}
+#employmentDetails #recommendation .chat {
+  float: right;
+  margin-top: -28px;
+  font-size: 18px;
+}
+#employmentDetails #recommendation .close {
+  margin-top: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 22px;
+}
+#employmentDetails #recommendation i:hover {
+  color: #99bddf;
 }
 </style>
