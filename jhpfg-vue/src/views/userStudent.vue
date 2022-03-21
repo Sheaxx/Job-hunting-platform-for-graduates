@@ -426,6 +426,7 @@ export default {
             that.campusExperienceInfo[item].duration.split(",");
         }
       });
+    //收藏列表
     this.$ajax
       .get("/user/getCollectList/" + window.localStorage.getItem("username"))
       .then((res) => {

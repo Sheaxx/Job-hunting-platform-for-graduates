@@ -92,7 +92,7 @@ exports.getCollectList = (req, res) => {
 exports.getSentList = (req, res) => {
   let username = req.params.username;
   let sql1 = 'select * from user where username="' + username + '"';
-  db.query(sql1, (err,sents) => {
+  db.query(sql1, (err, sents) => {
     if (err) throw err;
     let sql2 = 'select * from employment'
     db.query(sql2, (err, employments) => {
@@ -345,11 +345,16 @@ exports.register = (req, res) => {
 //登录
 exports.login = (req, res) => {
   let user = req.body;
-  let sql = 'select * from user where username="' + user.username + '"';
-  db.query(sql, (err, result) => {
+  let sql1 = 'select * from user where username="' + user.username + '"';
+  db.query(sql1, (err, result) => {
     if (err) throw err;
     if (user.password == result[0].password) {
-      res.send(result[0]);
+      let sql2 = 'select school from resume where username="' + user.username + '"';
+      db.query(sql2, (err, school) => {
+        if (err) throw err;
+        result[0].school = school[0].school;
+        res.send(result[0]);
+      })
     } else {
       res.send("error");
     }

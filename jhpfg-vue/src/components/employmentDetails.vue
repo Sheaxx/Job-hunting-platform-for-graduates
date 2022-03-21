@@ -59,6 +59,23 @@
         @click="toRecommendation"
       >推荐列表</el-link>
     </div>
+    <div
+      class="recommendBox"
+      v-if="isSchool"
+    >
+      <el-link
+        icon="el-icon-coordinate"
+        class="delete"
+        @click="recommend"
+        v-if="!isRecommed"
+      >推荐</el-link>
+      <el-link
+        icon="el-icon-s-check"
+        class="delete"
+        @click="cancelRecommend"
+        v-else
+      >取消推荐</el-link>
+    </div>
     <div class="topBar">
       <el-tag class="isFullTime">{{showIsFullTime(details.isFullTime)}}</el-tag>
       <h5>{{ details.station }}</h5>
@@ -156,7 +173,10 @@
             :key="item.username"
           >
             <h6>{{item.username}}</h6>
-            <i class="el-icon-s-comment chat" @click="chatRecommendation"></i>
+            <i
+              class="el-icon-s-comment chat"
+              @click="chatRecommendation"
+            ></i>
           </li>
           <div class="close">
             <i
@@ -182,11 +202,13 @@ export default {
     return {
       isStudent: false, //用户身份是否是学生
       isCompany: false, //用户身份是否是企业
+      isSchool: false, //用户身份是否是学校
       isOpenSendResume: false, //是否打开投递简历窗口，默认为否
       isOpenDelete: false, //是否打开删除招聘信息窗口，默认为否
       isEditEmployment: false, //是否打开编辑窗口，默认为否
       isSentResume: false, //是否打开查看投递者页面，默认为否
       isCollect: false, //该详情是否已被收藏
+      isRecommed: false, //该详情是否被学校推荐
       isRecommendation: false, //是否打开推荐人选页面，默认为否
       showSendResume: false, //是否展示投递简历按钮
       detailsForm: {}, //备份
@@ -247,6 +269,36 @@ export default {
           that.$message.success("取消收藏");
         });
     },
+    //学校推荐
+    recommend() {
+      let that = this;
+      this.$ajax
+        .post(
+          "/school/recommend/" +
+            window.localStorage.getItem("school") +
+            "/" +
+            this.details.id
+        )
+        .then((res) => {
+          that.isRecommed = true;
+          that.$message.success("推荐成功");
+        });
+    },
+    //取消学校推荐
+    cancelRecommend() {
+      let that = this;
+      this.$ajax
+        .post(
+          "/school/cancelRecommend/" +
+            window.localStorage.getItem("school") +
+            "/" +
+            this.details.id
+        )
+        .then((res) => {
+          that.isRecommed = false;
+          that.$message.success("取消推荐");
+        });
+    },
     //点击投递简历按钮
     openSendResume() {
       this.isOpenSendResume = true;
@@ -289,8 +341,14 @@ export default {
     },
     //查看推荐人选
     toRecommendation() {
-      this.isRecommendation = true;
-      document.documentElement.style.overflow = "hidden";
+      let that = this;
+      this.$ajax
+        .get("/employment/getUsersByStation/" + this.details.id)
+        .then((res) => {
+          that.recommendationList = res.data;
+          that.isRecommendation = true;
+          document.documentElement.style.overflow = "hidden";
+        });
     },
     //推荐人选点击聊天
     chatRecommendation() {
@@ -341,33 +399,50 @@ export default {
   created() {
     let that = this;
     Object.assign(this.detailsForm, this.details);
-    let list = window.localStorage.getItem("sentList").split(",");
-    if (list.indexOf(String(this.details.id)) != -1) {
-      this.showSendResume = false;
-    } else {
-      this.showSendResume = true;
-    }
-    let collectList = window.localStorage.getItem("collectList");
-    collectList = collectList.split(",");
-    for (let item in collectList) {
-      if (collectList[item] == this.details.id) {
-        this.isCollect = true;
+    //判断用户身份
+    switch (window.localStorage.getItem("role")) {
+      case "0": {
+        this.isStudent = true;
+        //判断该信息是否已投递简历
+        let list = window.localStorage.getItem("sentList").split(",");
+        if (list.indexOf(String(this.details.id)) != -1) {
+          this.showSendResume = false;
+        } else {
+          this.showSendResume = true;
+        }
+        //判断是否是用户收藏的信息
+        let collectList = window.localStorage.getItem("collectList");
+        collectList = collectList.split(",");
+        for (let item in collectList) {
+          if (collectList[item] == this.details.id) {
+            this.isCollect = true;
+            break;
+          }
+        }
         break;
       }
-    }
-    switch (window.localStorage.getItem("role")) {
-      case "0":
-        this.isStudent = true;
-        break;
       case "1":
         this.isCompany = true;
         break;
+      case "2": {
+        this.isSchool = true;
+        //判断是否是学校推荐的招聘信息
+        this.$ajax
+          .get(
+            "school/getSchoolByName/" + window.localStorage.getItem("school")
+          )
+          .then((res) => {
+            let recommendList = res.data.recommend;
+            recommendList = recommendList.split(",");
+            for (let item in recommendList) {
+              if (recommendList[item] == this.details.id) {
+                that.isRecommed = true;
+                break;
+              }
+            }
+          });
+      }
     }
-    this.$ajax
-      .get("/employment/getUsersByStation/" + this.details.id)
-      .then((res) => {
-        that.recommendationList = res.data;
-      });
   },
 };
 </script>

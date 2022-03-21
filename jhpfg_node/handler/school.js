@@ -60,6 +60,86 @@ exports.getSchoolByKeyword = (req, res) => {
   })
 }
 
+//获取学校的推荐列表
+exports.getRecommendList = (req, res) => {
+  let id = req.params.id;
+  let sql1 = 'select * from school where id=' + id;
+  db.query(sql1, (err, recommendList) => {
+    if (err) throw err;
+    let sql2 = 'select * from employment'
+    db.query(sql2, (err, employments) => {
+      let results = [];
+      let list = recommendList[0].recommend.split(",")
+      for (let i in list) {
+        for (let j in employments) {
+          if (list[i] == employments[j].id) {
+            results.push(employments[j])
+            break;
+          }
+        }
+      }
+      let sql3 = 'select * from company'
+      db.query(sql3, (err, companys) => {
+        if (err) throw err;
+        for (let i in results) {
+          for (let j in companys) {
+            if (results[i].companyId === companys[j].id) {
+              results[i].companyName = companys[j].name;
+              results[i].trade = companys[j].trade;
+              results[i].level = companys[j].level;
+              break;
+            }
+          }
+        }
+        res.send(results);
+      })
+    })
+  })
+}
+
+//学校推荐
+exports.recommend = (req, res) => {
+  let { school, employment } = req.params;
+  //找到这个学校
+  let sql1 = 'select * from school where name="' + school + '"';
+  db.query(sql1, (err, result) => {
+    if (err) throw err;
+    let list = result[0].recommend;
+    if (list.length) {
+      list = list.split(",");
+      list[list.length] = employment;
+    } else {
+      list = [employment];
+    }
+    //更新他的推荐列表
+    let sql2 = 'update school set recommend="' + list + '" where name="' + school + '"';
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+      res.send(list);
+    })
+  })
+}
+
+//取消学校推荐
+exports.cancelRecommend = (req, res) => {
+  let { school, employment } = req.params;
+  //找到这个学校
+  let sql1 = 'select * from school where name="' + school + '"';
+  db.query(sql1, (err, result) => {
+    if (err) throw err;
+    let list = result[0].recommend;
+    list = list.split(",");
+    let index = list.indexOf(String(employment));
+    list.splice(index, 1).join(",");
+    //更新他的推荐列表
+    let sql2 = 'update school set recommend="' + list + '" where name="' + school + '"';
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+      res.send(list);
+    })
+  })
+}
+
 //更新学校信息
 exports.updateSchool = (req, res) => {
   let school = req.body;

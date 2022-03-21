@@ -13,7 +13,7 @@
         tab-position="left"
         style="height: 500px"
         :value="tabValue"
-        v-show="!isPostDetails"
+        v-show="!isPostDetails && !isEmploymentDetails"
       >
         <el-tab-pane
           label="我的信息"
@@ -206,7 +206,28 @@
         <el-tab-pane
           label="认证招聘信息"
           name="3"
+          class="employmentList"
         >
+          <ul v-if="!isEmploymentDetails" >
+            <li
+              v-for="item in employmentList"
+              :key="item.id"
+              @click="toEmploymentDetails(item.id)"
+            >
+              <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
+              <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
+              <p class="station">{{ item.station }}</p>
+              <p class="jobMsg">
+                <span>{{ showLocation(item.location) }}</span>
+                <span>{{ item.education }}</span>
+              </p>
+              <p class="companyMsg">
+                <span>{{ item.companyName }}</span>
+                <span>{{ item.trade }}</span>
+                <span>{{ item.level }}</span>
+              </p>
+            </li>
+          </ul>
         </el-tab-pane>
         <el-tab-pane
           label="我的发布"
@@ -226,6 +247,13 @@
           </ul>
         </el-tab-pane>
       </el-tabs>
+      <employment-details
+        v-if="isEmploymentDetails"
+        :details="employmentDetails"
+        :companyDetails="companyDetails"
+        @toList="toEmploymentList"
+        @sendResume="sendResume"
+      ></employment-details>
       <forum-details
         v-if="isPostDetails"
         :details="postDetails"
@@ -248,13 +276,14 @@ import EmploymentDetails from "../components/employmentDetails.vue";
 import ForumDetails from "../components/forumDetails.vue";
 
 export default {
-  components: { ForumDetails },
+  components: { EmploymentDetails, ForumDetails },
   data() {
     return {
       tabValue: "1", //选项卡的值，默认为第一个
       isUpdatePassword: false, //修改密码界面，默认为否
       isUpdatePersonal: false, //更新个人信息界面，默认为否
       isUpdateSchool: false, //更新学校信息页面，默认为否
+      isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
       isPostDetails: false, //是否是帖子详情页，默认为否
       notShowUploadAvatar: false, //（用户头像）不显示上传图标，默认为否
       notShowUploadLogo: false, //（学校LOGO）不显示上传图标，默认为否
@@ -283,6 +312,9 @@ export default {
         address: "",
         introduction: "",
       }, //学校编辑信息
+      employmentList: [], //招聘信息列表
+      employmentDetails: {}, //招聘信息详情
+      companyDetails: {}, //公司详情
       postList: [], //帖子列表
       postDetails: {}, //某个帖子的详情
       commentList: [], //评论列表
@@ -346,6 +378,19 @@ export default {
         case 5:
           return "企业招聘";
       }
+    },
+    //实习或全职转文字显示
+    showIsFullTime(val) {
+      switch (val) {
+        case 0:
+          return "实习";
+        case 1:
+          return "全职";
+      }
+    },
+    //地区码转中文
+    showLocation(location) {
+      return CodeToText[location[0]] + "" + CodeToText[location[1]];
     },
     //点击修改密码
     openUpdatePassword() {
@@ -458,6 +503,38 @@ export default {
     cancelUpdateSchool() {
       this.isUpdateSchool = false;
     },
+    //查看招聘信息详情
+    toEmploymentDetails(id) {
+      let that = this;
+      this.$ajax.get("/employment/getEmploymentById/" + id).then((res) => {
+        that.employmentDetails = res.data;
+        that.employmentDetails.location =
+          that.employmentDetails.location.split(",");
+        that.$ajax
+          .get("/company/getCompanyById/" + that.employmentDetails.companyId)
+          .then((res) => {
+            that.companyDetails = res.data;
+            that.companyDetails.location =
+              that.companyDetails.location.split(",");
+            that.isEmploymentDetails = true;
+            that.tabValue = "3";
+          });
+      });
+    },
+    //招聘信息详情返回列表
+    toEmploymentList() {
+      let that = this;
+      this.$ajax
+        .get("/user/getCollectList/" + window.localStorage.getItem("username"))
+        .then((res) => {
+          that.employmentList = res.data;
+          for (let item in that.employmentList) {
+            that.employmentList[item].location =
+              that.employmentList[item].location.split(",");
+          }
+          that.isEmploymentDetails = false;
+        });
+    },
     //查看我发布的帖子详情
     toPostDetails(id) {
       let that = this;
@@ -483,6 +560,15 @@ export default {
           .get("/school/getSchoolByName/" + res.data.school)
           .then((res) => {
             that.schoolDetails = res.data;
+            that.$ajax
+              .get("/school/getRecommendList/" + that.schoolDetails.id)
+              .then((res) => {
+                that.employmentList = res.data;
+                for (let item in that.employmentList) {
+                  that.employmentList[item].location =
+                    that.employmentList[item].location.split(",");
+                }
+              });
           });
       });
     this.$ajax
@@ -651,6 +737,46 @@ export default {
   height: 500px;
   overflow: auto;
   padding-right: 5%;
+}
+#userSchool .employmentList {
+  width: 87%;
+  padding: 1%;
+  height: 500px;
+  overflow: auto;
+}
+#userSchool .employmentList .isFullTime {
+  float: left;
+  margin-right: 20px;
+}
+#userSchool .employmentList li {
+  width: 95%;
+  height: 18%;
+  padding: 1.8%;
+  margin-bottom: 2%;
+  border: #8e909421 1px solid;
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.05);
+}
+#userSchool .employmentList .salary {
+  float: right;
+  color: #72b3f0;
+  font-size: 1.2rem;
+  width: 50%;
+  text-align: right;
+}
+#userSchool .employmentList .jobMsg,
+#userSchool .employmentList .companyMsg {
+  color: #8e9094;
+  margin-top: 1%;
+  font-size: 0.8rem;
+}
+#userSchool .employmentList li:hover {
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+}
+#userSchool .employmentList li:hover .station {
+  color: #72b3f0;
+}
+#userSchool .employmentList span {
+  margin-right: 0.5%;
 }
 /* 我的发布 */
 #userSchool .list {

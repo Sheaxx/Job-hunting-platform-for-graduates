@@ -15,6 +15,15 @@ router.get('/getSchoolByName/:name', handler.getSchoolByName)
 //根据关键字进行搜索
 router.get('/getSchoolByKeyword', handler.getSchoolByKeyword)
 
+//获取学校的推荐列表
+router.get('/getRecommendList/:id', handler.getRecommendList)
+
+//学校推荐
+router.post('/recommend/:school/:employment', handler.recommend)
+
+//取消学校推荐
+router.post('/cancelRecommend/:school/:employment', handler.cancelRecommend)
+
 //更新学校信息
 router.post('/updateSchool', handler.updateSchool)
 
