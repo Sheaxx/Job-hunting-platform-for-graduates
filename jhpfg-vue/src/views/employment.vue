@@ -9,9 +9,64 @@
         class="index-boxTitle"
         slot="boxTitle"
       >招聘信息</h4>
+      <el-switch
+        v-model="certification"
+        active-text="只看学校认证"
+        inactive-text="展示所有岗位"
+        :active-value="1"
+        :inactive-value="0"
+        active-color="#72b3f0"
+        v-show="!isEmploymentDetails && !isCompanyDetails && !isSchoolDetails "
+        @change="switchRecommend"
+      >
+      </el-switch>
+      <el-table
+        :data="recommendList"
+        style="width: 100%"
+        @row-click="tableClick"
+        v-if="certification"
+        class="recommend"
+        header-cell-style="text-align:center"
+        cell-style="text-align:center"
+      >
+        <el-table-column
+          prop="type"
+          label="类型"
+          width="140"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="station"
+          label="岗位"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="companyName"
+          label="公司"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="salary"
+          label="薪水"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="area"
+          label="地点"
+          width="140"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="education"
+          label="学历"
+          width="140"
+        >
+        </el-table-column>
+      </el-table>
       <div
         id="employmentListBox"
-        v-show="!isEmploymentDetails && !isCompanyDetails && !isSchoolDetails"
+        v-show="!isEmploymentDetails && !isCompanyDetails && !isSchoolDetails && !certification"
       >
         <el-input
           placeholder="请输入内容"
@@ -34,6 +89,10 @@
             <el-option
               label="搜学校"
               value="3"
+            ></el-option>
+            <el-option
+              label="学校推荐招聘"
+              value="4"
             ></el-option>
           </el-select>
           <el-button
@@ -76,7 +135,6 @@
                 v-model="educationFilter"
                 placeholder="学历要求"
               >
-                <el-option value="不限"></el-option>
                 <el-option value="大专"></el-option>
                 <el-option value="本科"></el-option>
                 <el-option value="硕士"></el-option>
@@ -88,12 +146,26 @@
                 v-model="salaryFilter"
                 placeholder="薪资待遇"
               >
-                <el-option value="不限"></el-option>
-                <el-option value="3K以下"></el-option>
-                <el-option value="3-5K"></el-option>
-                <el-option value="5-10K"></el-option>
-                <el-option value="10-20K"></el-option>
-                <el-option value="20K以上"></el-option>
+                <el-option
+                  label="3K以下"
+                  :value="1"
+                ></el-option>
+                <el-option
+                  label="3-5K"
+                  :value="2"
+                ></el-option>
+                <el-option
+                  label="5-10K"
+                  :value="3"
+                ></el-option>
+                <el-option
+                  label="10-20K"
+                  :value="4"
+                ></el-option>
+                <el-option
+                  label="20K以上"
+                  :value="5"
+                ></el-option>
               </el-select>
             </li>
             <li>
@@ -105,19 +177,19 @@
               </el-cascader>
             </li>
             <li>
-              <el-switch
-                v-model="certification"
-                active-text="只看学校认证"
-                inactive-text="展示所有岗位"
-                active-color="#72b3f0"
-              >
-              </el-switch>
+              <el-button
+                round
+                icon="el-icon-refresh-left"
+                @click="refreshSelect"
+              >重置</el-button>
             </li>
             <li>
               <el-button
                 round
-                icon="el-icon-refresh-left"
-              >重置</el-button>
+                type="primary"
+                icon="el-icon-s-operation"
+                @click="getSelectAccountListByPage"
+              >筛选</el-button>
             </li>
           </ul>
           <ul id="employmentList">
@@ -192,7 +264,7 @@
           :current-page="currentPage"
           :total="total"
           layout="prev, pager, next"
-          @current-change="handleCurrentChange"
+          @current-change="switchPage(val)"
         >
         </el-pagination>
       </div>
@@ -240,7 +312,10 @@
         >
         </el-pagination> -->
         </div>
-        <div class="companyBar" v-if="!isEmploymentDetails ">
+        <div
+          class="companyBar"
+          v-if="!isEmploymentDetails "
+        >
           <img
             :src="companyDetails.logo"
             alt="公司logo"
@@ -322,6 +397,8 @@
         style="width: 100%"
         @row-click="tableClick"
         v-if="searchSelect==1 || searchSelect == ''"
+        header-cell-style="text-align:center"
+        cell-style="text-align:center"
       >
         <el-table-column
           prop="station"
@@ -340,7 +417,7 @@
         >
         </el-table-column>
         <el-table-column
-          prop="location"
+          prop="area"
           label="地点"
           width="140"
         >
@@ -358,6 +435,8 @@
         style="width: 100%"
         @row-click="tableClick"
         v-if="searchSelect==2"
+        header-cell-style="text-align:center"
+        cell-style="text-align:center"
       >
         <el-table-column
           prop="name"
@@ -389,6 +468,8 @@
         style="width: 100%"
         @row-click="tableClick"
         v-if="searchSelect==3"
+        header-cell-style="text-align:center"
+        cell-style="text-align:center"
       >
         <el-table-column
           prop="name"
@@ -433,8 +514,9 @@ export default {
       salaryFilter: "", //筛选薪资
       locationOptions: provinceAndCityDataPlus,
       locationSelectedOptions: [], //工作地点选择的两个变量
-      certification: false, //筛选学校认证
+      certification: 0, //筛选学校认证
       employmentList: [], //首页招聘信息列表
+      recommendList: [], //学校推荐列表
       companyList: [], //公司列表
       company_employmentList: [], //某个公司的招聘信息列表
       schoolList: [], //学校列表
@@ -462,6 +544,46 @@ export default {
     //地区码转中文
     showLocation(location) {
       return CodeToText[location[0]] + "" + CodeToText[location[1]];
+    },
+    //选择是否展示学校认证
+    switchRecommend() {
+      if (this.certification == 0) return;
+      let that = this;
+      this.$ajax.get("/company/getAllCompany").then((res) => {
+        let companys = res.data;
+        this.$ajax
+          .post(
+            "/employment/getRecommend",
+            qs.stringify({ school: window.localStorage.getItem("school") }),
+            {
+              "content-type": "application/x-www-form-urlencoded",
+            }
+          )
+          .then((res) => {
+            that.recommendList = res.data;
+            for (let item in that.recommendList) {
+              that.recommendList[item].salary =
+                that.recommendList[item].salaryStart +
+                " - " +
+                that.recommendList[item].salaryEnd;
+              that.recommendList[item].location =
+                that.recommendList[item].location.split(",");
+              that.recommendList[item].area = that.showLocation(
+                that.recommendList[item].location
+              );
+              that.recommendList[item].type = that.showIsFullTime(
+                that.recommendList[item].isFullTime
+              );
+            }
+            for (let i in that.recommendList) {
+              for (let j in companys) {
+                if (that.recommendList[i].companyId == companys[j].id) {
+                  that.recommendList[i].companyName = companys[j].name;
+                }
+              }
+            }
+          });
+      });
     },
     //查看招聘详情
     toEmploymentDetails(id) {
@@ -493,8 +615,9 @@ export default {
       });
       this.$ajax.get("/company/getAllEmployment/" + id).then((res) => {
         that.company_employmentList = res.data;
-        for(let item in that.company_employmentList) {
-          that.company_employmentList[item].location = that.company_employmentList[item].location.split(",");
+        for (let item in that.company_employmentList) {
+          that.company_employmentList[item].location =
+            that.company_employmentList[item].location.split(",");
         }
         that.isCompanyDetails = true;
       });
@@ -514,6 +637,19 @@ export default {
     //学校详情返回列表
     schoolToList() {
       this.isSchoolDetails = false;
+    },
+    //选择调用哪个分页函数
+    switchPage(val) {
+      if (
+        this.educationFilter != "" ||
+        this.salaryFilter != "" ||
+        this.locationSelectedOptions.length ||
+        this.certification != ""
+      ) {
+        this.handleSelectCurrentChange(val);
+      } else {
+        this.handleCurrentChange(val);
+      }
     },
     // 分页显示处理结果
     setAccountList(response) {
@@ -568,6 +704,80 @@ export default {
       this.currentPage = val; // 保存当前页码
       this.getAccountListByPage(); // 调用分页函数
     },
+    //筛选条件下的：按照分页显示数据的函数
+    getSelectAccountListByPage() {
+      let that = this;
+      let salaryStart = 0;
+      let salaryEnd = 0;
+      switch (this.salaryFilter) {
+        case 1:
+          salaryEnd = 3000;
+          break;
+        case 2:
+          salaryStart = 3000;
+          salaryEnd = 5000;
+          break;
+        case 3:
+          salaryStart = 5000;
+          salaryEnd = 10000;
+          break;
+        case 4:
+          salaryStart = 10000;
+          salaryEnd = 20000;
+          break;
+        case 5:
+          salaryStart = 20000;
+      }
+      let obj = {
+        education: this.educationFilter,
+        salaryStart: salaryStart,
+        salaryEnd: salaryEnd,
+        location: this.locationSelectedOptions.join(","),
+      };
+      this.$ajax
+        .post("/employment/getSelectAccountListByPage/1", qs.stringify(obj), {
+          "content-type": "application/x-www-form-urlencoded",
+        })
+        .then((res) => {
+          // 接收后端返回的数据总条数 total 和 对应页码的数据 data
+          let { total, results } = res.data;
+          // 赋值给对应的变量即可
+          that.total = total;
+          that.employmentList = results;
+          for (let item in that.employmentList) {
+            that.employmentList[item].location =
+              that.employmentList[item].location.split(",");
+          }
+          // 如果当前页没有数据 且 排除第一页
+          if (!data.length && this.currentPage !== 1) {
+            // 页码减去 1
+            that.currentPage -= 1;
+            // 再调用自己
+            that.getSelectAccountListByPage();
+          }
+        });
+    },
+    //重置筛选条件
+    refreshSelect() {
+      this.educationFilter = "";
+      this.salaryFilter = "";
+      this.locationSelectedOptions = [];
+      this.certification = "";
+      let that = this;
+      this.$ajax.get("/employment/getAccountListByPage/1").then((res) => {
+        that.employmentList = res.data.results;
+        that.total = res.data.total;
+        for (let item in that.employmentList) {
+          that.employmentList[item].location =
+            that.employmentList[item].location.split(",");
+        }
+      });
+    },
+    //筛选条件下的分页函数
+    handleSelectCurrentChange(val) {
+      this.currentPage = val; // 保存当前页码
+      this.getSelectAccountListByPage(); // 调用分页函数
+    },
     //根据关键字搜索职位
     searchEmployment(isFullTime) {
       let obj = {
@@ -589,6 +799,9 @@ export default {
                 that.searchList[item].salaryStart +
                 " - " +
                 that.searchList[item].salaryEnd;
+              let location = that.searchList[item].location.split(",");
+              that.searchList[item].area =
+                CodeToText[location[0]] + "" + CodeToText[location[1]];
             }
             for (let i in that.searchList) {
               for (let j in companys) {
@@ -634,14 +847,18 @@ export default {
     tableClick(row, column, event) {
       this.fromSearch = true;
       this.isSearchList = false;
-      this.isEmploymentDetails = true;
       let that = this;
       this.$ajax.get("/employment/getEmploymentById/" + row.id).then((res) => {
         that.employmentDetails = res.data;
+        that.employmentDetails.location =
+          that.employmentDetails.location.split(",");
         that.$ajax
           .get("/company/getCompanyById/" + that.employmentDetails.companyId)
           .then((res) => {
             that.companyDetails = res.data;
+            that.companyDetails.location =
+              that.companyDetails.location.split(",");
+            that.isEmploymentDetails = true;
           });
       });
     },
@@ -673,6 +890,16 @@ export default {
 <style>
 #employment {
   position: relative;
+}
+/* 学校认证 */
+#employment .el-switch {
+  position: absolute;
+  top: -10px;
+  right: 0;
+}
+#employment .el-switch__label.el-switch__label--right.is-active,
+#employment .el-switch__label.el-switch__label--left.is-active {
+  color: #72b3f0;
 }
 /* 搜索框 */
 #employment .searchInput {
@@ -754,10 +981,6 @@ export default {
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
 }
 .employmentItem:hover .station {
-  color: #72b3f0;
-}
-#employment .el-switch__label.el-switch__label--right.is-active,
-#employment .el-switch__label.el-switch__label--left.is-active {
   color: #72b3f0;
 }
 #employment .el-pagination {
@@ -967,5 +1190,12 @@ export default {
 #employment .searchList .searchValue {
   font-weight: 600;
   font-size: 1.2rem;
+}
+/* 展示学校认证 */
+#employment .recommend {
+  position: relative;
+  top: 20px;
+  height: 550px;
+  overflow-y: auto;
 }
 </style>

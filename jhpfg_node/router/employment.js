@@ -6,6 +6,12 @@ const handler = require('../handler/employment');
 //分页获取招聘信息列表
 router.get('/getAccountListByPage/:currentPage', handler.getAccountListByPage)
 
+//根据筛选条件分页获取招聘信息列表
+router.post('/getSelectAccountListByPage/:currentPage', handler.getSelectAccountListByPage)
+
+//根据学校名获得其认证的招聘信息
+router.post('/getRecommend', handler.getRecommend);
+
 //根据id搜索某一条招聘信息
 router.get('/getEmploymentById/:id', handler.getEmploymentById);
 
