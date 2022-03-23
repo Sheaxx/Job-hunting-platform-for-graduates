@@ -90,10 +90,6 @@
               label="搜学校"
               value="3"
             ></el-option>
-            <el-option
-              label="学校推荐招聘"
-              value="4"
-            ></el-option>
           </el-select>
           <el-button
             slot="append"
@@ -284,6 +280,20 @@
           @click="companyToList"
           v-if="!isEmploymentDetails "
         >返回</el-button>
+        <el-button
+          round
+          icon="el-icon-plus"
+          type="primary"
+          @click="follow"
+          v-if="!isFollow"
+        >关注</el-button>
+        <el-button
+          round
+          icon="el-icon-check"
+          type="primary"
+          @click="cancelFollow"
+          v-else
+        >已关注</el-button>
         <div class="listBar">
           <ul class="list">
             <li
@@ -504,6 +514,7 @@ export default {
       isCompanyDetails: false, //是否是公司详情页，默认为否
       isSchoolDetails: false, //是否是学校详情页，默认为否
       isSearchList: false, //是否是搜索结果列表，默认为否
+      isFollow: false, //是否关注了这个公司
       showDeleteUpdate: false, //详情是否展示删除修改按钮
       currentPage: 1, // 当前页
       total: 0, // 数据总条数
@@ -621,6 +632,15 @@ export default {
         }
         that.isCompanyDetails = true;
       });
+      //判断用户是否关注该公司
+      let followList = window.localStorage.getItem("followList");
+      followList = followList.split(",");
+      for(let item in followList) {
+        if (followList[item] == id) {
+          this.isFollow = true;
+          break;
+        }
+      }
     },
     //公司详情返回列表
     companyToList() {
@@ -862,9 +882,42 @@ export default {
           });
       });
     },
+    //关注公司
+    follow() {
+      let that = this;
+      this.$ajax
+        .post(
+          "/company/follow/" +
+            window.localStorage.getItem("username") +
+            "/" +
+            this.companyDetails.id
+        )
+        .then((res) => {
+          window.localStorage.setItem("followList", res.data.join(","));
+          that.isFollow = true;
+          that.$message.success("关注成功");
+        });
+    },
+    //取消关注
+    cancelFollow() {
+      let that = this;
+      this.$ajax
+        .post(
+          "/company/cancelFollow/" +
+            window.localStorage.getItem("username") +
+            "/" +
+            this.companyDetails.id
+        )
+        .then((res) => {
+          window.localStorage.setItem("followList", res.data.join(","));
+          that.isFollow = false;
+          that.$message.success("取消关注");
+        });
+    },
   },
   mounted() {
     let that = this;
+    //获取分页招聘信息
     this.$ajax.get("/employment/getAccountListByPage/1").then((res) => {
       that.employmentList = res.data.results;
       that.total = res.data.total;
@@ -873,6 +926,7 @@ export default {
           that.employmentList[item].location.split(",");
       }
     });
+    //获取公司分页
     this.$ajax.get("/company/getAccountListByPage/1").then((res) => {
       that.companyList = res.data.results;
       for (let item in that.companyList) {
@@ -880,6 +934,7 @@ export default {
           that.companyList[item].location.split(",");
       }
     });
+    //获取学校分页
     this.$ajax.get("/school/getAccountListByPage/1").then((res) => {
       that.schoolList = res.data.results;
     });

@@ -91,3 +91,91 @@ exports.updateCompany = (req, res) => {
     })
   }
 }
+
+//获取用户的关注列表
+exports.getFollowList = (req, res) => {
+  let username = req.params.username;
+  //获取用户的关注列表
+  let sql1 = 'select * from user where username="' + username + '"';
+  db.query(sql1, (err, follows) => {
+    if (err) throw err;
+    //根据关注列表获得公司们
+    let sql2 = 'select * from company';
+    db.query(sql2, (err, companys) => {
+      let results = [];
+      let list = follows[0].followList.split(",")
+      for (let i in list) {
+        for (let j in companys) {
+          if (list[i] == companys[j].id) {
+            results.push(companys[j].id)
+            break;
+          }
+        }
+      }
+      //获取所有在企业板块的帖子
+      let sql3 = 'select * from forum where zone=5 order by id desc';
+      db.query(sql3, (err, forums) => {
+        if (err) throw err;
+        //获取所有在用户所关注的公司里的账号
+        //如果这个帖子的发布者属于用户关注的公司，则加入结果
+        let sql4 = 'select username from resume where company in (' + results + ')';
+        db.query(sql4, (err, authors) => {
+          if (err) throw err;
+          let arr = [];
+          for (let i in forums) {
+            for (let j in authors) {
+              if (forums[i].author == authors[j].username) {
+                arr.push(forums[i]);
+                break;
+              }
+            }
+          }
+          res.send(arr);
+        })
+      })
+    })
+  })
+}
+
+//关注公司
+exports.follow = (req, res) => {
+  let { username, id } = req.params;
+  //找到这个用户
+  let sql1 = 'select * from user where username="' + username + '"';
+  db.query(sql1, (err, result) => {
+    if (err) throw err;
+    let list = result[0].followList;
+    if (list.length) {
+      list = list.split(",");
+      list[list.length] = id;
+    } else {
+      list = [id];
+    }
+    //更新他的关注列表
+    let sql2 = 'update user set followList="' + list + '" where username="' + username + '"';
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+      res.send(list);
+    })
+  })
+}
+
+//取消关注
+exports.cancelFollow = (req, res) => {
+  let { username, id } = req.params;
+  //找到这个用户
+  let sql1 = 'select * from user where username="' + username + '"';
+  db.query(sql1, (err, result) => {
+    if (err) throw err;
+    let list = result[0].followList;
+    list = list.split(",");
+    let index = list.indexOf(String(id));
+    list.splice(index, 1).join(",");
+    //更新他的投递列表
+    let sql2 = 'update user set followList="' + list + '" where username="' + username + '"';
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+      res.send(list);
+    })
+  })
+}

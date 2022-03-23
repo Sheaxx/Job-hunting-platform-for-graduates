@@ -21,4 +21,13 @@ router.get('/getAllCompany', handler.getAllCompany)
 //更新公司信息
 router.post('/updateCompany', handler.updateCompany)
 
+//获取用户的关注列表
+router.get('/getFollowList/:username', handler.getFollowList)
+
+//关注公司
+router.post('/follow/:username/:id', handler.follow)
+
+//取消关注
+router.post('/cancelFollow/:username/:id', handler.cancelFollow)
+
 module.exports = router

@@ -334,6 +334,7 @@ exports.register = (req, res) => {
       user.collectList = "";
       user.sentList = "";
       user.chatList = "";
+      user.followList = "";
       db.query(sql2, user, (err, result) => {
         if (err) throw err;
         res.send(user);

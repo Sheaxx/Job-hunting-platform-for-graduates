@@ -168,6 +168,23 @@
             </li>
           </ul>
         </el-tab-pane>
+        <el-tab-pane
+          label="我的关注"
+          name="6"
+        >
+          <ul class="list">
+            <li
+              v-for="(item) in followList"
+              :key="item.id"
+              @click="toPostDetails(item.id)"
+            >
+              <el-tag>{{showZone(item.zone)}}</el-tag>
+              <h6>{{item.title}}</h6>
+              <span>{{item.author}}</span>
+              <span>{{item.createTime}}</span>
+            </li>
+          </ul>
+        </el-tab-pane>
       </el-tabs>
       <employment-details
         v-if="isEmploymentDetails"
@@ -231,6 +248,7 @@ export default {
       postList: [], //发布的帖子列表
       postDetails: {}, //某个帖子的详情
       commentList: [], //评论列表
+      followList:[], //关注的公司帖子列表
     };
   },
   methods: {
@@ -446,12 +464,14 @@ export default {
             that.resumeSentList[item].location.split(",");
         }
       });
+    //用户信息
     this.$ajax
       .get("/user/getUser/" + window.localStorage.getItem("username"))
       .then((res) => {
         that.userInfo = res.data;
         that.avatarUrl = that.userInfo.avatar;
       });
+    //我发布的
     this.$ajax
       .get(
         "/forum/getPostByUsername/" + window.localStorage.getItem("username")
@@ -459,6 +479,10 @@ export default {
       .then((res) => {
         that.postList = res.data;
       });
+    //我关注的
+    this.$ajax.get("/company/getFollowList/" + window.localStorage.getItem("username")).then(res => {
+      that.followList = res.data;
+    })
   },
 };
 </script>

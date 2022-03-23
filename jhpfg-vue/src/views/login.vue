@@ -153,6 +153,7 @@ export default {
             window.localStorage.setItem("collectList", res.data.collectList);
             window.localStorage.setItem("sentList", res.data.sentList);
             window.localStorage.setItem("chatList", res.data.chatList);
+            window.localStorage.setItem("followList", res.data.followList);
             window.localStorage.setItem("school", res.data.school);
             that.$router.replace("/employment");
             that.$socket.emit("login", obj.username);
