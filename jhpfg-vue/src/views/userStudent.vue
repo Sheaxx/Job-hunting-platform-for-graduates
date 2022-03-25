@@ -108,7 +108,7 @@
             <li
               v-for="item in collectionList"
               :key="item.id"
-              @click="toEmploymentDetails(item.id)"
+              @click="toEmploymentDetails(item.id, '3')"
             >
               <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
               <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
@@ -134,7 +134,7 @@
             <li
               v-for="item in resumeSentList"
               :key="item.id"
-              @click="toEmploymentDetails(item.id)"
+              @click="toEmploymentDetails(item.id, '4')"
             >
               <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
               <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
@@ -159,7 +159,7 @@
             <li
               v-for="(item) in postList"
               :key="item.id"
-              @click="toPostDetails(item.id)"
+              @click="toPostDetails(item.id, '5')"
             >
               <el-tag>{{showZone(item.zone)}}</el-tag>
               <h6>{{item.title}}</h6>
@@ -176,7 +176,7 @@
             <li
               v-for="(item) in followList"
               :key="item.id"
-              @click="toPostDetails(item.id)"
+              @click="toPostDetails(item.id, '6')"
             >
               <el-tag>{{showZone(item.zone)}}</el-tag>
               <h6>{{item.title}}</h6>
@@ -369,7 +369,7 @@ export default {
       return CodeToText[location[0]] + "" + CodeToText[location[1]];
     },
     //查看招聘信息详情
-    toEmploymentDetails(id) {
+    toEmploymentDetails(id, tab) {
       let that = this;
       this.$ajax.get("/employment/getEmploymentById/" + id).then((res) => {
         that.employmentDetails = res.data;
@@ -382,7 +382,7 @@ export default {
             that.companyDetails.location =
               that.companyDetails.location.split(",");
             that.isEmploymentDetails = true;
-            that.tabValue = "3";
+            that.tabValue = tab;
           });
       });
     },
@@ -401,9 +401,9 @@ export default {
         });
     },
     //查看我发布的帖子详情
-    toPostDetails(id) {
+    toPostDetails(id, tab) {
       this.isPostDetails = true;
-      this.tabValue = "5";
+      this.tabValue = tab;
       let that = this;
       this.$ajax.get("/forum/getPostById/" + id).then((res) => {
         that.postDetails = res.data.post;

@@ -4,7 +4,7 @@ const router = express.Router();
 const handler = require('../handler/calendar');
 
 //获取全部日程表信息
-router.get('/getAll', handler.getAll)
+router.post('/getAll', handler.getAll)
 
 //添加日程表
 router.post('/add', handler.add)

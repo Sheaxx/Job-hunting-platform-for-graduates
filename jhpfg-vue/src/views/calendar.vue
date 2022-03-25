@@ -194,7 +194,7 @@ export default {
       isAdd: false, //是否打开添加窗口，默认为否
       isEdit: false, //是否打开修改窗口，默认为否
       isDelete: false, //是否打开删除窗口，默认为否
-      isAuthor:false,//是否有更新的权力
+      isAuthor: false, //是否有更新的权力
       dayMap: [], //{招聘会名字，地点，时间}
       jobFair: {}, //日期：[招聘会名字]
       contentList: [], //当天的{招聘会名字，地点，时间}
@@ -207,7 +207,7 @@ export default {
       editList: [], //修改某天招聘会列表
       currentId: "", //当前要删除的id
       currentIndex: "", //当前要删除的索引
-      school:"",//用户所在学校
+      school: "", //用户所在学校
     };
   },
   methods: {
@@ -229,6 +229,7 @@ export default {
       for (let item in this.editContent) {
         this.editContent[item] = "";
       }
+      this.editContent.school = window.localStorage.getItem("school");
       this.isAdd = true;
       document.body.scrollTop = document.documentElement.scrollTop = 0;
       document.documentElement.style.overflow = "hidden";
@@ -328,29 +329,41 @@ export default {
   },
   created() {
     let that = this;
-    this.$ajax.get("/calendar/getAll").then((res) => {
-      that.dayMap = res.data;
-      for (let item in that.dayMap) {
-        let date = that.dayMap[item].time.split(" ");
-        //抽取时间
-        that.dayMap[item].clock = date[1];
-        //整理每一天有的宣讲会
-        if (!(String(date[0]) in that.jobFair)) {
-          that.jobFair[date[0]] = [];
+    this.$ajax
+      .post(
+        "/calendar/getAll",
+        qs.stringify(
+          { school: window.localStorage.getItem("school") },
+          {
+            "content-type": "application/x-www-form-urlencoded",
+          }
+        )
+      )
+      .then((res) => {
+        that.dayMap = res.data;
+        for (let item in that.dayMap) {
+          let date = that.dayMap[item].time.split(" ");
+          //抽取时间
+          that.dayMap[item].clock = date[1];
+          //整理每一天有的宣讲会
+          if (!(String(date[0]) in that.jobFair)) {
+            that.jobFair[date[0]] = [];
+          }
+          that.jobFair[date[0]].splice(
+            that.jobFair[date[0]].length,
+            1,
+            that.dayMap[item].name
+          );
         }
-        that.jobFair[date[0]].splice(
-          that.jobFair[date[0]].length,
-          1,
-          that.dayMap[item].name
-        );
-      }
-    });
-    this.$ajax.get("/user/getResume/" + window.localStorage.getItem("username")).then(res => {
-      that.school = res.data.school;
-      if (window.localStorage.getItem("role") == 3 ) {
-        that.isAuthor = true;
-      }
-    })
+      });
+    this.$ajax
+      .get("/user/getResume/" + window.localStorage.getItem("username"))
+      .then((res) => {
+        that.school = res.data.school;
+        if (window.localStorage.getItem("role") == 3) {
+          that.isAuthor = true;
+        }
+      });
   },
 };
 </script>

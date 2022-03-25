@@ -1,10 +1,10 @@
 const db = require('../config/db')
 const moment = require('moment')
 
-// 根据学校！！！！还没做！！！
 //获取全部日程表信息
 exports.getAll = (req, res) => {
-  let sql = 'select * from calendar';
+  let school = req.body.school;
+  let sql = 'select * from calendar where school="' + school + '"';
   db.query(sql, (err, result) => {
     if (err) throw err;
     for (let item in result) {
