@@ -6,7 +6,10 @@
       round
       @click="updateEmployment"
     >确定</el-button>
-    <el-button round @click="cancelUpdate">取消</el-button>
+    <el-button
+      round
+      @click="cancelUpdate"
+    >取消</el-button>
     <el-form label-width="80px">
       <el-form-item
         label="职位"
@@ -69,6 +72,12 @@
             <el-option value="博士"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item
+          label="招聘人数"
+          class="total"
+        >
+          <el-input v-model="editEmployment.total" />
+        </el-form-item>
       </div>
       <el-form-item
         label="职位介绍"
@@ -110,8 +119,8 @@ export default {
     return {
       options: provinceAndCityData,
       locationValue: [], //地区选择
-      zoneValue:[], //职位选择
-      editForm:{},//备份编辑
+      zoneValue: [], //职位选择
+      editForm: {}, //备份编辑
     };
   },
   methods: {
@@ -123,7 +132,13 @@ export default {
     updateEmployment() {
       let obj = Object.assign({}, this.editEmployment);
       obj.zone = this.zoneValue.join(" / ");
-      obj.location = this.locationValue.join(",")
+      obj.location = this.locationValue.join(",");
+      for(let item in obj) {
+        if (obj[item] == "" || obj[item].length == 0) {
+          this.$message.warning("请填写完毕内容");
+          return;
+        }
+      }
       let that = this;
       this.$ajax
         .post("/employment/updateEmployment", qs.stringify(obj), {
@@ -143,7 +158,7 @@ export default {
     this.locationValue = this.editEmployment.location;
     this.zoneValue = this.editEmployment.zone;
     if (this.zoneValue.length) this.zoneValue = this.zoneValue.split(" / ");
-  }
+  },
 };
 </script>
 
@@ -184,11 +199,15 @@ export default {
 }
 #editEmployment .salary {
   float: left;
+  width: 40%;
 }
 #editEmployment .salary .el-input {
-  width: 40%;
+  width: 38%;
 }
 #editEmployment .salary span {
   margin: 0 10px;
+}
+#editEmployment .total {
+  margin-left: 30px;
 }
 </style>

@@ -114,12 +114,16 @@ export default {
     },
     //发送消息
     send() {
+      if (this.value == "") {
+        this.$message.warning("不能发送空内容");
+        return;
+      }
       let that = this;
       new Promise((resolve, reject) => {
         let obj = {
           sender: window.localStorage.getItem("username"),
-          receiver: this.currentUser,
-          content: this.value,
+          receiver: that.currentUser,
+          content: that.value,
           time: getNowTime(),
         };
         this.currentMessages.push(obj);
@@ -129,11 +133,11 @@ export default {
         let newMsgList = document.getElementsByClassName("message");
         let newLi = newMsgList[newMsgList.length - 1];
         newLi.classList.add("my_message");
-        this.$socket.emit("send", obj);
+        that.$socket.emit("send", obj);
         let users = window.localStorage.getItem("chatList");
         users = users.split(",");
-        if (users.indexOf(this.currentUser) == -1) {
-          users.push(this.currentUser);
+        if (users.indexOf(that.currentUser) == -1) {
+          users.push(that.currentUser);
           window.localStorage.setItem("chatList", users.join(","));
         }
       });

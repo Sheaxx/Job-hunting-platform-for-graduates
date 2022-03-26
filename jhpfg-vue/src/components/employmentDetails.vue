@@ -83,6 +83,7 @@
       <p class="jobMsg">
         <span>{{ showLocation(details.location) }}</span>
         <span>{{ details.education }}</span>
+        <span>招聘 {{ details.total }} 人</span>
       </p>
     </div>
     <div class="introduction section">

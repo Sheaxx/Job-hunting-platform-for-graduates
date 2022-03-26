@@ -139,28 +139,10 @@ exports.updateAvatar = (req, res) => {
 //更新用户的简历信息
 exports.updateResume = (req, res) => {
   let resume = req.body
-  let sql1 = 'select * from resume where username="' + resume.username + '"';
-  db.query(sql1, (err, result) => {
+  let sql = 'update resume set ? where username="' + resume.username + '"';
+  db.query(sql, (err, result) => {
     if (err) throw err;
-    //未填写过简历，新建一个数据
-    if (!result.length) {
-      let sql2 = 'select max(id) as maxid from resume';
-      let sql3 = 'insert into resume set ?';
-      db.query(sql2, (err, results) => {
-        if (err) throw err;
-        resume.id = results[0].maxid + 1
-        db.query(sql3, resume, (err, result) => {
-          if (err) throw err;
-          res.send('success');
-        })
-      })
-    } else {//否则，修改数据
-      let sql4 = 'update resume set ? where username="' + resume.username + '"';
-      db.query(sql4, resume, (err, result) => {
-        if (err) throw err;
-        res.send('success');
-      })
-    }
+    res.send('success');
   })
 }
 
@@ -323,12 +305,14 @@ exports.cancelCollect = (req, res) => {
 //注册
 exports.register = (req, res) => {
   let user = req.body;
+  //查找该用户名是否已被注册
   let sql1 = 'select * from user where username="' + user.username + '"';
   db.query(sql1, (err, result) => {
     if (err) throw err;
     if (result.length) {
       res.send("error");
     } else {
+      //用户表插入
       let sql2 = 'insert into user set ?';
       user.avatar = "";
       user.collectList = "";
@@ -337,7 +321,32 @@ exports.register = (req, res) => {
       user.followList = "";
       db.query(sql2, user, (err, result) => {
         if (err) throw err;
-        res.send(user);
+        //简历表插入
+        let sql3 = 'select max(id) as maxid from resume';
+        db.query(sql3, (err, results) => {
+          if (err) throw err;
+          let resume = {
+            id: results[0].maxid + 1,
+            username: user.username,
+            realname: "",
+            birth: null,
+            sex: "",
+            tel: "",
+            email: "",
+            highesteducation: "",
+            school: "",
+            expectedPosition: "",
+            skill: "",
+            certificate: "",
+            position: "",
+            company: 0
+          }
+          let sql4 = 'insert into resume set ?';
+          db.query(sql4, resume, (err, result) => {
+            if (err) throw err;
+            res.send(user);
+          })
+        })
       })
     }
   })

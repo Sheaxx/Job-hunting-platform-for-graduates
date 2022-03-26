@@ -279,6 +279,10 @@ export default {
     },
     //根据关键字搜索
     search() {
+      if (this.searchValue == "") {
+        this.$message.warning("请输入搜索内容");
+        return;
+      }
       let obj = {
         keyword: this.searchValue,
       };
