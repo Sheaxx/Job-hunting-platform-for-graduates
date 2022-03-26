@@ -48,7 +48,11 @@ const routes = [
   {
     path: '/login',
     component: () => import('../views/login')
-  }
+  },
+  {
+    path: '/room',
+    component: () => import('../views/room'),
+  },
 ]
 
 const router = new VueRouter({
