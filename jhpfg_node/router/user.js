@@ -15,6 +15,9 @@ router.get('/getCollectList/:username', handler.getCollectList);
 //获取用户的投递列表
 router.get('/getSentList/:username', handler.getSentList);
 
+//根据用户名和招聘id获取招聘流程
+router.get('/getSent/:id/:username', handler.getSent);
+
 //更新用户的头像
 router.post('/updateAvatar/:username', handler.updateAvatar);
 

@@ -97,13 +97,19 @@
                   round
                   @click="openUpdatePersonal"
                 >更新信息</el-button>
-                <h6 class="name">{{personalInfo.realname}}</h6>
-                <p class="school"><i class="el-icon-s-home"></i>{{companyDetails.name}}</p>
-                <p class="position"><i class="el-icon-s-cooperation"></i>{{personalInfo.position}}</p>
+                <div v-if="personalInfo.realname != ''">
+                  <h6 class="name">{{personalInfo.realname}}</h6>
+                  <p class="school"><i class="el-icon-s-home"></i>{{companyDetails.name}}</p>
+                  <p class="position"><i class="el-icon-s-cooperation"></i>{{personalInfo.position}}</p>
+                </div>
               </div>
+              <el-empty
+                description="暂未填写个人信息"
+                v-if="personalInfo.realname == '' && !isUpdatePersonal"
+              ></el-empty>
               <div
                 class="personalUpdateBox"
-                v-else
+                v-if="isUpdatePersonal"
               >
                 <el-button
                   type="primary"
@@ -145,32 +151,38 @@
               round
               @click="openUpdateCompany"
             >更新信息</el-button>
-            <h6 class="companyName">{{companyDetails.name}}</h6>
-            <img
-              :src="companyDetails.logo"
-              alt="公司logo"
-            >
-            <ul class="row1">
-              <li>
-                <i class="el-icon-menu"></i>{{companyDetails.trade}}
-              </li>
-              <li>
-                <i class="el-icon-s-check"></i>{{companyDetails.level}}
-              </li>
-            </ul>
-            <ul class="row2">
-              <li>
-                <i class="el-icon-location"></i>{{companyDetails.address}}
-              </li>
-            </ul>
-            <div class="introduction">
-              <h6>公司简介</h6>
-              <p>{{companyDetails.introduction}}</p>
+            <div v-if="personalInfo.company != ''">
+              <h6 class="companyName">{{companyDetails.name}}</h6>
+              <img
+                :src="companyDetails.logo"
+                alt="公司logo"
+              >
+              <ul class="row1">
+                <li>
+                  <i class="el-icon-menu"></i>{{companyDetails.trade}}
+                </li>
+                <li>
+                  <i class="el-icon-s-check"></i>{{companyDetails.level}}
+                </li>
+              </ul>
+              <ul class="row2">
+                <li>
+                  <i class="el-icon-location"></i>{{companyDetails.address}}
+                </li>
+              </ul>
+              <div class="introduction">
+                <h6>公司简介</h6>
+                <p>{{companyDetails.introduction}}</p>
+              </div>
             </div>
+            <el-empty
+                description="暂未填写公司信息"
+                v-if="personalInfo.company == '' && !isUpdateCompany"
+              ></el-empty>
           </div>
           <div
             id="companyUpdateBox"
-            v-else
+            v-if="isUpdateCompany"
           >
             <el-form label-width="100px">
               <el-form-item label="LOGO">
@@ -352,7 +364,7 @@ export default {
       tradeValue: [], // 公司更新行业选择
       options: provinceAndCityData,
       locationValue: [], //地区选择
-      userInfo: {},//用户信息
+      userInfo: {}, //用户信息
       personalInfo: {}, //个人信息
       editPersonal: {
         realname: "",
@@ -383,7 +395,9 @@ export default {
         introduction: "",
         requirements: "",
         author: "",
-        sentUsers:""
+        sentUsers: "",
+        total:0,
+        progressList:""
       }, //招聘信息编辑
       employmentList: [], //公司发布的招聘信息列表
       postList: [], //发布的帖子列表
@@ -549,6 +563,12 @@ export default {
     },
     //确认更新个人信息
     updatePersonal() {
+      for (let item in this.editPersonal) {
+        if (this.editPersonal[item] == "") {
+          this.$message.warning("请填写完毕信息");
+          return;
+        }
+      }
       let that = this;
       let obj = Object.assign({}, this.editPersonal);
       this.$ajax
@@ -634,8 +654,8 @@ export default {
     //打开编辑招聘信息页面
     openAddEmployment() {
       this.isAddEmployment = true;
-      for(let item in this.editEmployment) {
-        this.editEmployment[item] = ""
+      for (let item in this.editEmployment) {
+        this.editEmployment[item] = "";
       }
       this.editEmployment.zone = [];
       this.editEmployment.location = [];
@@ -787,6 +807,10 @@ export default {
 }
 #userCompany .personalBox i {
   margin-right: 10px;
+}
+#userCompany .personalBox .el-empty {
+  position: relative;
+  top: 30px;
 }
 /* 修改界面 */
 #userCompany .personalUpdateBox .el-form {

@@ -3,12 +3,14 @@
     <el-button
       round
       @click="toList"
+      class="detailsButton"
     >返回</el-button>
     <el-button
       type="primary"
       round
       @click="openSendResume"
       v-if="showSendResume && isStudent"
+      class="detailsButton"
     >投递简历</el-button>
     <el-button
       type="primary"
@@ -16,6 +18,7 @@
       disabled
       @click="openSendResume"
       v-if="!showSendResume && isStudent"
+      class="detailsButton"
     >已投递简历</el-button>
     <div
       class="collectBox"
@@ -457,7 +460,7 @@ export default {
   background: #fff;
   height: 80vh;
 }
-#employmentDetails .el-button {
+#employmentDetails .detailsButton {
   float: right;
   margin-right: 3%;
 }

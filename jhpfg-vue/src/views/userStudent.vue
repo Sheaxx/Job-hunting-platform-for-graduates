@@ -127,27 +127,27 @@
         </el-tab-pane>
         <el-tab-pane
           label="我的投递"
-          class="resumeSent employmentList"
+          class="resumeSent"
           name="4"
         >
           <ul v-if="!isEmploymentDetails">
             <li
               v-for="item in resumeSentList"
               :key="item.id"
-              @click="toEmploymentDetails(item.id, '4')"
             >
-              <p class="salary"><span>{{ item.salaryStart }} - {{ item.salaryEnd }}</span></p>
-              <el-tag class="isFullTime">{{showIsFullTime(item.isFullTime)}}</el-tag>
-              <p class="station">{{ item.station }}</p>
-              <p class="jobMsg">
-                <span>{{ showLocation(item.location) }}</span>
-                <span>{{ item.education }}</span>
-              </p>
-              <p class="companyMsg">
-                <span>{{ item.companyName }}</span>
-                <span>{{ item.trade }}</span>
-                <span>{{ item.level }}</span>
-              </p>
+              <h5 class="company">{{item.companyName}}</h5>
+              <h6 class="position">{{item.employmentStation}}</h6>
+              <el-steps
+                :active="item.current"
+                finish-status="success"
+                :process-status="item.currentState"
+              >
+                <el-step
+                  v-for="item2 in item.progressList"
+                  :key="item2"
+                  :title="item2"
+                ></el-step>
+              </el-steps>
             </li>
           </ul>
         </el-tab-pane>
@@ -248,7 +248,7 @@ export default {
       postList: [], //发布的帖子列表
       postDetails: {}, //某个帖子的详情
       commentList: [], //评论列表
-      followList:[], //关注的公司帖子列表
+      followList: [], //关注的公司帖子列表
     };
   },
   methods: {
@@ -460,9 +460,10 @@ export default {
       .then((res) => {
         that.resumeSentList = res.data;
         for (let item in that.resumeSentList) {
-          that.resumeSentList[item].location =
-            that.resumeSentList[item].location.split(",");
+          that.resumeSentList[item].progressList =
+            that.resumeSentList[item].progressList.split(",");
         }
+        console.log(that.resumeSentList);
       });
     //用户信息
     this.$ajax
@@ -480,9 +481,11 @@ export default {
         that.postList = res.data;
       });
     //我关注的
-    this.$ajax.get("/company/getFollowList/" + window.localStorage.getItem("username")).then(res => {
-      that.followList = res.data;
-    })
+    this.$ajax
+      .get("/company/getFollowList/" + window.localStorage.getItem("username"))
+      .then((res) => {
+        that.followList = res.data;
+      });
   },
 };
 </script>
@@ -575,7 +578,7 @@ export default {
   margin-right: 0.5%;
 }
 /* 投递简历 */
-/* #userStudent .resumeSent {
+#userStudent .resumeSent {
   width: 87%;
   overflow: auto;
   height: 500px;
@@ -605,7 +608,7 @@ export default {
 }
 #userStudent .resumeSent .el-step__title {
   font-size: 0.9rem;
-} */
+}
 /* 我的发布 */
 #userStudent .list {
   width: 90%;

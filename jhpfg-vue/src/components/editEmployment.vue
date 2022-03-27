@@ -10,7 +10,7 @@
       round
       @click="cancelUpdate"
     >取消</el-button>
-    <el-form label-width="80px">
+    <el-form label-width="70px">
       <el-form-item
         label="职位"
         class="station"
@@ -101,6 +101,35 @@
           :rows="8"
         ></el-input>
       </el-form-item>
+      <el-form-item
+        label="招聘流程"
+        class="progress"
+      >
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          circle
+          class="addButton"
+          size="small"
+          @click="addProgress"
+        />
+        <ul>
+          <li
+            v-for="(item,index) in editEmployment.progressList"
+            :key="index"
+          >
+            第 {{index+1}} 轮流程：<el-input v-model="editEmployment.progressList[index]"></el-input>
+            <el-button
+              type="primary"
+              icon="el-icon-minus"
+              circle
+              class="reduceButton"
+              size="small"
+              @click="reduceProgress(index)"
+            />
+          </li>
+        </ul>
+      </el-form-item>
     </el-form>
   </div>
 </template>
@@ -128,12 +157,27 @@ export default {
     setStationValue(value) {
       this.zoneValue = value;
     },
+    //新增一项流程
+    addProgress() {
+      this.editEmployment.progressList.splice(
+        this.editEmployment.progressList.length,
+        1,
+        ""
+      );
+    },
+    //减少一项流程
+    reduceProgress(index) {
+      this.editEmployment.progressList.splice(index, 1);
+    },
     //编辑完成
     updateEmployment() {
       let obj = Object.assign({}, this.editEmployment);
       obj.zone = this.zoneValue.join(" / ");
       obj.location = this.locationValue.join(",");
-      for(let item in obj) {
+      obj.total = obj.progressList.length;
+      obj.progressList = obj.progressList.join(",");
+      console.log(obj)
+      for (let item in obj) {
         if (obj[item] == "" || obj[item].length == 0) {
           this.$message.warning("请填写完毕内容");
           return;
@@ -154,10 +198,12 @@ export default {
       this.$emit("cancelUpdateEmployment");
     },
   },
-  created() {
+  mounted() {
     this.locationValue = this.editEmployment.location;
     this.zoneValue = this.editEmployment.zone;
     if (this.zoneValue.length) this.zoneValue = this.zoneValue.split(" / ");
+    this.editEmployment.progressList =
+      this.editEmployment.progressList.split(",");
   },
 };
 </script>
@@ -209,5 +255,12 @@ export default {
 }
 #editEmployment .total {
   margin-left: 30px;
+}
+#editEmployment .progress .el-button {
+  float: none;
+}
+#editEmployment .progress .el-input {
+  width: 300px;
+  margin: 10px 20px 10px 0;
 }
 </style>

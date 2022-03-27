@@ -198,9 +198,9 @@
           </el-form-item>
           <el-form-item label="期待职位">
             <station-select
-            :value="zoneValue"
-            @setStationValue="setStationValue"
-          ></station-select>
+              :value="zoneValue"
+              @setStationValue="setStationValue"
+            ></station-select>
           </el-form-item>
           <el-form-item label="出生日期">
             <el-date-picker
@@ -528,20 +528,20 @@ import qs from "qs";
 import StationSelect from "../components/stationSelect.vue";
 
 export default {
-  components:{ StationSelect },
+  components: { StationSelect },
   data() {
     return {
       isUpdateResume: false, //是否打开更新简历窗口，默认为否
-      showUpdate:true, //是否展示修改简历选项
-      zoneValue:[], //职位选择
+      showUpdate: true, //是否展示修改简历选项
+      zoneValue: [], //职位选择
       editResume: {
         resumeInfo: {},
         educationInfo: [],
         internshipInfo: [],
-        projectInfo: [],//项目经历
+        projectInfo: [], //项目经历
         skillInfo: [], //技能
         certificateInfo: [], //证书
-        campusExperienceInfo: [],//校内经历
+        campusExperienceInfo: [], //校内经历
       },
     };
   },
@@ -568,8 +568,12 @@ export default {
       this.editResume.projectInfo = Array.from(this.projectInfo);
       this.editResume.skillInfo = Array.from(this.skillInfo);
       this.editResume.certificateInfo = Array.from(this.certificateInfo);
-      this.editResume.campusExperienceInfo = Array.from(this.campusExperienceInfo);
-      this.zoneValue = Array.from(this.editResume.resumeInfo.expectedPosition.split(" / "));
+      this.editResume.campusExperienceInfo = Array.from(
+        this.campusExperienceInfo
+      );
+      this.zoneValue = Array.from(
+        this.editResume.resumeInfo.expectedPosition.split(" / ")
+      );
     },
     //确定更新简历
     updateResume() {
@@ -680,7 +684,11 @@ export default {
       obj.duration = [];
       obj.position = "";
       obj.content = "";
-      this.editResume.educationInfo.splice(this.editResume.educationInfo.length, 1, obj);
+      this.editResume.educationInfo.splice(
+        this.editResume.educationInfo.length,
+        1,
+        obj
+      );
     },
     //减少一项教育经历
     reduceEducation(index) {
@@ -695,7 +703,11 @@ export default {
       obj.duration = [];
       obj.position = "";
       obj.content = "";
-      this.editResume.internshipInfo.splice(this.editResume.internshipInfo.length, 1, obj);
+      this.editResume.internshipInfo.splice(
+        this.editResume.internshipInfo.length,
+        1,
+        obj
+      );
     },
     //减少一项实习经历
     reduceInternship(index) {
@@ -710,7 +722,11 @@ export default {
       obj.role = "";
       obj.duration = [];
       obj.content = "";
-      this.editResume.projectInfo.splice(this.editResume.projectInfo.length, 1, obj);
+      this.editResume.projectInfo.splice(
+        this.editResume.projectInfo.length,
+        1,
+        obj
+      );
     },
     //减少一项项目经历
     reduceProject(index) {
@@ -745,7 +761,11 @@ export default {
     },
     //添加一项证书
     addCertificate() {
-      this.editResume.certificateInfo.splice(this.editResume.certificateInfo.length, 1, "");
+      this.editResume.certificateInfo.splice(
+        this.editResume.certificateInfo.length,
+        1,
+        ""
+      );
     },
     //减少一项证书
     reduceCertificate(index) {
@@ -753,10 +773,10 @@ export default {
     },
   },
   mounted() {
-    if(window.localStorage.getItem("role") != "0") {
+    if (window.localStorage.getItem("role") != "0") {
       this.showUpdate = false;
     }
-  }
+  },
 };
 </script>
 

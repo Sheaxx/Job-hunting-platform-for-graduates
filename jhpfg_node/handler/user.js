@@ -91,37 +91,36 @@ exports.getCollectList = (req, res) => {
 //获取用户的投递列表
 exports.getSentList = (req, res) => {
   let username = req.params.username;
-  let sql1 = 'select * from user where username="' + username + '"';
-  db.query(sql1, (err, sents) => {
+  let sql1 = 'select * from progress where sender="' + username + '"';
+  db.query(sql1, (err, progresses) => {
     if (err) throw err;
-    let sql2 = 'select * from employment'
-    db.query(sql2, (err, employments) => {
-      let results = [];
-      let list = sents[0].sentList.split(",")
-      for (let i in list) {
-        for (let j in employments) {
-          if (list[i] == employments[j].id) {
-            results.push(employments[j])
+    let arr = [];
+    for (let item in progresses) {
+      arr.push(progresses[item].company);
+    }
+    let sql2 = 'select id,name from company where id in (' + arr.join(",") + ')';
+    db.query(sql2, (err, results) => {
+      if (err) throw err;
+      for (let i in progresses) {
+        for (let j in results) {
+          if (progresses[i].company == results[j].id) {
+            progresses[i].companyName = results[j].name;
             break;
           }
         }
       }
-      let sql3 = 'select * from company'
-      db.query(sql3, (err, companys) => {
-        if (err) throw err;
-        for (let i in results) {
-          for (let j in companys) {
-            if (results[i].companyId === companys[j].id) {
-              results[i].companyName = companys[j].name;
-              results[i].trade = companys[j].trade;
-              results[i].level = companys[j].level;
-              break;
-            }
-          }
-        }
-        res.send(results);
-      })
+      res.send(progresses);
     })
+  })
+}
+
+//根据用户名和招聘id获取招聘流程
+exports.getSent = (req, res) => {
+  let { id, username } = req.params;
+  let sql = 'select * from progress where employmentId=' + id + ' and sender="' + username + '"';
+  db.query(sql, (err, progress) => {
+    if (err) throw err;
+    res.send(progress[0]);
   })
 }
 
@@ -238,9 +237,9 @@ exports.sendResume = (req, res) => {
       if (err) throw err;
       //找到这条招聘信息
       let sql3 = 'select * from employment where id=' + id;
-      db.query(sql3, (err, result) => {
+      db.query(sql3, (err, employment) => {
         if (err) throw err;
-        let users = result[0].sentUsers;
+        let users = employment[0].sentUsers;
         if (users.length) {
           users = users.split(",");
           users[users.length] = username;
@@ -252,7 +251,27 @@ exports.sendResume = (req, res) => {
         let sql4 = 'update employment set sentUsers="' + users + '" where id=' + id;
         db.query(sql4, (err, result) => {
           if (err) throw err;
-          res.send("success");
+          //在简历投递表里插入新信息
+          let sql5 = 'select max(id) as maxid from progress';
+          let sql6 = 'insert into progress set ?';
+          db.query(sql5, (err, result) => {
+            if (err) throw err;
+            let progress = {
+              id: result[0].maxid + 1,
+              employmentId: id,
+              employmentStation: employment[0].station,
+              company: employment[0].companyId,
+              sender: username,
+              total: employment[0].total,
+              progressList: employment[0].progressList,
+              current: 0,
+              currentState: "process",
+            }
+            db.query(sql6, progress, (err, result) => {
+              if (err) throw err;
+              res.send("success");
+            })
+          })
         })
       })
     })

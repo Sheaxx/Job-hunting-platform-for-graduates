@@ -635,7 +635,7 @@ export default {
       //判断用户是否关注该公司
       let followList = window.localStorage.getItem("followList");
       followList = followList.split(",");
-      for(let item in followList) {
+      for (let item in followList) {
         if (followList[item] == id) {
           this.isFollow = true;
           break;

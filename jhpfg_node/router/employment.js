@@ -27,4 +27,10 @@ router.post('/updateEmployment', handler.updateEmployment);
 //删除招聘信息
 router.post('/deleteEmployment/:id', handler.deleteEmployment);
 
+//使招聘者进入下一个招聘流程
+router.post('/nextProgress/:id', handler.nextProgress);
+
+//终止招聘流程
+router.post('/stopProgress/:id', handler.stopProgress);
+
 module.exports = router

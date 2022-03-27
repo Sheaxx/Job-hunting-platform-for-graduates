@@ -109,7 +109,7 @@ exports.getSelectAccountListByPage = (req, res) => {
 
 //根据学校名获得其认证的招聘信息
 exports.getRecommend = (req, res) => {
-  let {school} = req.body;
+  let { school } = req.body;
   let sql1 = 'select recommend from school where name="' + school + '"';
   db.query(sql1, (err, recommend) => {
     if (err) throw err;
@@ -209,5 +209,36 @@ exports.deleteEmployment = (req, res) => {
   db.query(sql, (err, results) => {
     if (err) throw err;
     res.send('success')
+  })
+}
+
+//使招聘者进入下一个招聘流程
+exports.nextProgress = (req, res) => {
+  let id = req.params.id;
+  let sql1 = 'select * from progress where id=' + id;
+  db.query(sql1, (err, progress) => {
+    if (err) throw err;
+    progress[0].current += 1;
+    progress[0].currentState = "process";
+    let sql2 = 'update progress set ? where id=' + id;
+    db.query(sql2, progress[0], (err, result) => {
+      if (err) throw err;
+      res.send(progress[0]);
+    })
+  })
+}
+
+//终止招聘流程
+exports.stopProgress = (req, res) => {
+  let id = req.params.id;
+  let sql1 = 'select * from progress where id=' + id;
+  db.query(sql1, (err, progress) => {
+    if (err) throw err;
+    progress[0].currentState = "error";
+    let sql2 = 'update progress set currentState="error" where id=' + id;
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+      res.send(progress[0]);
+    })
   })
 }
