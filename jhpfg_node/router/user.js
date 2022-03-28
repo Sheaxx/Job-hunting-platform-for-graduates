@@ -33,8 +33,8 @@ router.post('/updateTable/:table', handler.updateTable)
 //根据用户名返回学校用户信息
 router.get('/getPersonal/:username', handler.getPersonal)
 
-//根据投递者用户名列表获取他的真名和学校
-router.get('/getRealnameSchool/:sentUsers', handler.getRealnameSchool)
+//获取投递者信息列表
+router.get('/getSenderList/:sentUsers', handler.getSenderList)
 
 //更新学校用户信息
 router.post('/updatePersonal', handler.updatePersonal)

@@ -171,11 +171,31 @@ exports.updateTable = (req, res) => {
       let sql3 = 'update ' + table + ' set ? where id=' + data.id
       db.query(sql3, data, (err, result) => {
         if (err) throw err;
-        res.send('success');
       })
     }
   })
+  if (table == "education") {
+    let sql4 = 'select * from education where username="' + data.username + '"';
+    db.query(sql4, (err, result) => {
+      if (err) throw err;
+      let newest = result[0];
+      let gpa = 0;
+      for (let item in result) {
+        if (result[item].duration > newest.duration) {
+          newest = result[item];
+        }
+        gpa += result[item].gpa;
+      }
+      gpa = gpa / result.length;
+      console.log(newest)
+      let sql5 = 'update resume set gpa=' + gpa + ',school="' + newest.school + '",specialty="' + newest.specialty + '",highesteducation="' + newest.qualification +'" where username="' + username + '"';
+      db.query(sql5, (err, result) => {
+        if (err) throw err;
+      })
+    })
+  }
 }
+
 
 //根据用户名返回学校或企业用户信息
 exports.getPersonal = (req, res) => {
@@ -188,10 +208,10 @@ exports.getPersonal = (req, res) => {
   })
 }
 
-//根据投递者用户名列表获取他的真名和学校
-exports.getRealnameSchool = (req, res) => {
+//获取投递者信息列表
+exports.getSenderList = (req, res) => {
   let sentUsers = req.params.sentUsers.split(",");
-  let sql = 'select username,realname,school from resume';
+  let sql = 'select username,realname,school,specialty,highesteducation,gpa from resume';
   db.query(sql, (err, result) => {
     if (err) throw err;
     let list = [];

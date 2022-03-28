@@ -6,6 +6,45 @@
       @click="back"
       class="back"
     >返回</el-button>
+    <div class="select">
+      <el-select
+        v-model="selectCondition"
+        slot="prepend"
+        placeholder="筛选条件"
+      >
+        <el-option
+          label="专业"
+          value="1"
+        ></el-option>
+        <el-option
+          label="绩点"
+          value="2"
+        ></el-option>
+        <el-option
+          label="学历"
+          value="3"
+        ></el-option>
+      </el-select>
+      <el-input
+        placeholder="筛选内容"
+        v-model="selectContent"
+      ></el-input>
+    </div>
+    <div class="selectButton">
+      <el-button
+        icon="el-icon-refresh-left"
+        round
+        size="mini"
+        @click="refresh"
+      ></el-button>
+      <el-button
+        type="primary"
+        icon="el-icon-search"
+        round
+        size="mini"
+        @click="select"
+      ></el-button>
+    </div>
     <div class="userList">
       <ul>
         <li
@@ -120,6 +159,8 @@ export default {
       showNext: false, //下一个流程提示窗口，默认为否
       showStop: false, //终止流程提示窗口，默认为否
       showButton: true, //是否展示操作流程的按钮
+      selectCondition: "", //筛选条件
+      selectContent: "", //筛选内容
     };
   },
   methods: {
@@ -219,53 +260,114 @@ export default {
         this.showButton = false;
       }
     },
+    //筛选搜索
+    select() {
+      switch (this.selectCondition) {
+        case "1": {
+          let arr = [];
+          for (let item in this.userList) {
+            if (this.userList[item].specialty == this.selectContent) {
+              arr.push(this.userList[item]);
+            }
+          }
+          if (arr.length == 0) {
+            this.$message.warning("没有找到符合条件的应聘者");
+          } else {
+            this.userList = arr;
+          }
+          break;
+        }
+        case "2": {
+          let arr = [];
+          for (let item in this.userList) {
+            if (this.userList[item].gpa >= this.selectContent) {
+              arr.push(this.userList[item]);
+            }
+          }
+          if (arr.length == 0) {
+            this.$message.warning("没有找到符合条件的应聘者");
+          } else {
+            this.userList = arr;
+          }
+          break;
+        }
+        case "3": {
+          let arr = [];
+          for (let item in this.userList) {
+            if (this.userList[item].highesteducation == this.selectContent) {
+              arr.push(this.userList[item]);
+            }
+          }
+          if (arr.length == 0) {
+            this.$message.warning("没有找到符合条件的应聘者");
+          } else {
+            this.userList = arr;
+          }
+          break;
+        }
+        default: {
+          this.$message.warning("请先选择筛选条件");
+        }
+      }
+    },
+    //重置筛选条件
+    refresh() {
+      this.init();
+      this.selectCondition = "";
+      this.selectContent = "";
+    },
+    //初始化
+    init() {
+      let that = this;
+      this.$ajax
+        .get("/user/getSenderList/" + this.employment.sentUsers)
+        .then((res) => {
+          that.userList = res.data;
+          that.$ajax
+            .get("/user/getResume/" + that.userList[0].username)
+            .then((res) => {
+              that.resumeInfo = res.data.resume;
+              that.educationInfo = res.data.education;
+              that.internshipInfo = res.data.internship;
+              that.projectInfo = res.data.project;
+              that.campusExperienceInfo = res.data.campusExperience;
+              that.skillInfo = res.data.skill;
+              that.certificateInfo = res.data.certificate;
+              for (let item in that.educationInfo) {
+                that.educationInfo[item].duration =
+                  that.educationInfo[item].duration.split(",");
+              }
+              for (let item in that.internshipInfo) {
+                that.internshipInfo[item].duration =
+                  that.internshipInfo[item].duration.split(",");
+              }
+              for (let item in that.projectInfo) {
+                that.projectInfo[item].duration =
+                  that.projectInfo[item].duration.split(",");
+              }
+              for (let item in that.campusExperienceInfo) {
+                that.campusExperienceInfo[item].duration =
+                  that.campusExperienceInfo[item].duration.split(",");
+              }
+            });
+          that.$ajax
+            .get(
+              "/user/getSent/" +
+                that.employment.id +
+                "/" +
+                that.userList[0].username
+            )
+            .then((res) => {
+              that.progress = res.data;
+              that.isShowButton();
+              that.progress.progressList =
+                that.progress.progressList.split(",");
+            });
+        });
+    },
   },
   mounted() {
-    let that = this;
-    this.$ajax
-      .get("/user/getRealnameSchool/" + this.employment.sentUsers)
-      .then((res) => {
-        that.userList = res.data;
-        that.$ajax
-          .get("/user/getResume/" + that.userList[0].username)
-          .then((res) => {
-            that.resumeInfo = res.data.resume;
-            that.educationInfo = res.data.education;
-            that.internshipInfo = res.data.internship;
-            that.projectInfo = res.data.project;
-            that.campusExperienceInfo = res.data.campusExperience;
-            that.skillInfo = res.data.skill;
-            that.certificateInfo = res.data.certificate;
-            for (let item in that.educationInfo) {
-              that.educationInfo[item].duration =
-                that.educationInfo[item].duration.split(",");
-            }
-            for (let item in that.internshipInfo) {
-              that.internshipInfo[item].duration =
-                that.internshipInfo[item].duration.split(",");
-            }
-            for (let item in that.projectInfo) {
-              that.projectInfo[item].duration =
-                that.projectInfo[item].duration.split(",");
-            }
-            for (let item in that.campusExperienceInfo) {
-              that.campusExperienceInfo[item].duration =
-                that.campusExperienceInfo[item].duration.split(",");
-            }
-          });
-        that.$ajax
-          .get(
-            "/user/getSent/" +
-              that.employment.id +
-              "/" +
-              that.userList[0].username
-          )
-          .then((res) => {
-            that.progress = res.data;
-            that.isShowButton();
-            that.progress.progressList = that.progress.progressList.split(",");
-          });
-      });
+    this.init();
   },
 };
 </script>
@@ -288,10 +390,34 @@ export default {
 #sentResume h4 {
   font-size: 1.2rem;
 }
+/* 筛选条件 */
+#sentResume .select {
+  width: 20%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  position: relative;
+  top: 2vh;
+}
+#sentResume .el-select {
+  width: 40%;
+}
+#sentResume .el-input {
+  width: 45%;
+}
+#sentResume .selectButton {
+  position: relative;
+  top: 3vh;
+  width: 19%;
+  display: flex;
+  justify-content: right;
+  padding-right: 1%;
+}
+/* 左侧列表 */
 #sentResume .userList ul {
   margin-top: 2vh;
   width: 20%;
-  height: 74vh;
+  height: 66vh;
   border-right: 1px solid rgba(0, 0, 0, 0.2);
   overflow-y: auto;
 }
