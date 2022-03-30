@@ -27,4 +27,7 @@ router.post('/cancelRecommend/:school/:employment', handler.cancelRecommend)
 //更新学校信息
 router.post('/updateSchool', handler.updateSchool)
 
+//获取学校的老师
+router.post('/getTeachers', handler.getTeachers)
+
 module.exports = router

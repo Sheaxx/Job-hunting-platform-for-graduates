@@ -47,7 +47,22 @@
         >发布评论</el-button>
       </div>
     </div>
-    <div class="rightBar"></div>
+    <div class="rightBar">
+      <img
+        :src="userInfo.avatar"
+        alt="用户头像"
+        class="avatar"
+      />
+      <p class="username">{{ userInfo.username }}</p>
+      <h6 class="role">{{showRole(userInfo.role)}}</h6>
+      <ul class="postList">
+        <li
+          v-for="item in postList"
+          :key="item.id"
+          @click="otherPost(item.id)"
+        ><i class="el-icon-s-comment"></i>{{item.title}}</li>
+      </ul>
+    </div>
     <div
       class="deleteBox"
       v-if="isOpenDelete"
@@ -83,6 +98,8 @@ export default {
     details: Object,
     commentList: Array,
     showDelete: Boolean, //是否展示删除选项
+    userInfo: Object,
+    postList: Array,
   },
   methods: {
     //根据zone显示文字
@@ -98,6 +115,17 @@ export default {
           return "工作分享";
         case 5:
           return "企业招聘";
+      }
+    },
+    //身份显示
+    showRole(role) {
+      switch (role) {
+        case 0:
+          return "学生";
+        case 1:
+          return "企业";
+        case 2:
+          return "学校";
       }
     },
     //返回列表
@@ -144,6 +172,27 @@ export default {
           that.$message.success("评论成功");
           that.commentValue = "";
         });
+    },
+    //点击其他帖子
+    otherPost(id) {
+      let that = this;
+      this.$ajax.get("/forum/getPostById/" + id).then((res) => {
+        that.details = res.data.post;
+        that.commentList = res.data.commentList;
+        if (that.details.author == window.localStorage.getItem("username")) {
+          that.showDelete = true;
+        } else {
+          that.showDelete = false;
+        }
+        that.$ajax.get("/user/getUser/" + that.details.author).then((res) => {
+          that.userInfo = res.data;
+          that.$ajax
+            .get("/forum/getPostByUsername/" + that.userInfo.username)
+            .then((res) => {
+              that.postList = res.data;
+            });
+        });
+      });
     },
   },
 };
@@ -201,14 +250,6 @@ export default {
   margin-bottom: 9vh;
   line-height: 1.6rem;
 }
-#forumDetails .rightBar {
-  position: absolute;
-  width: 25%;
-  height: 70vh;
-  top: 9vh;
-  left: 62vw;
-  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
-}
 #forumDetails .el-divider,
 #forumDetails .el-timeline {
   width: 98%;
@@ -225,6 +266,55 @@ export default {
 }
 #forumDetails .addComment {
   margin-top: -100px;
+}
+/* 用户信息 */
+#forumDetails .rightBar {
+  position: absolute;
+  width: 25%;
+  height: 65vh;
+  top: 9vh;
+  left: 62vw;
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+}
+#forumDetails .avatar,
+#forumDetails .username,
+#forumDetails .role,
+#forumDetails .postList {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+}
+#forumDetails .avatar {
+  width: 140px;
+  height: 140px;
+  top: 18vh;
+}
+#forumDetails .username {
+  top: 31vh;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+#forumDetails .role {
+  top: 34vh;
+  color: #75777a;
+  font-size: 0.85rem;
+}
+#forumDetails .postList {
+  top: 50vh;
+  height: 20vh;
+  width: 70%;
+}
+#forumDetails .postList i {
+  margin-right: 10px;
+  color: #99bddf;
+}
+#forumDetails .postList li {
+  margin-bottom: 8px;
+  text-decoration: underline;
+}
+#forumDetails .postList li:hover {
+  color: #99bddf;
+  cursor: pointer;
 }
 /* 删除帖子提示窗口 */
 #forumDetails .deleteBox {

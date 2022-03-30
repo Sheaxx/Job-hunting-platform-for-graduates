@@ -356,26 +356,12 @@
         <h6>{{schoolDetails.address}}</h6>
         <div class="concat">
           <ul>
-            <li>
+            <li v-for="item in teacherList" :key="item.username">
               <img
-                src="../assets/image/avatar.png"
+                :src="item.avatar"
                 alt="联系人头像"
               />
-              <p class="name">李老师</p>
-              <p class="tel">13700000000</p>
-              <el-button
-                type="primary"
-                icon="el-icon-chat-line-round"
-                circle
-              ></el-button>
-            </li>
-            <li>
-              <img
-                src="../assets/image/avatar.png"
-                alt="联系人头像"
-              />
-              <p class="name">李老师</p>
-              <p class="tel">13700000000</p>
+              <p class="name">{{item.username}}</p>
               <el-button
                 type="primary"
                 icon="el-icon-chat-line-round"
@@ -534,6 +520,7 @@ export default {
       employmentDetails: {}, //某个招聘信息的详情
       companyDetails: {}, //招聘信息详情页面的公司信息
       schoolDetails: {}, //学校详情
+      teacherList:[], //老师列表
     };
   },
   watch: {
@@ -652,6 +639,11 @@ export default {
       let that = this;
       this.$ajax.get("/school/getSchoolById/" + id).then((res) => {
         that.schoolDetails = res.data;
+        that.$ajax.post("/school/getTeachers",qs.stringify({school: that.schoolDetails.name}), {
+          "content-type": "application/x-www-form-urlencoded",
+        }).then(res => {
+          that.teacherList = res.data;
+        })
       });
     },
     //学校详情返回列表
@@ -1219,27 +1211,23 @@ export default {
 }
 /* 学校详情-联系人列表 */
 #schoolDetails .concat ul {
-  width: 30%;
+  width: 28%;
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.1);
   float: left;
+  padding: 1%;
 }
 #schoolDetails .concat li {
   position: relative;
   padding: 15px;
-  font-size: 0.9rem;
 }
 #schoolDetails .concat img {
   width: 48px;
   height: 48px;
 }
-#schoolDetails .concat .name,
-#schoolDetails .concat .tel {
+#schoolDetails .concat .name {
   position: absolute;
-  top: 25px;
+  top: 30px;
   left: 80px;
-}
-#schoolDetails .concat .tel {
-  top: 45px;
 }
 #schoolDetails .concat .el-button {
   margin-top: 5px;

@@ -543,7 +543,6 @@ export default {
   font-size: 0.85rem;
   display: flex;
   justify-content: center;
-
   color: #75777a;
 }
 #employmentDetails .msg span:not(.level) {

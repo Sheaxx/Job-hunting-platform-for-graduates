@@ -80,6 +80,8 @@
         :details="details"
         :commentList="commentList"
         :showDelete="showDelete"
+        :userInfo="userInfo"
+        :postList="postList"
         @toList="toList"
         @refresh="toDetails"
       ></forum-details>
@@ -207,6 +209,8 @@ export default {
         zone: "",
       },
       commentList: [], //评论列表
+      userInfo:{}, //发布者个人信息
+      postList:[], //该发布者发布的其他帖子
     };
   },
   methods: {
@@ -227,6 +231,14 @@ export default {
         } else {
           that.showDelete = false;
         }
+        that.$ajax.get("/user/getUser/" + that.details.author).then((res) => {
+          that.userInfo = res.data;
+          that.$ajax
+            .get("/forum/getPostByUsername/" + that.userInfo.username)
+            .then((res) => {
+              that.postList = res.data;
+            });
+        });
       });
     },
     //帖子详情页返回列表

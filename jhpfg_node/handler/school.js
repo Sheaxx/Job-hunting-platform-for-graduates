@@ -162,3 +162,27 @@ exports.updateSchool = (req, res) => {
     })
   }
 }
+
+//获取学校的老师
+exports.getTeachers = (req, res) => {
+  let name = req.body.school;
+  let sql1 = 'select * from resume where school="' + name + '"';
+  db.query(sql1, (err, users) => {
+    if (err) throw err;
+    let arr = [];
+    for (let item in users) {
+      arr.push('"' + users[item].username + '"');
+    }
+    let sql2 = 'select * from user where username in (' + arr.join(",") + ')';
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+      let list = [];
+      for (let item in result) {
+        if (result[item].role == 2) {
+          list.push(result[item]);
+        }
+      }
+      res.send(list);
+    })
+  })
+}
