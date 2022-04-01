@@ -356,7 +356,10 @@
         <h6>{{schoolDetails.address}}</h6>
         <div class="concat">
           <ul>
-            <li v-for="item in teacherList" :key="item.username">
+            <li
+              v-for="item in teacherList"
+              :key="item.username"
+            >
               <img
                 :src="item.avatar"
                 alt="联系人头像"
@@ -366,6 +369,7 @@
                 type="primary"
                 icon="el-icon-chat-line-round"
                 circle
+                @click="schoolToChat(item.username)"
               ></el-button>
             </li>
           </ul>
@@ -520,7 +524,7 @@ export default {
       employmentDetails: {}, //某个招聘信息的详情
       companyDetails: {}, //招聘信息详情页面的公司信息
       schoolDetails: {}, //学校详情
-      teacherList:[], //老师列表
+      teacherList: [], //老师列表
     };
   },
   watch: {
@@ -639,11 +643,17 @@ export default {
       let that = this;
       this.$ajax.get("/school/getSchoolById/" + id).then((res) => {
         that.schoolDetails = res.data;
-        that.$ajax.post("/school/getTeachers",qs.stringify({school: that.schoolDetails.name}), {
-          "content-type": "application/x-www-form-urlencoded",
-        }).then(res => {
-          that.teacherList = res.data;
-        })
+        that.$ajax
+          .post(
+            "/school/getTeachers",
+            qs.stringify({ school: that.schoolDetails.name }),
+            {
+              "content-type": "application/x-www-form-urlencoded",
+            }
+          )
+          .then((res) => {
+            that.teacherList = res.data;
+          });
       });
     },
     //学校详情返回列表
@@ -917,6 +927,11 @@ export default {
           that.isFollow = false;
           that.$message.success("取消关注");
         });
+    },
+    //学校列表点击聊天
+    schoolToChat(username) {
+      window.sessionStorage.setItem("toChat", username);
+      this.$router.replace("/messages");
     },
   },
   mounted() {

@@ -56,6 +56,7 @@
 </template>
 
 <script>
+import qs from "qs";
 import getNowTime from "../utils/date";
 
 export default {
@@ -64,8 +65,8 @@ export default {
       list: [], //用户列表显示最新消息内容
       currentUser: "", //当前打开的聊天框对方用户名
       currentMessages: [], //当前聊天记录
-      total: [], //与我有关的所有聊天记录
       value: "", //输入框的内容
+      initUser: 0, //最开始选中的用户
     };
   },
   methods: {
@@ -74,27 +75,28 @@ export default {
       this.currentUser = username;
       this.currentMessages = [];
       //切换左侧用户列表样式
-      let lis = document.getElementsByClassName("chatItem");
       let currentActive = document.getElementsByClassName("active")[0];
-      lis[index].classList.add("active");
       currentActive.classList.remove("active");
-      //从total中挑聊天记录
       let that = this;
       this.$ajax
         .get("/message/getRecords/" + window.localStorage.getItem("username"))
         .then((res) => {
           for (let item in res.data) {
             if (
-              res.data[item].sender == that.list[0].username ||
-              res.data[item].receiver == that.list[0].username
+              res.data[item].sender == that.list[index].username ||
+              res.data[item].receiver == that.list[index].username
             ) {
-              that.currentMessages.push(res.data[item]);
+              that.currentMessages.splice(
+                that.currentMessages.length,
+                1,
+                res.data[item]
+              );
             }
           }
           new Promise((resolve, reject) => {
-            let li = document.getElementsByClassName("chatItem")[0];
+            let li = document.getElementsByClassName("chatItem")[index];
             li.classList.add("active");
-            that.currentUser = that.list[0].username;
+            that.currentUser = that.list[index].username;
             resolve();
           }).then((res) => {
             //区分自己发送和接收的消息
@@ -143,37 +145,49 @@ export default {
       });
     },
   },
-  beforeMount() {
-    //从total中挑聊天记录
-    for (let i = 0; i < this.total.length; i++) {
-      if (
-        this.total[i].sender == this.list[0].username ||
-        this.total[i].receiver == this.list[0].username
-      ) {
-        let obj = Object.assign({}, this.total[i]);
-        this.currentMessages.push(obj);
-      }
-    }
-  },
   created() {
     let that = this;
     let users = window.localStorage.getItem("chatList");
-    users = users.split(",");
-    for (let item in users) {
-      that.$ajax.get("/message/getAvatar/" + users[item]).then((res) => {
-        that.list.push({ username: users[item], avatar: res.data });
+    this.$ajax
+      .post("/message/getAvatar", qs.stringify({ chatList: users }), {
+        "content-type": "application/x-www-form-urlencoded",
+      })
+      .then((res) => {
+        that.list = res.data;
+        //外来聊天
+        let users = window.localStorage.getItem("chatList");
+        users = users.split(",");
+        let toChat = window.sessionStorage.getItem("toChat");
+        if (toChat) {
+          if (users.indexOf(toChat) == -1) {
+            //列表里不存在这位聊天对象
+            this.$ajax.get("/message/getOneAvatar/" + toChat).then((res) => {
+              that.list.splice(0, 0, { username: toChat, avatar: res.data });
+            });
+          } else {
+            //存在这个人
+            for (let i = 0; i < this.list.length; i++) {
+              if (this.list[i].username == toChat) {
+                this.initUser = i;
+                break;
+              }
+            }
+          }
+          window.sessionStorage.removeItem("toChat");
+        }
       });
-    }
   },
   mounted() {
     let that = this;
+
+    //获取聊天记录
     this.$ajax
       .get("/message/getRecords/" + window.localStorage.getItem("username"))
       .then((res) => {
         for (let item in res.data) {
           if (
-            res.data[item].sender == that.list[0].username ||
-            res.data[item].receiver == that.list[0].username
+            res.data[item].sender == that.list[that.initUser].username ||
+            res.data[item].receiver == that.list[that.initUser].username
           ) {
             that.currentMessages.splice(
               that.currentMessages.length,
@@ -183,9 +197,9 @@ export default {
           }
         }
         new Promise((resolve, reject) => {
-          let li = document.getElementsByClassName("chatItem")[0];
+          let li = document.getElementsByClassName("chatItem")[that.initUser];
           li.classList.add("active");
-          that.currentUser = that.list[0].username;
+          that.currentUser = that.list[that.initUser].username;
           resolve();
         }).then((res) => {
           //区分自己发送和接收的消息

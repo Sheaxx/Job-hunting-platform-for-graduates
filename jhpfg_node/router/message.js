@@ -7,6 +7,9 @@ const handler = require('../handler/message');
 router.get('/getRecords/:username', handler.getRecords)
 
 //根据用户名获取头像
-router.get('/getAvatar/:username', handler.getAvatar)
+router.post('/getAvatar', handler.getAvatar)
+
+//获取一个头像
+router.get('/getOneAvatar/:username', handler.getOneAvatar)
 
 module.exports = router
