@@ -722,6 +722,11 @@ export default {
       .then((res) => {
         that.postList = res.data;
       });
+    let editCompany = window.sessionStorage.getItem("editCompany");
+    if (editCompany) {
+      this.tabValue = "2";
+      window.sessionStorage.removeItem("editCompany");
+    }
   },
 };
 </script>

@@ -294,6 +294,10 @@
           @click="cancelFollow"
           v-else
         >已关注</el-button>
+        <el-link
+          icon="el-icon-edit"
+          @click="toEditCompany"
+        >修改</el-link>
         <div class="listBar">
           <ul class="list">
             <li
@@ -347,6 +351,10 @@
           round
           @click="schoolToList"
         >返回</el-button>
+        <el-link
+          icon="el-icon-edit"
+          @click="toEditSchool"
+        >修改</el-link>
         <img
           :src="schoolDetails.logo"
           alt="学校logo"
@@ -933,6 +941,16 @@ export default {
       window.sessionStorage.setItem("toChat", username);
       this.$router.replace("/messages");
     },
+    //公司详情页面点击修改
+    toEditCompany() {
+      window.sessionStorage.setItem("editCompany", true);
+      this.$router.replace("/userCompany");
+    },
+    //学校详情页面点击修改
+    toEditSchool() {
+      window.sessionStorage.setItem("editSchool", true);
+      this.$router.replace("/userSchool");
+    },
   },
   mounted() {
     let that = this;
@@ -1108,11 +1126,17 @@ export default {
 #companyDetails .listBar {
   width: 70%;
 }
-/* 公司详情，学校详情的返回按钮 */
+/* 公司详情，学校详情的返回按钮和修改 */
 #companyDetails .el-button,
 #schoolDetails .el-button {
   float: right;
   margin-right: 3%;
+}
+#companyDetails .el-link,
+#schoolDetails .el-link {
+  float: right;
+  margin-right: 3%;
+  margin-top: 15px;
 }
 #companyDetails .list {
   clear: both;

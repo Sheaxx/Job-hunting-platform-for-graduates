@@ -179,7 +179,6 @@ export default {
   },
   mounted() {
     let that = this;
-
     //获取聊天记录
     this.$ajax
       .get("/message/getRecords/" + window.localStorage.getItem("username"))

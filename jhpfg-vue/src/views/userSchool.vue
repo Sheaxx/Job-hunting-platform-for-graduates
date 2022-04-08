@@ -208,7 +208,7 @@
           name="3"
           class="employmentList"
         >
-          <ul v-if="!isEmploymentDetails" >
+          <ul v-if="!isEmploymentDetails">
             <li
               v-for="item in employmentList"
               :key="item.id"
@@ -584,6 +584,11 @@ export default {
       .then((res) => {
         that.postList = res.data;
       });
+    let editSchool = window.sessionStorage.getItem("editSchool");
+    if (editSchool) {
+      this.tabValue = "2";
+      window.sessionStorage.removeItem("editSchool");
+    }
   },
 };
 </script>
