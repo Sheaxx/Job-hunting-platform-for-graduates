@@ -176,9 +176,14 @@ export default {
       obj.location = this.locationValue.join(",");
       obj.total = obj.progressList.length;
       obj.progressList = obj.progressList.join(",");
-      console.log(obj)
       for (let item in obj) {
-        if (obj[item] == "" || obj[item].length == 0) {
+        if (obj[item] == "" || obj[item] == null ||obj[item].length == 0 ) {
+          if (item == "id" || item == "sentUsers") {
+            continue;
+          }
+          if (item == "isFullTime" && (obj[item] == 0 || obj[item] == 1)) {
+            continue;
+          }
           this.$message.warning("请填写完毕内容");
           return;
         }

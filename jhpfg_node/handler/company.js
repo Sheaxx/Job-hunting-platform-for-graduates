@@ -179,3 +179,16 @@ exports.cancelFollow = (req, res) => {
     })
   })
 }
+
+//根据名称更新用户简历
+exports.updateResumeByName = (req, res) => {
+  let { name, username } = req.body;
+  let sql1 = 'select * from company where name="' + name + '"';
+  db.query(sql1, (err, results) => {
+    if (err) throw err;
+    let sql2 = 'update resume set company=' + results[0].id + ' where username="' + username + '"';
+    db.query(sql2, (err, result) => {
+      if (err) throw err;
+    })
+  })
+}

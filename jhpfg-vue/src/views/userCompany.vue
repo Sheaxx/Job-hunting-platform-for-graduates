@@ -122,16 +122,23 @@
                 >取消更新</el-button>
                 <el-form label-width="100px">
                   <el-form-item label="姓名">
-                    <el-input v-model="editPersonal.realname" />
+                    <el-input
+                      v-model="editPersonal.realname"
+                      placeholder="请填写真实姓名"
+                    />
                   </el-form-item>
                   <el-form-item label="公司">
                     <el-input
-                      disabled
-                      v-model="companyDetails.name"
+                      :disabled="!isEditPersonCompany"
+                      v-model="personCompany"
+                      placeholder="请注意：仅能填写一次。请填写公司全称"
                     />
                   </el-form-item>
                   <el-form-item label="职位">
-                    <el-input v-model="editPersonal.position" />
+                    <el-input
+                      v-model="editPersonal.position"
+                      placeholder="请填写担任职位"
+                    />
                   </el-form-item>
                 </el-form>
               </div>
@@ -176,9 +183,9 @@
               </div>
             </div>
             <el-empty
-                description="暂未填写公司信息"
-                v-if="personalInfo.company == '' && !isUpdateCompany"
-              ></el-empty>
+              description="暂未填写公司信息"
+              v-if="personalInfo.company == '' && !isUpdateCompany"
+            ></el-empty>
           </div>
           <div
             id="companyUpdateBox"
@@ -366,6 +373,8 @@ export default {
       locationValue: [], //地区选择
       userInfo: {}, //用户信息
       personalInfo: {}, //个人信息
+      personCompany: "", //个人所属公司
+      isEditPersonCompany: true, //是否可以编辑个人所属公司
       editPersonal: {
         realname: "",
         company: "",
@@ -396,8 +405,8 @@ export default {
         requirements: "",
         author: "",
         sentUsers: "",
-        total:0,
-        progressList:""
+        total: 0,
+        progressList: "",
       }, //招聘信息编辑
       employmentList: [], //公司发布的招聘信息列表
       postList: [], //发布的帖子列表
@@ -502,12 +511,17 @@ export default {
           avatar: that.avatarUrl,
         };
         that.$ajax
-          .post("/user/updateAvatar/" + "aaa", qs.stringify(obj), {
-            "content-type": "application/x-www-form-urlencoded",
-          })
+          .post(
+            "/user/updateAvatar/" + window.localStorage.getItem("username"),
+            qs.stringify(obj),
+            {
+              "content-type": "application/x-www-form-urlencoded",
+            }
+          )
           .then((res) => {
             that.userInfo.avatar = that.avatarUrl;
-            that.$message.success("更换头像成功");
+            window.localStorage.setItem("avatar", that.avatarUrl);
+            that.$router.go(0);
           });
       };
     },
@@ -563,11 +577,13 @@ export default {
     },
     //确认更新个人信息
     updatePersonal() {
-      for (let item in this.editPersonal) {
-        if (this.editPersonal[item] == "") {
-          this.$message.warning("请填写完毕信息");
-          return;
-        }
+      if (
+        this.personCompany == "" ||
+        this.editPersonal.realname == "" ||
+        this.editPersonal.position == ""
+      ) {
+        this.$message.warning("2请填写完毕信息");
+        return;
       }
       let that = this;
       let obj = Object.assign({}, this.editPersonal);
@@ -576,6 +592,23 @@ export default {
           "content-type": "application/x-www-form-urlencoded",
         })
         .then((res) => {
+          if (!that.personalInfo.company) {
+            that.$ajax
+              .post(
+                "/company/updateResumeByName",
+                qs.stringify({
+                  name: that.personCompany,
+                  username: window.localStorage.getItem("username"),
+                }),
+                {
+                  "content-type": "application/x-www-form-urlencoded",
+                }
+              )
+              .then((res) => {
+                that.isEditPersonCompany = false;
+              });
+          }
+          that.$router.go(0);
           that.personalInfo = obj;
           that.isUpdatePersonal = false;
           that.$message.success("更新成功");
@@ -645,7 +678,7 @@ export default {
           that.employmentDetails.location.split(",");
         that.isEmploymentDetails = true;
       });
-      this.tabValue = 3;
+      this.tabValue = "3";
     },
     //招聘信息详情返回列表
     toEmploymentList() {
@@ -660,6 +693,7 @@ export default {
       this.editEmployment.zone = [];
       this.editEmployment.location = [];
       this.editEmployment.author = window.localStorage.getItem("username");
+      this.editEmployment.companyId = this.companyDetails.id;
     },
     //确定更新招聘信息
     updateEmployment() {
@@ -686,28 +720,32 @@ export default {
       this.isPostDetails = false;
     },
   },
-  mounted() {
+  created() {
     let that = this;
     this.$ajax
       .get("/user/getPersonal/" + window.localStorage.getItem("username"))
       .then((res) => {
         that.personalInfo = res.data;
-        that.$ajax
-          .get("/company/getCompanyById/" + res.data.company)
-          .then((res) => {
-            that.companyDetails = res.data;
-            that.companyDetails.location = that.locationValue =
-              that.companyDetails.location.split(",");
-          });
-        that.$ajax
-          .get("/company/getAllEmployment/" + res.data.company)
-          .then((res) => {
-            that.employmentList = res.data;
-            for (let item in that.employmentList) {
-              that.employmentList[item].location =
-                that.employmentList[item].location.split(",");
-            }
-          });
+        if (res.data.company) {
+          that.$ajax
+            .get("/company/getCompanyById/" + res.data.company)
+            .then((res) => {
+              that.isEditPersonCompany = false;
+              that.personCompany = res.data.name;
+              that.companyDetails = res.data;
+              that.companyDetails.location = that.locationValue =
+                that.companyDetails.location.split(",");
+            });
+          that.$ajax
+            .get("/company/getAllEmployment/" + res.data.company)
+            .then((res) => {
+              that.employmentList = res.data;
+              for (let item in that.employmentList) {
+                that.employmentList[item].location =
+                  that.employmentList[item].location.split(",");
+              }
+            });
+        }
       });
     this.$ajax
       .get("/user/getUser/" + window.localStorage.getItem("username"))
@@ -920,15 +958,13 @@ export default {
   top: 10px;
   padding-top: 10px;
   height: 420px;
-  overflow: auto;
-  display: flex;
-  justify-content: center;
+  overflow-y: auto;
 }
 #userCompany .companyRecruitment li {
-  width: 94%;
+  width: 92%;
   height: 10%;
   padding: 1.8%;
-  margin-bottom: 2%;
+  margin: 1% auto;
   border: #8e909421 1px solid;
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.05);
 }

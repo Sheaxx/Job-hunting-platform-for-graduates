@@ -14,7 +14,7 @@
         <p>{{ resumeInfo.realname }}</p>
         <ul class="row1">
           <li>
-            {{ resumeInfo.sex }}
+            {{ resumeInfo.sex == 0? '男' : '女' }}
           </li>
           <li>
             <img
@@ -900,8 +900,9 @@ export default {
   font-weight: 700;
   color: #707070;
 }
-#userInfo .content {
+#resumeReadBox .row3 .content {
   line-height: 1.5rem;
+  white-space: pre-line;
 }
 /* 技能，证书 */
 #skillCertificateBox {

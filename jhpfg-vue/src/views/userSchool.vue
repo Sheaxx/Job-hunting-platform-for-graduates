@@ -204,7 +204,7 @@
           </div>
         </el-tab-pane>
         <el-tab-pane
-          label="认证招聘信息"
+          label="推荐招聘信息"
           name="3"
           class="employmentList"
         >
@@ -344,12 +344,17 @@ export default {
           avatar: that.avatarUrl,
         };
         that.$ajax
-          .post("/user/updateAvatar/" + "aaa", qs.stringify(obj), {
-            "content-type": "application/x-www-form-urlencoded",
-          })
+          .post(
+            "/user/updateAvatar/" + window.localStorage.getItem("username"),
+            qs.stringify(obj),
+            {
+              "content-type": "application/x-www-form-urlencoded",
+            }
+          )
           .then((res) => {
             that.userInfo.avatar = that.avatarUrl;
-            that.$message.success("更换头像成功");
+            window.localStorage.setItem("avatar", that.avatarUrl);
+            that.$router.go(0);
           });
       };
     },
@@ -556,20 +561,23 @@ export default {
       .get("/user/getPersonal/" + window.localStorage.getItem("username"))
       .then((res) => {
         that.personalInfo = res.data;
-        that.$ajax
-          .get("/school/getSchoolByName/" + res.data.school)
-          .then((res) => {
-            that.schoolDetails = res.data;
-            that.$ajax
-              .get("/school/getRecommendList/" + that.schoolDetails.id)
-              .then((res) => {
+        let school = res.data.school;
+        that.$ajax.get("/school/getSchoolByName/" + school).then((res) => {
+          that.schoolDetails = res.data;
+          that.$ajax
+            .post("/school/getRecommendList", qs.stringify({ name: school }), {
+              "content-type": "application/x-www-form-urlencoded",
+            })
+            .then((res) => {
+              if (res.data != "null") {
                 that.employmentList = res.data;
                 for (let item in that.employmentList) {
                   that.employmentList[item].location =
                     that.employmentList[item].location.split(",");
                 }
-              });
-          });
+              }
+            });
+        });
       });
     this.$ajax
       .get("/user/getUser/" + window.localStorage.getItem("username"))
@@ -689,6 +697,9 @@ export default {
   width: 85%;
   height: 500px;
 }
+#userSchool #schoolReadBox {
+  overflow: auto;
+}
 #userSchool #schoolReadBox .el-button:first-of-type {
   float: right;
   margin-right: 3vw;
@@ -732,6 +743,7 @@ export default {
 #userSchool #schoolReadBox .introduction p {
   line-height: 1.5rem;
   letter-spacing: 1px;
+  white-space: pre-wrap;
 }
 /* 更新 */
 #userSchool #schoolUpdateBox .el-button {

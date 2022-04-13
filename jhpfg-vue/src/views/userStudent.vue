@@ -284,7 +284,8 @@ export default {
           )
           .then((res) => {
             that.userInfo.avatar = that.avatarUrl;
-            that.$message.success("更换头像成功");
+            window.localStorage.setItem("avatar", that.avatarUrl);
+            that.$router.go(0);
           });
       };
     },

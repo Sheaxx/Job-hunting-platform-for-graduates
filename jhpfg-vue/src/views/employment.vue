@@ -11,12 +11,13 @@
       >招聘信息</h4>
       <el-switch
         v-model="certification"
-        active-text="只看学校认证"
+        active-text="只看学校推荐"
         inactive-text="展示所有岗位"
         :active-value="1"
         :inactive-value="0"
         active-color="#72b3f0"
-        v-show="!isEmploymentDetails && !isCompanyDetails && !isSchoolDetails "
+        v-show="!isEmploymentDetails && !isCompanyDetails && !isSchoolDetails && (searchSelect == '1' || searchSelect == '')"
+        v-if="showSwitch"
         @change="switchRecommend"
       >
       </el-switch>
@@ -296,6 +297,7 @@
         >已关注</el-button>
         <el-link
           icon="el-icon-edit"
+          v-if="showEditCompany"
           @click="toEditCompany"
         >修改</el-link>
         <div class="listBar">
@@ -307,7 +309,12 @@
             >
               <p class="authorMsg">
                 <span>{{item.author}}</span>
-                <span>她的职位</span>
+                <span>
+                  <i
+                    class="el-icon-s-comment chat"
+                    @click="toChat(item.author)"
+                  ></i>
+                </span>
               </p>
               <p class="station">{{ item.station }}</p>
               <p class="msg">
@@ -340,6 +347,7 @@
             <span class="trade">{{ companyDetails.trade }}</span>
             <span class="level">{{ companyDetails.level }}</span>
           </div>
+          <p class="address"><i class="el-icon-location"></i>{{ companyDetails.address }}</p>
           <p class="introduction">{{ companyDetails.introduction }}</p>
         </div>
       </div>
@@ -353,6 +361,7 @@
         >返回</el-button>
         <el-link
           icon="el-icon-edit"
+          v-if="showEditSchool"
           @click="toEditSchool"
         >修改</el-link>
         <img
@@ -361,7 +370,8 @@
           class="logo"
         >
         <h3>{{schoolDetails.name}}</h3>
-        <h6>{{schoolDetails.address}}</h6>
+        <h6><i class="el-icon-location"></i>{{schoolDetails.address}}</h6>
+        <h4>教师列表</h4>
         <div class="concat">
           <ul>
             <li
@@ -373,11 +383,12 @@
                 alt="联系人头像"
               />
               <p class="name">{{item.username}}</p>
+              <p class="position">{{item.position}}</p>
               <el-button
                 type="primary"
                 icon="el-icon-chat-line-round"
                 circle
-                @click="schoolToChat(item.username)"
+                @click="toChat(item.username)"
               ></el-button>
             </li>
           </ul>
@@ -514,6 +525,9 @@ export default {
       isSearchList: false, //是否是搜索结果列表，默认为否
       isFollow: false, //是否关注了这个公司
       showDeleteUpdate: false, //详情是否展示删除修改按钮
+      showSwitch: true, //是否展示学校推荐列表按钮
+      showEditCompany: false, //是否展示修改公司
+      showEditSchool: false, //是否展示修改学校
       currentPage: 1, // 当前页
       total: 0, // 数据总条数
       searchValue: "", //搜索内容
@@ -622,6 +636,11 @@ export default {
       this.$ajax.get("/company/getCompanyById/" + id).then((res) => {
         that.companyDetails = res.data;
         that.companyDetails.location = that.companyDetails.location.split(",");
+        that.$ajax.get("/user//getResume/" + window.localStorage.getItem("username")).then(res => {
+          if (res.data.company == id && window.localStorage.getItem("role") == "1") {
+            that.showEditCompany = true;
+          }
+        })
       });
       this.$ajax.get("/company/getAllEmployment/" + id).then((res) => {
         that.company_employmentList = res.data;
@@ -647,7 +666,6 @@ export default {
     },
     //查看学校详情
     toSchoolDetails(id) {
-      this.isSchoolDetails = true;
       let that = this;
       this.$ajax.get("/school/getSchoolById/" + id).then((res) => {
         that.schoolDetails = res.data;
@@ -660,7 +678,16 @@ export default {
             }
           )
           .then((res) => {
+            if (
+              window.localStorage.getItem("school") ==
+                that.schoolDetails.name &&
+              window.localStorage.getItem("role") == "2"
+            ) {
+              that.showEditSchool = true;
+            }
             that.teacherList = res.data;
+            console.log(that.teacherList)
+            that.isSchoolDetails = true;
           });
       });
     },
@@ -936,8 +963,8 @@ export default {
           that.$message.success("取消关注");
         });
     },
-    //学校列表点击聊天
-    schoolToChat(username) {
+    //点击聊天跳转
+    toChat(username) {
       window.sessionStorage.setItem("toChat", username);
       this.$router.replace("/messages");
     },
@@ -954,6 +981,10 @@ export default {
   },
   mounted() {
     let that = this;
+    let role = window.localStorage.getItem("role");
+    if (role == "1") {
+      this.showSwitch = false;
+    }
     //获取分页招聘信息
     this.$ajax.get("/employment/getAccountListByPage/1").then((res) => {
       that.employmentList = res.data.results;
@@ -1180,6 +1211,9 @@ export default {
   display: inline-block;
   margin: 0 20px -3px 20px;
 }
+#companyDetails .chat:hover {
+  color: #99bddf;
+}
 /* 公司信息 */
 #companyDetails .companyBar {
   position: fixed;
@@ -1188,11 +1222,13 @@ export default {
   top: 25vh;
   left: 71vw;
   border-left: #8e909444 1px solid;
+  overflow-y: auto;
 }
 /* 全部居中 */
 #companyDetails .companyBar img,
 #companyDetails .companyName,
 #companyDetails .companyBar .msg,
+#companyDetails .companyBar .address,
 #companyDetails .companyBar .introduction {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -1220,8 +1256,15 @@ export default {
 #companyDetails .companyBar .msg span:not(.level) {
   margin-right: 5px;
 }
+#companyDetails .companyBar .address {
+  top: 42%;
+  width: 85%;
+  font-size: 0.9rem;
+  text-align: center;
+  color: #75777a;
+}
 #companyDetails .companyBar .introduction {
-  top: 63%;
+  top: 70%;
   width: 85%;
   line-height: 1.5rem;
   font-size: 0.9rem;
@@ -1243,6 +1286,12 @@ export default {
   font-size: 1.4rem;
   font-weight: 600;
 }
+#schoolDetails h4 {
+  position: relative;
+  top: 10px;
+  left: 20px;
+  font-weight: 600;
+}
 #schoolDetails h6 {
   position: relative;
   top: -60px;
@@ -1254,6 +1303,8 @@ export default {
   box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.1);
   float: left;
   padding: 1%;
+  position: relative;
+  top: 30px;
 }
 #schoolDetails .concat li {
   position: relative;
@@ -1269,13 +1320,16 @@ export default {
   left: 80px;
 }
 #schoolDetails .concat .el-button {
-  margin-top: 5px;
+  position: relative;
+  top: -40px;
 }
 /* 介绍 */
 #schoolDetails .content {
   width: 66%;
   margin-left: 30%;
   padding: 2%;
+  line-height: 25px;
+  white-space: pre-wrap;
 }
 /* 搜索结果页面 */
 #employment .searchList .toList {

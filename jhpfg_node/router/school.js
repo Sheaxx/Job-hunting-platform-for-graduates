@@ -16,7 +16,7 @@ router.get('/getSchoolByName/:name', handler.getSchoolByName)
 router.get('/getSchoolByKeyword', handler.getSchoolByKeyword)
 
 //获取学校的推荐列表
-router.get('/getRecommendList/:id', handler.getRecommendList)
+router.post('/getRecommendList', handler.getRecommendList)
 
 //学校推荐
 router.post('/recommend/:school/:employment', handler.recommend)

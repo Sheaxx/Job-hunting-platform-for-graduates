@@ -113,6 +113,7 @@
         <span class="trade">{{ companyDetails.trade }}</span>
         <span class="level">{{ companyDetails.level }}</span>
       </div>
+      <p class="address"><i class="el-icon-location"></i>{{ companyDetails.address }}</p>
       <p class="introduction">{{ companyDetails.introduction }}</p>
     </div>
     <div
@@ -179,7 +180,7 @@
             <h6>{{item.username}}</h6>
             <i
               class="el-icon-s-comment chat"
-              @click="chatRecommendation"
+              @click="toChat(item.username)"
             ></i>
           </li>
           <div class="close">
@@ -355,7 +356,8 @@ export default {
         });
     },
     //推荐人选点击聊天
-    chatRecommendation() {
+    toChat(username) {
+      window.sessionStorage.setItem("toChat", username);
       this.$router.replace("/messages");
     },
     //推荐人选返回详情页面
@@ -459,6 +461,7 @@ export default {
   left: 0;
   background: #fff;
   height: 80vh;
+  width: 85vw;
 }
 #employmentDetails .detailsButton {
   float: right;
@@ -508,6 +511,7 @@ export default {
 }
 #employmentDetails .sectionContent {
   line-height: 1.6rem;
+  white-space: pre-line;
 }
 /* 公司信息 */
 #employmentDetails .companyBar {
@@ -517,11 +521,13 @@ export default {
   top: 25vh;
   left: 71vw;
   border-left: #8e909444 1px solid;
+  overflow-y: auto;
 }
 /* 全部居中 */
 #employmentDetails .logo,
 #employmentDetails .companyName,
 #employmentDetails .msg,
+#employmentDetails .address,
 #employmentDetails .companyBar .introduction {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -548,8 +554,15 @@ export default {
 #employmentDetails .msg span:not(.level) {
   margin-right: 5px;
 }
+#employmentDetails .address {
+  top: 42%;
+  width: 85%;
+  font-size: 0.9rem;
+  text-align: center;
+  color: #75777a;
+}
 #employmentDetails .companyBar .introduction {
-  top: 63%;
+  top: 70%;
   width: 85%;
   line-height: 1.5rem;
   font-size: 0.9rem;
@@ -581,6 +594,10 @@ export default {
 #openSendResume p {
   margin: 8% auto 4% 18%;
 }
+#openSendResume .el-button {
+  float: right;
+  margin-right: 30px;
+}
 /* 删除招聘信息提示窗口 */
 #employmentDetails .deleteBox {
   position: absolute;
@@ -607,6 +624,10 @@ export default {
 }
 #employmentDetails .deleteBox p {
   margin: 8% auto 4% 18%;
+}
+#employmentDetails .deleteBox .el-button {
+  float: right;
+  margin-right: 30px;
 }
 /* 推荐列表 */
 #employmentDetails #recommendation {

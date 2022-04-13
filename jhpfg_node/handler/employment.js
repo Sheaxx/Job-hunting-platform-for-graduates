@@ -113,12 +113,17 @@ exports.getRecommend = (req, res) => {
   let sql1 = 'select recommend from school where name="' + school + '"';
   db.query(sql1, (err, recommend) => {
     if (err) throw err;
-    let list = recommend[0].recommend;
-    let sql2 = 'select * from employment where id in (' + list + ')';
-    db.query(sql2, (err, result) => {
-      if (err) throw err;
-      res.send(result);
-    })
+    if (recommend.length) {
+      let list = recommend[0].recommend;
+      let sql2 = 'select * from employment where id in (' + list + ')';
+      db.query(sql2, (err, result) => {
+        if (err) throw err;
+        res.send(result);
+      })
+    }
+    else {
+      res.send("");
+    }
   })
 }
 
@@ -156,7 +161,11 @@ exports.getUsersByStation = (req, res) => {
     if (err) throw err;
     let station = result[0].zone;
     let sentUsers = result[0].sentUsers;
-    sentUsers = sentUsers.split(",");
+    if (sentUsers) {
+      sentUsers = sentUsers.split(",");
+    } else {
+      sentUsers = [];
+    }
     let sql2 = 'select username from resume where expectedPosition="' + station + '"';
     db.query(sql2, (err, result) => {
       if (err) throw err;
@@ -168,9 +177,9 @@ exports.getUsersByStation = (req, res) => {
             tag = false;
             break;
           }
-          if (tag == true) {
-            arr.push(result[i]);
-          }
+        }
+        if (tag == true) {
+          arr.push(result[i]);
         }
       }
       res.send(arr);

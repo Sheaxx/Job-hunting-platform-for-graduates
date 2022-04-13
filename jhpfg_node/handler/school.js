@@ -62,38 +62,43 @@ exports.getSchoolByKeyword = (req, res) => {
 
 //获取学校的推荐列表
 exports.getRecommendList = (req, res) => {
-  let id = req.params.id;
-  let sql1 = 'select * from school where id=' + id;
+  let name = req.body.name;
+  let sql1 = 'select * from school where name="' + name + '"';
   db.query(sql1, (err, recommendList) => {
     if (err) throw err;
-    let sql2 = 'select * from employment'
-    db.query(sql2, (err, employments) => {
-      let results = [];
-      let list = recommendList[0].recommend.split(",")
-      for (let i in list) {
-        for (let j in employments) {
-          if (list[i] == employments[j].id) {
-            results.push(employments[j])
-            break;
-          }
-        }
-      }
-      let sql3 = 'select * from company'
-      db.query(sql3, (err, companys) => {
+    if (recommendList.length == 0) {
+      res.send("null");
+    } else {
+      let sql2 = 'select * from employment'
+      db.query(sql2, (err, employments) => {
         if (err) throw err;
-        for (let i in results) {
-          for (let j in companys) {
-            if (results[i].companyId === companys[j].id) {
-              results[i].companyName = companys[j].name;
-              results[i].trade = companys[j].trade;
-              results[i].level = companys[j].level;
+        let results = [];
+        let list = recommendList[0].recommend.split(",")
+        for (let i in list) {
+          for (let j in employments) {
+            if (list[i] == employments[j].id) {
+              results.push(employments[j])
               break;
             }
           }
         }
-        res.send(results);
+        let sql3 = 'select * from company'
+        db.query(sql3, (err, companys) => {
+          if (err) throw err;
+          for (let i in results) {
+            for (let j in companys) {
+              if (results[i].companyId === companys[j].id) {
+                results[i].companyName = companys[j].name;
+                results[i].trade = companys[j].trade;
+                results[i].level = companys[j].level;
+                break;
+              }
+            }
+          }
+          res.send(results);
+        })
       })
-    })
+    }
   })
 }
 
@@ -104,8 +109,9 @@ exports.recommend = (req, res) => {
   let sql1 = 'select * from school where name="' + school + '"';
   db.query(sql1, (err, result) => {
     if (err) throw err;
-    let list = result[0].recommend;
-    if (list.length) {
+    let list = [];
+    if (result[0].recommend.length) {
+      list = result[0].recommend;
       list = list.split(",");
       list[list.length] = employment;
     } else {

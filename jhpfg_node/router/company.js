@@ -30,4 +30,7 @@ router.post('/follow/:username/:id', handler.follow)
 //取消关注
 router.post('/cancelFollow/:username/:id', handler.cancelFollow)
 
+//根据名称更新用户简历
+router.post('/updateResumeByName', handler.updateResumeByName)
+
 module.exports = router

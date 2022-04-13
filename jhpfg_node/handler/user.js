@@ -138,8 +138,9 @@ exports.updateAvatar = (req, res) => {
 //更新用户的简历信息
 exports.updateResume = (req, res) => {
   let resume = req.body
+  resume.birth = moment(resume.birth).format("YYYY-MM-DD");
   let sql = 'update resume set ? where username="' + resume.username + '"';
-  db.query(sql, (err, result) => {
+  db.query(sql, resume, (err, result) => {
     if (err) throw err;
     res.send('success');
   })
@@ -187,8 +188,7 @@ exports.updateTable = (req, res) => {
         gpa += result[item].gpa;
       }
       gpa = gpa / result.length;
-      console.log(newest)
-      let sql5 = 'update resume set gpa=' + gpa + ',school="' + newest.school + '",specialty="' + newest.specialty + '",highesteducation="' + newest.qualification +'" where username="' + username + '"';
+      let sql5 = 'update resume set gpa=' + gpa + ',school="' + newest.school + '",specialty="' + newest.specialty + '",highesteducation="' + newest.qualification +'" where username="' + data.username + '"';
       db.query(sql5, (err, result) => {
         if (err) throw err;
       })
@@ -229,8 +229,25 @@ exports.getSenderList = (req, res) => {
 //更新学校或企业用户信息
 exports.updatePersonal = (req, res) => {
   let user = req.body;
+  let obj = {
+    birth:null,
+    sex:"",
+    tel:"",
+    email:"",
+    highesteducation:"",
+    expectedPosition:"",
+    skill:"",
+    certificate:"",
+    specialty:"",
+    gpa:null
+  };
+  obj.realname = user.realname;
+  obj.position = user.position;
+  if ("school" in user) { //身份为学校
+    obj.school = user.school;
+  }
   let sql = 'update resume set ? where username="' + user.username + '"';
-  db.query(sql, user, (err, result) => {
+  db.query(sql, obj, (err, result) => {
     if (err) throw err;
     res.send('success');
   })
@@ -260,7 +277,7 @@ exports.sendResume = (req, res) => {
       db.query(sql3, (err, employment) => {
         if (err) throw err;
         let users = employment[0].sentUsers;
-        if (users.length) {
+        if (employment[0].sentUsers != null) {
           users = users.split(",");
           users[users.length] = username;
           users.join(",");
@@ -378,7 +395,7 @@ exports.register = (req, res) => {
             skill: "",
             certificate: "",
             position: "",
-            company: 0
+            company: null
           }
           let sql4 = 'insert into resume set ?';
           db.query(sql4, resume, (err, result) => {

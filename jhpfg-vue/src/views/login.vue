@@ -124,6 +124,7 @@ export default {
             that.$message.error("该用户名已存在");
           } else {
             that.$message.success("注册成功，请登录");
+            that.toLogin();
           }
         });
     },
