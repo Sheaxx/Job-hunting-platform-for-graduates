@@ -376,11 +376,11 @@ export default {
       this.$ajax
         .post("/employment/deleteEmployment/" + this.details.id)
         .then((res) => {
-          this.isOpenDelete = false;
+          that.isOpenDelete = false;
           document.documentElement.style.overflow = "auto";
-          this.$message.success("删除成功");
-          this.toList();
-          this.$emit("refresh");
+          that.toList();
+          that.$emit("refresh",1);
+          that.$message.success("删除成功");
         });
     },
     //取消删除

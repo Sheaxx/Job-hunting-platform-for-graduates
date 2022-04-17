@@ -145,7 +145,7 @@ exports.follow = (req, res) => {
   db.query(sql1, (err, result) => {
     if (err) throw err;
     let list = result[0].followList;
-    if (list.length) {
+    if (list != null) {
       list = list.split(",");
       list[list.length] = id;
     } else {

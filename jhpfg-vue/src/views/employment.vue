@@ -286,14 +286,16 @@
           icon="el-icon-plus"
           type="primary"
           @click="follow"
-          v-if="!isFollow"
+          v-if="isStudent"
+          v-show="!isFollow"
         >关注</el-button>
         <el-button
           round
           icon="el-icon-check"
           type="primary"
           @click="cancelFollow"
-          v-else
+          v-if="isStudent"
+          v-show="isFollow"
         >已关注</el-button>
         <el-link
           icon="el-icon-edit"
@@ -519,6 +521,7 @@ export default {
   components: { EmploymentDetails },
   data() {
     return {
+      isStudent: false, //用户是否是学生
       isEmploymentDetails: false, //是否是招聘信息详情页，默认为否
       isCompanyDetails: false, //是否是公司详情页，默认为否
       isSchoolDetails: false, //是否是学校详情页，默认为否
@@ -636,11 +639,16 @@ export default {
       this.$ajax.get("/company/getCompanyById/" + id).then((res) => {
         that.companyDetails = res.data;
         that.companyDetails.location = that.companyDetails.location.split(",");
-        that.$ajax.get("/user//getResume/" + window.localStorage.getItem("username")).then(res => {
-          if (res.data.company == id && window.localStorage.getItem("role") == "1") {
-            that.showEditCompany = true;
-          }
-        })
+        that.$ajax
+          .get("/user//getResume/" + window.localStorage.getItem("username"))
+          .then((res) => {
+            if (
+              res.data.company == id &&
+              window.localStorage.getItem("role") == "1"
+            ) {
+              that.showEditCompany = true;
+            }
+          });
       });
       this.$ajax.get("/company/getAllEmployment/" + id).then((res) => {
         that.company_employmentList = res.data;
@@ -686,7 +694,7 @@ export default {
               that.showEditSchool = true;
             }
             that.teacherList = res.data;
-            console.log(that.teacherList)
+            console.log(that.teacherList);
             that.isSchoolDetails = true;
           });
       });
@@ -724,17 +732,33 @@ export default {
       }
     },
     // 按照分页显示数据的函数
-    getAccountListByPage() {
+    getAccountListByPage(val) {
       // 收集当前页码 和 每页显示条数
       let currentPage = this.currentPage;
       let that = this;
-      switch (this.searchSelect) {
+      let tag;
+      if (val) {
+        tag = val;
+      } else {
+        tag = this.searchSelect;
+      }
+      switch (tag) {
         case 1: {
           // 发送ajax请求 把分页数据发送给后端
           this.$ajax
             .get("/employment/getAccountListByPage/" + currentPage)
             .then((response) => {
-              that.setAccountList(response);
+              let { total, results } = response.data;
+              that.total = total;
+              that.employmentList = results;
+              for (let item in that.employmentList) {
+                that.employmentList[item].location =
+                  that.employmentList[item].location.split(",");
+              }
+              if (!data.length && this.currentPage !== 1) {
+                this.currentPage -= 1;
+                that.getAccountListByPage();
+              }
             });
           break;
         }
@@ -742,7 +766,17 @@ export default {
           this.$ajax
             .get("/company/getAccountListByPage/" + currentPage)
             .then((response) => {
-              that.setAccountList(response);
+              let { total, results } = response.data;
+              that.total = total;
+              that.companyList = results;
+              for (let item in that.companyList) {
+                that.companyList[item].location =
+                  that.companyList[item].location.split(",");
+              }
+              if (!data.length && this.currentPage !== 1) {
+                this.currentPage -= 1;
+                that.getAccountListByPage();
+              }
             });
           break;
         }
@@ -750,7 +784,13 @@ export default {
           this.$ajax
             .get("/school/getAccountListByPage/" + currentPage)
             .then((response) => {
-              that.setAccountList(response);
+              let { total, results } = response.data;
+              that.total = total;
+              that.schoolList = results;
+              if (!data.length && this.currentPage !== 1) {
+                this.currentPage -= 1;
+                that.getAccountListByPage();
+              }
             });
           break;
         }
@@ -982,7 +1022,9 @@ export default {
   mounted() {
     let that = this;
     let role = window.localStorage.getItem("role");
-    if (role == "1") {
+    if (role == "0") {
+      this.isStudent = true;
+    } else if (role == "1") {
       this.showSwitch = false;
     }
     //获取分页招聘信息

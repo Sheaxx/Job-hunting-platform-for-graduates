@@ -236,6 +236,12 @@ export default {
     },
     //确定添加
     addJobFair() {
+      for (let item in this.editContent) {
+        if (this.editContent[item] == "") {
+          this.$message.warning("请填写完毕信息");
+          return;
+        }
+      }
       let that = this;
       let obj = Object.assign({}, this.editContent);
       this.$ajax
@@ -244,7 +250,6 @@ export default {
         })
         .then((res) => {
           that.dayMap.splice(that.dayMap.length, 1, obj);
-          console.log(obj);
           let date = obj.time.split(" ");
           if (String(date[0]) in that.jobFair) {
             that.jobFair[date[0]].push(obj.name);
@@ -252,6 +257,8 @@ export default {
             that.jobFair[date[0]] = [obj.name];
           }
           that.isAdd = false;
+          that.contentList.push(res.data);
+          that.init();
           that.$message.success("添加成功");
           document.documentElement.style.overflow = "auto";
         });
@@ -269,6 +276,15 @@ export default {
     },
     //确认修改
     editJobFair() {
+      for (let i in this.editList) {
+        for (let j in this.editList[i]) {
+          if (this.editList[i][j] == "") {
+            let index = Number(i) + 1;
+            this.$message.warning("第" + index + "项日程表信息未填写完整");
+            return;
+          }
+        }
+      }
       let that = this;
       new Promise((resolve, reject) => {
         for (let item in this.editList) {
@@ -281,6 +297,11 @@ export default {
         resolve();
       }).then(() => {
         that.isEdit = false;
+        that.init();
+        that.contentList = [];
+        for (let item in that.editList) {
+          that.contentList.splice(item, 1, that.editList[item]);
+        }
         that.$message.success("更新成功");
       });
     },
@@ -316,6 +337,8 @@ export default {
       let that = this;
       this.$ajax.post("/calendar/delete/" + this.currentId).then((res) => {
         that.editList.splice(that.currentIndex, 1);
+        that.contentList.splice(that.currentIndex, 1);
+        that.init();
         that.$message.success("删除成功");
         that.isDelete = false;
         document.documentElement.style.overflow = "auto";
@@ -326,41 +349,48 @@ export default {
       this.isDelete = false;
       document.documentElement.style.overflow = "auto";
     },
-  },
-  created() {
-    let that = this;
-    this.$ajax
-      .post(
-        "/calendar/getAll",
-        qs.stringify(
-          { school: window.localStorage.getItem("school") },
-          {
-            "content-type": "application/x-www-form-urlencoded",
-          }
+    //初始化
+    init() {
+      this.dayMap = [];
+      this.jobFair = [];
+      let that = this;
+      this.$ajax
+        .post(
+          "/calendar/getAll",
+          qs.stringify(
+            { school: window.localStorage.getItem("school") },
+            {
+              "content-type": "application/x-www-form-urlencoded",
+            }
+          )
         )
-      )
-      .then((res) => {
-        that.dayMap = res.data;
-        for (let item in that.dayMap) {
-          let date = that.dayMap[item].time.split(" ");
-          //抽取时间
-          that.dayMap[item].clock = date[1];
-          //整理每一天有的宣讲会
-          if (!(String(date[0]) in that.jobFair)) {
-            that.jobFair[date[0]] = [];
+        .then((res) => {
+          that.dayMap = res.data;
+          for (let item in that.dayMap) {
+            let date = that.dayMap[item].time.split(" ");
+            //抽取时间
+            that.dayMap[item].clock = date[1];
+            //整理每一天有的宣讲会
+            if (!(String(date[0]) in that.jobFair)) {
+              that.jobFair[date[0]] = [];
+            }
+            that.jobFair[date[0]].splice(
+              that.jobFair[date[0]].length,
+              1,
+              that.dayMap[item].name
+            );
           }
-          that.jobFair[date[0]].splice(
-            that.jobFair[date[0]].length,
-            1,
-            that.dayMap[item].name
-          );
-        }
-      });
+        });
+    },
+  },
+  mounted() {
+    this.init();
+    let that = this;
     this.$ajax
       .get("/user/getResume/" + window.localStorage.getItem("username"))
       .then((res) => {
         that.school = res.data.school;
-        if (window.localStorage.getItem("role") == 3) {
+        if (window.localStorage.getItem("role") == 2) {
           that.isAuthor = true;
         }
       });

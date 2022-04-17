@@ -258,6 +258,9 @@
         v-if="isPostDetails"
         :details="postDetails"
         :commentList="commentList"
+        :showDelete="true"
+        :userInfo="userInfo"
+        :postList="postList"
         @toList="toPostList"
         @refresh="toPostDetails"
       ></forum-details>
@@ -291,13 +294,7 @@ export default {
       logoUrl: "", //编辑logo
       oldPassword: "", //旧密码
       newPassword: "", //新密码
-      userInfo: {
-        //用户信息
-        username: "zhalisu", //用户名
-        password: "", //密码
-        role: "学校", //角色身份
-        avatar: "", //头像
-      },
+      userInfo: {}, //用户信息
       personalInfo: {}, //个人信息
       editPersonal: {
         realname: "",
@@ -449,6 +446,14 @@ export default {
     },
     //确认更新个人信息
     updatePersonal() {
+      if (
+        this.editPersonal.realname == "" ||
+        this.editPersonal.school == "" ||
+        this.editPersonal.position == ""
+      ) {
+        this.$message.warning("请填写完毕信息");
+        return;
+      }
       let that = this;
       let obj = Object.assign({}, this.editPersonal);
       this.$ajax
@@ -490,6 +495,15 @@ export default {
     },
     //确认修改学校信息
     updateSchool() {
+      if (
+        this.editSchool.name == "" ||
+        this.editSchool.address == "" ||
+        this.introduction == "" ||
+        this.logoUrl == ""
+      ) {
+        this.$message.warning("请填写完毕信息");
+        return;
+      }
       let obj = Object.assign({}, this.editSchool);
       obj.logo = this.logoUrl;
       let that = this;

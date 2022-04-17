@@ -261,7 +261,7 @@ export default {
         !this.editPost.content ||
         !this.editPost.zone
       ) {
-        this.$message.error("请将内容填写完整");
+        this.$message.warning("请将内容填写完整");
         return;
       }
       let obj = Object.assign({}, this.editPost);
@@ -272,8 +272,9 @@ export default {
         })
         .then((res) => {
           //刷新页面
+          that.$message.success("发布成功");
           new Promise((resolve, reject) => {
-            that.$message.success("发布成功");
+            
             resolve();
           }).then(() => {
             setTimeout(() => {

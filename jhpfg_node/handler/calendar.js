@@ -25,7 +25,7 @@ exports.add = (req, res) => {
     let sql2 = 'insert into calendar set ?';
     db.query(sql2, affair, (err, result) => {
       if (err) throw err;
-      res.send('success');
+      res.send(affair);
     })
   })
 }

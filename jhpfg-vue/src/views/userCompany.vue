@@ -332,6 +332,9 @@
       v-if="isPostDetails"
       :details="postDetails"
       :commentList="commentList"
+      :showDelete="true"
+      :userInfo="userInfo"
+      :postList="postList"
       @toList="toPostList"
       @refresh="toPostDetails"
     ></forum-details>
@@ -582,7 +585,7 @@ export default {
         this.editPersonal.realname == "" ||
         this.editPersonal.position == ""
       ) {
-        this.$message.warning("2请填写完毕信息");
+        this.$message.warning("请填写完毕信息");
         return;
       }
       let that = this;
@@ -648,6 +651,18 @@ export default {
     },
     //确认修改公司信息
     updateCompany() {
+      if (
+        this.editCompany.name == "" ||
+        this.editCompany.trade == "" ||
+        this.editCompany.level == "" ||
+        this.editCompany.location == "" ||
+        this.editCompany.address == "" ||
+        this.editCompany.introduction == "" ||
+        this.logoUrl == ""
+      ) {
+        this.$message.warning("请填写完毕信息");
+        return;
+      }
       let obj = Object.assign({}, this.editCompany);
       obj.location = this.locationValue.join(",");
       obj.logo = this.logoUrl;

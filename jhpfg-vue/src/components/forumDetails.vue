@@ -245,10 +245,11 @@ export default {
   color: #8e9094;
 }
 #forumDetails .content {
-  width: 70%;
+  width: 95%;
   margin-top: 7vh;
   margin-bottom: 9vh;
   line-height: 1.6rem;
+  white-space: pre-wrap;
 }
 #forumDetails .el-divider,
 #forumDetails .el-timeline {

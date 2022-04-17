@@ -143,8 +143,8 @@
                 :process-status="item.currentState"
               >
                 <el-step
-                  v-for="item2 in item.progressList"
-                  :key="item2"
+                  v-for="(item2, index) in item.progressList"
+                  :key="index"
                   :title="item2"
                 ></el-step>
               </el-steps>
@@ -197,6 +197,9 @@
         v-if="isPostDetails"
         :details="postDetails"
         :commentList="commentList"
+        :showDelete="true"
+        :userInfo="userInfo"
+        :postList="postList"
         @toList="toPostList"
         @refresh="toPostDetails"
       ></forum-details>
