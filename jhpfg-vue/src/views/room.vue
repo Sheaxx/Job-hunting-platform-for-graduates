@@ -1,15 +1,15 @@
 <template>
   <div id="room">
-    <div class="container text-center" v-show="show">
+    <div class="container text-center insert" v-show="show">
       <div class="row">
         <div class="col-md-4 col-md-offset-4">
           <form class="form" action @submit.prevent="submit()">
-            <h2>WebRTC Video Demo. Please Sign In</h2>
+            <h2>即将进入面试房间</h2>
             <br />
             <input
               class="form-control"
               type="text"
-              placeholder="请输入您的昵称"
+              placeholder="可在此修改你的昵称（如岗位-姓名）"
               required
               autofocus
               v-model="user_name"
@@ -20,7 +20,7 @@
         </div>
       </div>
     </div>
-    <div class="container text-center" v-show="!show">
+    <div class="container text-center list" v-show="!show">
       <div class="row">
         <div class="col-md-3" style="height: 50%">
           <ul class="list-group">
@@ -41,11 +41,11 @@
                 class="form-control"
                 type="text"
                 v-model="call_username"
-                placeholder="username to call"
+                placeholder="输入用户名"
               />
               <br />
-              <button class="btn-success btn" :disabled="!users[user_name]" @click="call">Call</button>
-              <button class="btn-danger btn" :disabled="users[user_name]" @click="hangUp">Hang Up</button>
+              <button class="btn-success btn" :disabled="!users[user_name]" @click="call">通话</button>
+              <button class="btn-danger btn" :disabled="users[user_name]" @click="hangUp">结束通话</button>
             </div>
           </div>
         </div>
@@ -372,5 +372,38 @@ export default {
 }
 .red_color {
   color: red;
+}
+#room h2 {
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+}
+#room .insert .form-control {
+  margin-top: 30px;
+  width: 500px;
+  height: 2rem;
+}
+#room .insert .btn {
+  width: 20%;
+  margin-top: 35px;
+  background: #4c7ca8;
+  color: #fbfcfd;
+  outline: none;
+  border-radius: 8px;
+  padding: 13px;
+  letter-spacing: 2px;
+  border: none;
+  cursor: pointer;
+}
+#room .list {
+  width: 200px;
+  height: 500px;
+  background: #fff;
+  position: relative;
+  left: 20%;
+}
+#room .col-md-9 {
+  position: relative;
+  top: -110px;
+  left: 110%;
 }
 </style>

@@ -70,7 +70,7 @@
         icon="el-icon-coordinate"
         class="delete"
         @click="recommend"
-        v-if="!isRecommed"
+        v-if="!isRecommedSchool"
       >推荐</el-link>
       <el-link
         icon="el-icon-s-check"
@@ -89,6 +89,11 @@
         <span>招聘 {{ details.total }} 人</span>
       </p>
     </div>
+    <img
+      src="../assets/image/picture/recommend.png"
+      class="recommendImage"
+      v-if="isRecommedSchool || isRecommedStudent"
+    >
     <div class="introduction section">
       <h5 class="sectionTitle">
         <i class="el-icon-suitcase sectionIcon"></i>职位介绍
@@ -213,7 +218,8 @@ export default {
       isEditEmployment: false, //是否打开编辑窗口，默认为否
       isSentResume: false, //是否打开查看投递者页面，默认为否
       isCollect: false, //该详情是否已被收藏
-      isRecommed: false, //该详情是否被学校推荐
+      isRecommedSchool: false, //该详情是否被学校推荐（学校用户
+      isRecommedStudent: false, //该详情是否被学校推荐（学生用户
       isRecommendation: false, //是否打开推荐人选页面，默认为否
       showSendResume: false, //是否展示投递简历按钮
       detailsForm: {}, //备份
@@ -285,7 +291,7 @@ export default {
             this.details.id
         )
         .then((res) => {
-          that.isRecommed = true;
+          that.isRecommedSchool = true;
           that.$message.success("推荐成功");
         });
     },
@@ -300,7 +306,7 @@ export default {
             this.details.id
         )
         .then((res) => {
-          that.isRecommed = false;
+          that.isRecommedSchool = false;
           that.$message.success("取消推荐");
         });
     },
@@ -379,7 +385,7 @@ export default {
           that.isOpenDelete = false;
           document.documentElement.style.overflow = "auto";
           that.toList();
-          that.$emit("refresh",1);
+          that.$emit("refresh", 1);
           that.$message.success("删除成功");
         });
     },
@@ -408,6 +414,7 @@ export default {
     //判断用户身份
     switch (window.localStorage.getItem("role")) {
       case "0": {
+        //学生
         this.isStudent = true;
         //判断该信息是否已投递简历
         let list = window.localStorage.getItem("sentList").split(",");
@@ -425,12 +432,37 @@ export default {
             break;
           }
         }
+        //判断是否是学校推荐的招聘信息
+        this.$ajax
+          .get(
+            "school/getSchoolByName/" + window.localStorage.getItem("school")
+          )
+          .then((res) => {
+            let recommendList = res.data.recommend;
+            recommendList = recommendList.split(",");
+            for (let item in recommendList) {
+              if (recommendList[item] == that.details.id) {
+                that.isRecommedStudent = true;
+                break;
+              }
+            }
+          });
         break;
       }
-      case "1":
-        this.isCompany = true;
+      case "1": {
+        //企业
+        //判断是否是本公司发布的招聘信息
+        this.$ajax
+          .get("/user/getResume/" + window.localStorage.getItem("username"))
+          .then((res) => {
+            if (res.data.resume.company == that.companyDetails.id) {
+              that.isCompany = true;
+            }
+          });
         break;
+      }
       case "2": {
+        //学校
         this.isSchool = true;
         //判断是否是学校推荐的招聘信息
         this.$ajax
@@ -441,8 +473,8 @@ export default {
             let recommendList = res.data.recommend;
             recommendList = recommendList.split(",");
             for (let item in recommendList) {
-              if (recommendList[item] == this.details.id) {
-                that.isRecommed = true;
+              if (recommendList[item] == that.details.id) {
+                that.isRecommedSchool = true;
                 break;
               }
             }
@@ -684,5 +716,13 @@ export default {
 }
 #employmentDetails #recommendation i:hover {
   color: #99bddf;
+}
+/* 推荐标识 */
+#employmentDetails .recommendImage {
+  height: 80px;
+  width: 80px;
+  position: absolute;
+  top: 10px;
+  right: 400px;
 }
 </style>
